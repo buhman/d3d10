@@ -13,6 +13,14 @@ ID3D10Effect * g_pEffect = NULL;
 ID3D10EffectTechnique * g_pTechnique = NULL;
 ID3D10InputLayout * g_pVertexLayout = NULL;
 ID3D10Buffer * g_pVertexBuffer = NULL;
+ID3D10Buffer * g_pIndexBuffer = NULL;
+
+ID3D10EffectMatrixVariable * g_pWorldVariable = NULL;
+ID3D10EffectMatrixVariable * g_pViewVariable = NULL;
+ID3D10EffectMatrixVariable * g_pProjectionVariable = NULL;
+D3DXMATRIX g_World;
+D3DXMATRIX g_View;
+D3DXMATRIX g_Projection;
 
 HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -21,6 +29,7 @@ void Render();
 
 struct SimpleVertex {
   D3DXVECTOR3 Pos;
+  D3DXVECTOR4 Color;
 };
 
 void print(LPCSTR fmt, ...)
@@ -88,11 +97,14 @@ HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow)
 
   // create window
   RECT rc = { 0, 0, 640, 480 };
+  UINT width = rc.right - rc.left;
+  UINT height = rc.bottom - rc.top;
   AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
   g_hWnd = CreateWindow(L"d3d10wc",
                         L"d3d10", WS_OVERLAPPEDWINDOW,
                         CW_USEDEFAULT, CW_USEDEFAULT,
-                        rc.right - rc.left, rc.bottom - rc.top,
+                        width,
+                        height,
                         NULL,
                         NULL,
                         hInstance,
@@ -129,6 +141,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 HRESULT InitDirect3DDevice()
 {
+  RECT rc;
+  GetClientRect(g_hWnd, &rc);
+  UINT width = rc.right - rc.left;
+  UINT height = rc.bottom - rc.top;
+
   DXGI_SWAP_CHAIN_DESC sd = {};
   sd.BufferCount = 1;
   sd.BufferDesc.Width = 640;
@@ -206,9 +223,16 @@ HRESULT InitDirect3DDevice()
 
   g_pTechnique = g_pEffect->GetTechniqueByName("Render");
 
+  // variables
+
+  g_pWorldVariable = g_pEffect->GetVariableByName("World")->AsMatrix();
+  g_pViewVariable = g_pEffect->GetVariableByName("View")->AsMatrix();
+  g_pProjectionVariable = g_pEffect->GetVariableByName("Projection")->AsMatrix();
+
   // input layout
   D3D10_INPUT_ELEMENT_DESC layout[] = {
-    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT   , 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"COLOR"   , 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
   };
   UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
 
@@ -226,21 +250,29 @@ HRESULT InitDirect3DDevice()
   }
   g_pd3dDevice->IASetInputLayout(g_pVertexLayout);
 
+  //
+
+  D3D10_BUFFER_DESC bd;
+  D3D10_SUBRESOURCE_DATA initData;
+
   // vertex buffer
   SimpleVertex vertices[] = {
-    D3DXVECTOR3( 0.0f,  0.5f, 0.5f),
-    D3DXVECTOR3( 0.5f, -0.5f, 0.5f),
-    D3DXVECTOR3(-0.5f, -0.5f, 0.5f),
+    { D3DXVECTOR3(-1.0f,  1.0f, -1.0f), D3DXVECTOR4(0.0f, 0.0f, 1.0f, 1.0f) },
+    { D3DXVECTOR3( 1.0f,  1.0f, -1.0f), D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f) },
+    { D3DXVECTOR3( 1.0f,  1.0f,  1.0f), D3DXVECTOR4(0.0f, 1.0f, 1.0f, 1.0f) },
+    { D3DXVECTOR3(-1.0f,  1.0f,  1.0f), D3DXVECTOR4(1.0f, 0.0f, 0.0f, 1.0f) },
+    { D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR4(1.0f, 0.0f, 1.0f, 1.0f) },
+    { D3DXVECTOR3( 1.0f, -1.0f, -1.0f), D3DXVECTOR4(1.0f, 1.0f, 0.0f, 1.0f) },
+    { D3DXVECTOR3( 1.0f, -1.0f,  1.0f), D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f) },
+    { D3DXVECTOR3(-1.0f, -1.0f,  1.0f), D3DXVECTOR4(0.0f, 0.0f, 0.0f, 1.0f) },
   };
-  D3D10_BUFFER_DESC bd;
   bd.Usage = D3D10_USAGE_DEFAULT;
-  bd.ByteWidth = (sizeof (SimpleVertex)) * 3;
+  bd.ByteWidth = (sizeof (SimpleVertex)) * 8;
   bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
   bd.CPUAccessFlags = 0;
   bd.MiscFlags = 0;
-  D3D10_SUBRESOURCE_DATA InitData;
-  InitData.pSysMem = vertices;
-  hr = g_pd3dDevice->CreateBuffer(&bd, &InitData, &g_pVertexBuffer);
+  initData.pSysMem = vertices;
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffer);
   if (FAILED(hr)) {
     print("CreateBuffer\n");
     return hr;
@@ -249,21 +281,80 @@ HRESULT InitDirect3DDevice()
   UINT offset = 0;
   g_pd3dDevice->IASetVertexBuffers(0, 1, &g_pVertexBuffer, &stride, &offset);
 
+  // index buffer
+  DWORD indices[] = {
+    3,1,0,
+    2,1,3,
+
+    0,5,4,
+    1,5,0,
+
+    3,4,7,
+    0,4,3,
+
+    1,6,5,
+    2,6,1,
+
+    2,7,6,
+    3,7,2,
+
+    6,4,5,
+    7,4,6,
+  };
+  bd.Usage = D3D10_USAGE_DEFAULT;
+  bd.ByteWidth = (sizeof (DWORD)) * 36;
+  bd.BindFlags = D3D10_BIND_INDEX_BUFFER;
+  bd.CPUAccessFlags = 0;
+  bd.MiscFlags = 0;
+  initData.pSysMem = indices;
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pIndexBuffer);
+  if (FAILED(hr))
+    return hr;
+
+  g_pd3dDevice->IASetIndexBuffer(g_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
   g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+  // transform matrices
+  D3DXMatrixIdentity(&g_World);
+
+  D3DXVECTOR3 Eye(0.0f, 2.0f, -5.0f);
+  D3DXVECTOR3 At(0.0f, 1.0f, 0.0f);
+  D3DXVECTOR3 Up(0.0f, 1.0f, 0.0f);
+  D3DXMatrixLookAtLH(&g_View, &Eye, &At, &Up);
+
+  float fFov = (float)D3DX_PI * 0.5f;
+  float fAspect = width / (float)height;
+  float fNear = 0.1f;
+  float fFar = 100.0f;
+  D3DXMatrixPerspectiveFovLH(&g_Projection,
+                             fFov,
+                             fAspect,
+                             fNear,
+                             fFar);
 
   return S_OK;
 }
 
 void Render()
 {
+  static float t = 0.0f;
+  t += (float)D3DX_PI * 0.0125f;
+  D3DXMatrixRotationY(&g_World, t);
+
   float ClearColor[4] = { 0.0f, 0.125f, 0.6f, 1.0f };
   g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetView, ClearColor);
+
+  g_pWorldVariable->SetMatrix((float *)&g_World);
+  g_pViewVariable->SetMatrix((float *)&g_View);
+  g_pProjectionVariable->SetMatrix((float *)&g_Projection);
 
   D3D10_TECHNIQUE_DESC techDesc;
   g_pTechnique->GetDesc( &techDesc );
   for(UINT p = 0; p < techDesc.Passes; p++) {
     g_pTechnique->GetPassByIndex(p)->Apply(0);
-    g_pd3dDevice->Draw(3, 0);
+    //g_pd3dDevice->Draw(3, 0);
+    g_pd3dDevice->DrawIndexed(36, 0, 0);
   }
 
   g_pSwapChain->Present(0, 0);
