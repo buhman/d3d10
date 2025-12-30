@@ -1,0 +1,19 @@
+/Od
+/D "WIN32"
+/D "_DEBUG"
+/D "_WINDOWS"
+/D "_UNICODE"
+/D "UNICODE"
+/Gm
+/EHsc
+/RTC1
+/MDd
+/Fo"Debug\\"
+/Fd"Debug\vc80.pdb"
+/W3
+/c
+/Wp64
+/ZI
+/TP
+/nologo
+/errorReport:prompt
