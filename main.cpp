@@ -18,7 +18,8 @@ ID3D10Buffer * g_pIndexBuffer = NULL;
 ID3D10EffectMatrixVariable * g_pWorldVariable = NULL;
 ID3D10EffectMatrixVariable * g_pViewVariable = NULL;
 ID3D10EffectMatrixVariable * g_pProjectionVariable = NULL;
-D3DXMATRIX g_World;
+D3DXMATRIX g_World1;
+D3DXMATRIX g_World2;
 D3DXMATRIX g_View;
 D3DXMATRIX g_Projection;
 
@@ -336,7 +337,8 @@ HRESULT InitDirect3DDevice()
   g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
   // transform matrices
-  D3DXMatrixIdentity(&g_World);
+  D3DXMatrixIdentity(&g_World1);
+  D3DXMatrixIdentity(&g_World2);
 
   D3DXVECTOR3 Eye(0.0f, 2.0f, -5.0f);
   D3DXVECTOR3 At(0.0f, 1.0f, 0.0f);
@@ -360,20 +362,45 @@ void Render()
 {
   static float t = 0.0f;
   t += (float)D3DX_PI * 0.0125f;
-  D3DXMatrixRotationY(&g_World, t);
+
+  // first cube
+  D3DXMatrixRotationY(&g_World1, t);
+
+  // second cube
+  D3DXMATRIX mTranslate;
+  D3DXMATRIX mOrbit;
+  D3DXMATRIX mSpin;
+  D3DXMATRIX mScale;
+  D3DXMatrixRotationZ(&mSpin, -t);
+  D3DXMatrixRotationY(&mOrbit, -t * 2.0f);
+  D3DXMatrixTranslation(&mTranslate, -4.0f, 0.0f, 0.0f);
+  D3DXMatrixScaling(&mScale, 0.3f, 0.3f, 0.3f);
+
+  D3DXMatrixMultiply(&g_World2, &mScale, &mSpin);
+  D3DXMatrixMultiply(&g_World2, &g_World2, &mTranslate);
+  D3DXMatrixMultiply(&g_World2, &g_World2, &mOrbit);
+
 
   float ClearColor[4] = { 0.0f, 0.125f, 0.6f, 1.0f };
   g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetView, ClearColor);
 
-  g_pWorldVariable->SetMatrix((float *)&g_World);
   g_pViewVariable->SetMatrix((float *)&g_View);
   g_pProjectionVariable->SetMatrix((float *)&g_Projection);
 
   D3D10_TECHNIQUE_DESC techDesc;
-  g_pTechnique->GetDesc( &techDesc );
+  g_pTechnique->GetDesc(&techDesc);
+
+  // render first cube
+  g_pWorldVariable->SetMatrix((float *)&g_World1);
   for(UINT p = 0; p < techDesc.Passes; p++) {
     g_pTechnique->GetPassByIndex(p)->Apply(0);
-    //g_pd3dDevice->Draw(3, 0);
+    g_pd3dDevice->DrawIndexed(36, 0, 0);
+  }
+
+  // render second cube
+  g_pWorldVariable->SetMatrix((float *)&g_World2);
+  for(UINT p = 0; p < techDesc.Passes; p++) {
+    g_pTechnique->GetPassByIndex(p)->Apply(0);
     g_pd3dDevice->DrawIndexed(36, 0, 0);
   }
 
