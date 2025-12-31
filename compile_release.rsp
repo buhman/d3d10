@@ -1,0 +1,19 @@
+/O2
+/GL
+/D "WIN32"
+/D "NDEBUG"
+/D "_WINDOWS"
+/D "_UNICODE"
+/D "UNICODE"
+/FD
+/EHsc
+/MT
+/Fo"Release\\"
+/Fd"Release\vc80.pdb"
+/W3
+/c
+/Wp64
+/Zi
+/TP
+/nologo
+/errorReport:prompt

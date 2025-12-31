@@ -262,7 +262,7 @@ HRESULT InitDirect3DDevice()
                                       &pBlobErrors,
                                       NULL);
   if (FAILED(hr)) {
-    print("D3DX10CreateEffectFromFile\n");
+    print("D3DX10CreateEffectFromResource\n");
     if (pBlobErrors != NULL) {
       const char * pError = (const char *)pBlobErrors->GetBufferPointer();
       print("pError: %p\n", pError);
