@@ -245,28 +245,23 @@ HRESULT InitDirect3DDevice()
 
   // effect
 
-  ID3D10Blob * pBlobErrors = NULL;
-  DWORD dwShaderFlags = D3D10_SHADER_ENABLE_STRICTNESS | D3D10_SHADER_DEBUG;
-  hr = D3DX10CreateEffectFromResource(NULL,
-                                      L"RES_MAIN_FXO",
-                                      L"main.fxo",
-                                      NULL,
-                                      NULL,
-                                      "fx_4_0",
-                                      dwShaderFlags,
-                                      0,
-                                      g_pd3dDevice,
-                                      NULL,
-                                      NULL,
-                                      &g_pEffect,
-                                      &pBlobErrors,
-                                      NULL);
+  HRSRC hRes = FindResource(NULL, L"RES_MAIN_FXO", RT_RCDATA);
+  if (hRes == NULL) {
+    print("FindResource\n");
+    return -1;
+  }
+  DWORD dwResSize = SizeofResource(NULL, hRes);
+  HGLOBAL hData = LoadResource(NULL, hRes);
+  void * pData = LockResource(hData);
+  hr = D3D10CreateEffectFromMemory(pData,
+                                   dwResSize,
+                                   0,
+                                   g_pd3dDevice,
+                                   NULL,
+                                   &g_pEffect
+                                   );
   if (FAILED(hr)) {
-    print("D3DX10CreateEffectFromResource\n");
-    if (pBlobErrors != NULL) {
-      const char * pError = (const char *)pBlobErrors->GetBufferPointer();
-      print("pError: %p\n", pError);
-    }
+    print("D3D10CreateEffectFromMemory\n");
     return hr;
   }
 
