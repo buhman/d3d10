@@ -12,7 +12,8 @@ ID3D10Texture2D * g_pDepthStencil = NULL;
 ID3D10RenderTargetView * g_pRenderTargetView = NULL;
 ID3D10DepthStencilView * g_pDepthStencilView = NULL;
 ID3D10Effect * g_pEffect = NULL;
-ID3D10EffectTechnique * g_pTechnique = NULL;
+ID3D10EffectTechnique * g_pTechniqueRender = NULL;
+ID3D10EffectTechnique * g_pTechniqueRenderLight = NULL;
 ID3D10InputLayout * g_pVertexLayout = NULL;
 ID3D10Buffer * g_pVertexBuffer = NULL;
 ID3D10Buffer * g_pIndexBuffer = NULL;
@@ -20,6 +21,9 @@ ID3D10Buffer * g_pIndexBuffer = NULL;
 ID3D10EffectMatrixVariable * g_pWorldVariable = NULL;
 ID3D10EffectMatrixVariable * g_pViewVariable = NULL;
 ID3D10EffectMatrixVariable * g_pProjectionVariable = NULL;
+ID3D10EffectVectorVariable * g_pLightDirVariable = NULL;
+ID3D10EffectVectorVariable * g_pLightColorVariable = NULL;
+ID3D10EffectVectorVariable * g_pOutputColorVariable = NULL;
 D3DXMATRIX g_World1;
 D3DXMATRIX g_World2;
 D3DXMATRIX g_View;
@@ -32,7 +36,7 @@ void Render();
 
 struct SimpleVertex {
   D3DXVECTOR3 Pos;
-  D3DXVECTOR4 Color;
+  D3DXVECTOR3 Normal;
 };
 
 void print(LPCSTR fmt, ...)
@@ -265,23 +269,27 @@ HRESULT InitDirect3DDevice()
     return hr;
   }
 
-  g_pTechnique = g_pEffect->GetTechniqueByName("Render");
+  g_pTechniqueRender = g_pEffect->GetTechniqueByName("Render");
+  g_pTechniqueRenderLight = g_pEffect->GetTechniqueByName("RenderLight");
 
   // variables
 
   g_pWorldVariable = g_pEffect->GetVariableByName("World")->AsMatrix();
   g_pViewVariable = g_pEffect->GetVariableByName("View")->AsMatrix();
   g_pProjectionVariable = g_pEffect->GetVariableByName("Projection")->AsMatrix();
+  g_pLightDirVariable = g_pEffect->GetVariableByName("vLightDir")->AsVector();
+  g_pLightColorVariable = g_pEffect->GetVariableByName("vLightColor")->AsVector();
+  g_pOutputColorVariable = g_pEffect->GetVariableByName("vOutputColor")->AsVector();
 
   // input layout
   D3D10_INPUT_ELEMENT_DESC layout[] = {
-    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT   , 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"COLOR"   , 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"NORMAL"  , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
   };
   UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
 
   D3D10_PASS_DESC passDesc;
-  g_pTechnique->GetPassByIndex(0)->GetDesc(&passDesc);
+  g_pTechniqueRender->GetPassByIndex(0)->GetDesc(&passDesc);
   print("pass desc: `%s`\n", passDesc.Name);
 
   hr = g_pd3dDevice->CreateInputLayout(layout, numElements,
@@ -301,17 +309,39 @@ HRESULT InitDirect3DDevice()
 
   // vertex buffer
   SimpleVertex vertices[] = {
-    { D3DXVECTOR3(-1.0f,  1.0f, -1.0f), D3DXVECTOR4(0.0f, 0.0f, 1.0f, 1.0f) },
-    { D3DXVECTOR3( 1.0f,  1.0f, -1.0f), D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f) },
-    { D3DXVECTOR3( 1.0f,  1.0f,  1.0f), D3DXVECTOR4(0.0f, 1.0f, 1.0f, 1.0f) },
-    { D3DXVECTOR3(-1.0f,  1.0f,  1.0f), D3DXVECTOR4(1.0f, 0.0f, 0.0f, 1.0f) },
-    { D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR4(1.0f, 0.0f, 1.0f, 1.0f) },
-    { D3DXVECTOR3( 1.0f, -1.0f, -1.0f), D3DXVECTOR4(1.0f, 1.0f, 0.0f, 1.0f) },
-    { D3DXVECTOR3( 1.0f, -1.0f,  1.0f), D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f) },
-    { D3DXVECTOR3(-1.0f, -1.0f,  1.0f), D3DXVECTOR4(0.0f, 0.0f, 0.0f, 1.0f) },
+    { D3DXVECTOR3(-1.0f,  1.0f, -1.0f), D3DXVECTOR3( 0.0f,  1.0f,  0.0f) },
+    { D3DXVECTOR3( 1.0f,  1.0f, -1.0f), D3DXVECTOR3( 0.0f,  1.0f,  0.0f) },
+    { D3DXVECTOR3( 1.0f,  1.0f,  1.0f), D3DXVECTOR3( 0.0f,  1.0f,  0.0f) },
+    { D3DXVECTOR3(-1.0f,  1.0f,  1.0f), D3DXVECTOR3( 0.0f,  1.0f,  0.0f) },
+
+    { D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR3( 0.0f, -1.0f,  0.0f) },
+    { D3DXVECTOR3( 1.0f, -1.0f, -1.0f), D3DXVECTOR3( 0.0f, -1.0f,  0.0f) },
+    { D3DXVECTOR3( 1.0f, -1.0f,  1.0f), D3DXVECTOR3( 0.0f, -1.0f,  0.0f) },
+    { D3DXVECTOR3(-1.0f, -1.0f,  1.0f), D3DXVECTOR3( 0.0f, -1.0f,  0.0f) },
+
+    { D3DXVECTOR3(-1.0f, -1.0f,  1.0f), D3DXVECTOR3(-1.0f,  0.0f,  0.0f) },
+    { D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR3(-1.0f,  0.0f,  0.0f) },
+    { D3DXVECTOR3(-1.0f,  1.0f, -1.0f), D3DXVECTOR3(-1.0f,  0.0f,  0.0f) },
+    { D3DXVECTOR3(-1.0f,  1.0f,  1.0f), D3DXVECTOR3(-1.0f,  0.0f,  0.0f) },
+
+    { D3DXVECTOR3( 1.0f, -1.0f,  1.0f), D3DXVECTOR3( 1.0f,  0.0f,  0.0f) },
+    { D3DXVECTOR3( 1.0f, -1.0f, -1.0f), D3DXVECTOR3( 1.0f,  0.0f,  0.0f) },
+    { D3DXVECTOR3( 1.0f,  1.0f, -1.0f), D3DXVECTOR3( 1.0f,  0.0f,  0.0f) },
+    { D3DXVECTOR3( 1.0f,  1.0f,  1.0f), D3DXVECTOR3( 1.0f,  0.0f,  0.0f) },
+
+    { D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR3( 0.0f,  0.0f, -1.0f) },
+    { D3DXVECTOR3( 1.0f, -1.0f, -1.0f), D3DXVECTOR3( 0.0f,  0.0f, -1.0f) },
+    { D3DXVECTOR3( 1.0f,  1.0f, -1.0f), D3DXVECTOR3( 0.0f,  0.0f, -1.0f) },
+    { D3DXVECTOR3(-1.0f,  1.0f, -1.0f), D3DXVECTOR3( 0.0f,  0.0f, -1.0f) },
+
+    { D3DXVECTOR3(-1.0f, -1.0f,  1.0f), D3DXVECTOR3( 0.0f,  0.0f,  1.0f) },
+    { D3DXVECTOR3( 1.0f, -1.0f,  1.0f), D3DXVECTOR3( 0.0f,  0.0f,  1.0f) },
+    { D3DXVECTOR3( 1.0f,  1.0f,  1.0f), D3DXVECTOR3( 0.0f,  0.0f,  1.0f) },
+    { D3DXVECTOR3(-1.0f,  1.0f,  1.0f), D3DXVECTOR3( 0.0f,  0.0f,  1.0f) },
   };
+  int vertices_length = (sizeof (vertices)) / (sizeof (vertices[0]));
   bd.Usage = D3D10_USAGE_DEFAULT;
-  bd.ByteWidth = (sizeof (SimpleVertex)) * 8;
+  bd.ByteWidth = (sizeof (SimpleVertex)) * vertices_length;
   bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
   bd.CPUAccessFlags = 0;
   bd.MiscFlags = 0;
@@ -330,23 +360,24 @@ HRESULT InitDirect3DDevice()
     3,1,0,
     2,1,3,
 
-    0,5,4,
-    1,5,0,
-
-    3,4,7,
-    0,4,3,
-
-    1,6,5,
-    2,6,1,
-
-    2,7,6,
-    3,7,2,
-
     6,4,5,
     7,4,6,
+
+    11,9,8,
+    10,9,11,
+
+    14,12,13,
+    15,12,14,
+
+    19,17,16,
+    18,17,19,
+
+    22,20,21,
+    23,20,22
   };
+  int indices_length = (sizeof (indices)) / (sizeof (indices[0]));
   bd.Usage = D3D10_USAGE_DEFAULT;
-  bd.ByteWidth = (sizeof (DWORD)) * 36;
+  bd.ByteWidth = (sizeof (DWORD)) * indices_length;
   bd.BindFlags = D3D10_BIND_INDEX_BUFFER;
   bd.CPUAccessFlags = 0;
   bd.MiscFlags = 0;
@@ -384,7 +415,7 @@ HRESULT InitDirect3DDevice()
 void Render()
 {
   static float t = 0.0f;
-  if (0) {
+  if (1) {
     t += (float)D3DX_PI * 0.0125f;
   } else {
     static DWORD dwTimeStart = 0;
@@ -397,44 +428,66 @@ void Render()
   // first cube
   D3DXMatrixRotationY(&g_World1, t);
 
-  // second cube
-  D3DXMATRIX mTranslate;
-  D3DXMATRIX mOrbit;
-  D3DXMATRIX mSpin;
-  D3DXMATRIX mScale;
-  D3DXMatrixRotationZ(&mSpin, -t);
-  D3DXMatrixRotationY(&mOrbit, -t * 2.0f);
-  D3DXMatrixTranslation(&mTranslate, -4.0f, 0.0f, 0.0f);
-  D3DXMatrixScaling(&mScale, 0.3f, 0.3f, 0.3f);
+  // lights
+  D3DXVECTOR4 vLightDirs[2] = {
+    D3DXVECTOR4(-0.577f, 0.577f, -0.577f, 1.0f),
+    D3DXVECTOR4(0.0f, 0.0f, -1.0f, 1.0f),
+  };
+  D3DXVECTOR4 vLightColors[2] = {
+    D3DXVECTOR4(0.0f, 0.5f, 0.5f, 1.0f),
+    D3DXVECTOR4(0.5f, 0.0f, 0.0f, 1.0f)
+  };
 
-  D3DXMatrixMultiply(&g_World2, &mScale, &mSpin);
-  D3DXMatrixMultiply(&g_World2, &g_World2, &mTranslate);
-  D3DXMatrixMultiply(&g_World2, &g_World2, &mOrbit);
+  // rotate the second light around the origin
+  D3DXMATRIX mRotate;
+  D3DXVECTOR4 vOutDir;
+  D3DXMatrixRotationY(&mRotate, -2.0f * t);
+  D3DXVec3Transform(&vLightDirs[1], (D3DXVECTOR3 *)&vLightDirs[1], &mRotate);
 
+  D3DXMatrixRotationY(&mRotate, 0.4f * t);
+  D3DXVec3Transform(&vLightDirs[0], (D3DXVECTOR3 *)&vLightDirs[0], &mRotate);
 
+  // clear
   float ClearColor[4] = { 0.0f, 0.125f, 0.6f, 1.0f };
   g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetView, ClearColor);
   g_pd3dDevice->ClearDepthStencilView(g_pDepthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
 
+  // matrices
   g_pViewVariable->SetMatrix((float *)&g_View);
   g_pProjectionVariable->SetMatrix((float *)&g_Projection);
+  g_pWorldVariable->SetMatrix((float *)&g_World1);
 
-  D3D10_TECHNIQUE_DESC techDesc;
-  g_pTechnique->GetDesc(&techDesc);
+  // lights
+  g_pLightDirVariable->SetFloatVectorArray((float *)vLightDirs, 0, 2);
+  g_pLightColorVariable->SetFloatVectorArray((float *)vLightColors, 0, 2);
 
   // render first cube
-  g_pWorldVariable->SetMatrix((float *)&g_World1);
-  for(UINT p = 0; p < techDesc.Passes; p++) {
-    g_pTechnique->GetPassByIndex(p)->Apply(0);
+  D3D10_TECHNIQUE_DESC techDesc;
+  g_pTechniqueRender->GetDesc(&techDesc);
+  for (UINT p = 0; p < techDesc.Passes; p++) {
+    g_pTechniqueRender->GetPassByIndex(p)->Apply(0);
     g_pd3dDevice->DrawIndexed(36, 0, 0);
   }
 
-  // render second cube
-  g_pWorldVariable->SetMatrix((float *)&g_World2);
-  for(UINT p = 0; p < techDesc.Passes; p++) {
-    g_pTechnique->GetPassByIndex(p)->Apply(0);
-    g_pd3dDevice->DrawIndexed(36, 0, 0);
+  // render the lights
+  for (int m = 0; m < 2; m++) {
+    D3DXMATRIX mLight;
+    D3DXMATRIX mLightScale;
+    D3DXVECTOR3 vLightPos = vLightDirs[m] * 4.0f;
+    D3DXMatrixTranslation( &mLight, vLightPos.x, vLightPos.y, vLightPos.z );
+    D3DXMatrixScaling( &mLightScale, 0.2f, 0.2f, 0.2f );
+    mLight = mLightScale * mLight;
+
+    g_pWorldVariable->SetMatrix((float *)&mLight);
+    g_pOutputColorVariable->SetFloatVector((float *)&vLightColors[m]);
+
+    g_pTechniqueRenderLight->GetDesc( &techDesc );
+    for (UINT p = 0; p < techDesc.Passes; p++) {
+      g_pTechniqueRenderLight->GetPassByIndex(p)->Apply(0);
+      g_pd3dDevice->DrawIndexed(36, 0, 0);
+    }
   }
 
+  // present
   g_pSwapChain->Present(0, 0);
 }
