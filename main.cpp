@@ -65,6 +65,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
   if (FAILED(InitDirect3DDevice())) {
     print("InitDirect3DDevice\n");
+    system("pause");
     return 0;
   }
 
@@ -78,6 +79,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     }
   }
 
+  system("pause");
   return 0;
 }
 
@@ -159,19 +161,33 @@ HRESULT InitDirect3DDevice()
   sd.SampleDesc.Quality = 0;
   sd.Windowed = TRUE;
 
+  D3D10_DRIVER_TYPE driverTypes[] = {
+    D3D10_DRIVER_TYPE_HARDWARE,
+    D3D10_DRIVER_TYPE_REFERENCE,
+  };
+  UINT numDriverTypes = (sizeof (driverTypes)) / (sizeof (driverTypes[0]));
+
   HRESULT hr;
-  hr = D3D10CreateDeviceAndSwapChain(NULL,
-                                     D3D10_DRIVER_TYPE_REFERENCE,
-                                     NULL,
-                                     D3D10_CREATE_DEVICE_DEBUG,
-                                     D3D10_SDK_VERSION,
-                                     &sd,
-                                     &g_pSwapChain,
-                                     &g_pd3dDevice);
+  D3D10_DRIVER_TYPE driverType = D3D10_DRIVER_TYPE_NULL;
+  for (UINT i = 0; i < numDriverTypes; i++) {
+    driverType = driverTypes[i];
+    hr = D3D10CreateDeviceAndSwapChain(NULL,
+                                       driverType,
+                                       NULL,
+                                       0,
+                                       //D3D10_CREATE_DEVICE_DEBUG,
+                                       D3D10_SDK_VERSION,
+                                       &sd,
+                                       &g_pSwapChain,
+                                       &g_pd3dDevice);
+    if (SUCCEEDED(hr))
+      break;
+  }
   if (FAILED(hr)) {
     print("D3D10CreateDeviceAndSwapChain\n");
     return hr;
   }
+  print("driverType %d\n", driverType);
 
   ID3D10Texture2D * pBackBuffer;
   hr = g_pSwapChain->GetBuffer(0, __uuidof(ID3D10Texture2D), (LPVOID *)&pBackBuffer);
@@ -202,22 +218,26 @@ HRESULT InitDirect3DDevice()
 
   ID3D10Blob * pBlobErrors = NULL;
   DWORD dwShaderFlags = D3D10_SHADER_ENABLE_STRICTNESS | D3D10_SHADER_DEBUG;
-  hr = D3DX10CreateEffectFromFile(L"c:/Users/dot/d3d10/main.fx",
-                                  NULL,
-                                  NULL,
-                                  "fx_4_0",
-                                  dwShaderFlags,
-                                  0,
-                                  g_pd3dDevice,
-                                  NULL,
-                                  NULL,
-                                  &g_pEffect,
-                                  &pBlobErrors,
-                                  NULL);
+  hr = D3DX10CreateEffectFromResource(NULL,
+                                      L"RES_MAIN_FXO",
+                                      L"main.fxo",
+                                      NULL,
+                                      NULL,
+                                      "fx_4_0",
+                                      dwShaderFlags,
+                                      0,
+                                      g_pd3dDevice,
+                                      NULL,
+                                      NULL,
+                                      &g_pEffect,
+                                      &pBlobErrors,
+                                      NULL);
   if (FAILED(hr)) {
     print("D3DX10CreateEffectFromFile\n");
-    const char * pError = (const char *)pBlobErrors->GetBufferPointer();
-    (void)pError;
+    if (pBlobErrors != NULL) {
+      const char * pError = (const char *)pBlobErrors->GetBufferPointer();
+      print("pError: %p\n", pError);
+    }
     return hr;
   }
 
