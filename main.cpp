@@ -8,7 +8,9 @@ HINSTANCE g_hInstance = NULL;
 HWND g_hWnd = NULL;
 ID3D10Device * g_pd3dDevice = NULL;
 IDXGISwapChain * g_pSwapChain = NULL;
+ID3D10Texture2D * g_pDepthStencil = NULL;
 ID3D10RenderTargetView * g_pRenderTargetView = NULL;
+ID3D10DepthStencilView * g_pDepthStencilView = NULL;
 ID3D10Effect * g_pEffect = NULL;
 ID3D10EffectTechnique * g_pTechnique = NULL;
 ID3D10InputLayout * g_pVertexLayout = NULL;
@@ -151,8 +153,8 @@ HRESULT InitDirect3DDevice()
 
   DXGI_SWAP_CHAIN_DESC sd = {};
   sd.BufferCount = 1;
-  sd.BufferDesc.Width = 640;
-  sd.BufferDesc.Height = 480;
+  sd.BufferDesc.Width = width;
+  sd.BufferDesc.Height = height;
   sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
   sd.BufferDesc.RefreshRate.Numerator = 60;
   sd.BufferDesc.RefreshRate.Denominator = 1;
@@ -190,6 +192,7 @@ HRESULT InitDirect3DDevice()
   }
   print("driverType %d\n", driverType);
 
+  // back buffer
   ID3D10Texture2D * pBackBuffer;
   hr = g_pSwapChain->GetBuffer(0, __uuidof(ID3D10Texture2D), (LPVOID *)&pBackBuffer);
   if (FAILED(hr)) {
@@ -203,12 +206,37 @@ HRESULT InitDirect3DDevice()
     return hr;
   }
 
-  g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetView, NULL);
+  // depth buffer
+  D3D10_TEXTURE2D_DESC descDepth;
+  descDepth.Width = width;
+  descDepth.Height = height;
+  descDepth.MipLevels = 1;
+  descDepth.ArraySize = 1;
+  descDepth.Format = DXGI_FORMAT_D32_FLOAT;
+  descDepth.SampleDesc.Count = 1;
+  descDepth.SampleDesc.Quality = 0;
+  descDepth.Usage = D3D10_USAGE_DEFAULT;
+  descDepth.BindFlags = D3D10_BIND_DEPTH_STENCIL;
+  descDepth.CPUAccessFlags = 0;
+  descDepth.MiscFlags = 0;
+  hr = g_pd3dDevice->CreateTexture2D(&descDepth, NULL, &g_pDepthStencil);
+  if (FAILED(hr))
+    return hr;
+
+  D3D10_DEPTH_STENCIL_VIEW_DESC descDSV;
+  descDSV.Format = descDepth.Format;
+  descDSV.ViewDimension = D3D10_DSV_DIMENSION_TEXTURE2D;
+  descDSV.Texture2D.MipSlice = 0;
+  hr = g_pd3dDevice->CreateDepthStencilView(g_pDepthStencil, &descDSV, &g_pDepthStencilView);
+  if (FAILED(hr))
+    return hr;
+
+  g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetView, g_pDepthStencilView);
 
   // viewport
   D3D10_VIEWPORT vp;
-  vp.Width = 640;
-  vp.Height = 480;
+  vp.Width = width;
+  vp.Height = height;
   vp.MinDepth = 0.0f;
   vp.MaxDepth = 1.0f;
   vp.TopLeftX = 0;
@@ -361,7 +389,15 @@ HRESULT InitDirect3DDevice()
 void Render()
 {
   static float t = 0.0f;
-  t += (float)D3DX_PI * 0.0125f;
+  if (0) {
+    t += (float)D3DX_PI * 0.0125f;
+  } else {
+    static DWORD dwTimeStart = 0;
+    DWORD dwTimeCur = GetTickCount();
+    if (dwTimeStart == 0)
+      dwTimeStart = dwTimeCur;
+    t = (dwTimeCur - dwTimeStart) / 1000.0f;
+  }
 
   // first cube
   D3DXMatrixRotationY(&g_World1, t);
@@ -383,6 +419,7 @@ void Render()
 
   float ClearColor[4] = { 0.0f, 0.125f, 0.6f, 1.0f };
   g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetView, ClearColor);
+  g_pd3dDevice->ClearDepthStencilView(g_pDepthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
 
   g_pViewVariable->SetMatrix((float *)&g_View);
   g_pProjectionVariable->SetMatrix((float *)&g_Projection);
