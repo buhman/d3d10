@@ -18,12 +18,16 @@ ID3D10InputLayout * g_pVertexLayout = NULL;
 ID3D10Buffer * g_pVertexBuffer = NULL;
 ID3D10Buffer * g_pIndexBuffer = NULL;
 
+ID3D10Texture2D * g_pTexture = NULL;
+ID3D10ShaderResourceView * g_pTextureShaderResourceView = NULL;
+
 ID3D10EffectMatrixVariable * g_pWorldVariable = NULL;
 ID3D10EffectMatrixVariable * g_pViewVariable = NULL;
 ID3D10EffectMatrixVariable * g_pProjectionVariable = NULL;
 ID3D10EffectVectorVariable * g_pLightDirVariable = NULL;
 ID3D10EffectVectorVariable * g_pLightColorVariable = NULL;
 ID3D10EffectVectorVariable * g_pOutputColorVariable = NULL;
+ID3D10EffectShaderResourceVariable * g_pDiffuseVariable = NULL;
 D3DXMATRIX g_World1;
 D3DXMATRIX g_World2;
 D3DXMATRIX g_View;
@@ -37,6 +41,7 @@ void Render();
 struct SimpleVertex {
   D3DXVECTOR3 Pos;
   D3DXVECTOR3 Normal;
+  D3DXVECTOR2 Texture;
 };
 
 void print(LPCSTR fmt, ...)
@@ -181,8 +186,7 @@ HRESULT InitDirect3DDevice()
     hr = D3D10CreateDeviceAndSwapChain(NULL,
                                        driverType,
                                        NULL,
-                                       0,
-                                       //D3D10_CREATE_DEVICE_DEBUG,
+                                       D3D10_CREATE_DEVICE_DEBUG,
                                        D3D10_SDK_VERSION,
                                        &sd,
                                        &g_pSwapChain,
@@ -247,8 +251,43 @@ HRESULT InitDirect3DDevice()
   vp.TopLeftY = 0;
   g_pd3dDevice->RSSetViewports(1, &vp);
 
-  // effect
+  // texture
+  HRSRC hSeafloorRes = FindResource(NULL, L"RES_SEAFLOOR", RT_RCDATA);
+  if (hSeafloorRes == NULL) {
+    print("FindResource\n");
+    return -1;
+  }
+  DWORD dwSeafloorResSize = SizeofResource(NULL, hSeafloorRes);
+  HGLOBAL hSeafloorData = LoadResource(NULL, hSeafloorRes);
+  D3D10_SUBRESOURCE_DATA initSeafloorData;
+  initSeafloorData.pSysMem = LockResource(hSeafloorData);
+  initSeafloorData.SysMemPitch = 256 * 4;
+  D3D10_TEXTURE2D_DESC descTexture;
+  descTexture.Width = 256;
+  descTexture.Height = 256;
+  descTexture.MipLevels = 1;
+  descTexture.ArraySize = 1;
+  descTexture.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+  descTexture.SampleDesc.Count = 1;
+  descTexture.SampleDesc.Quality = 0;
+  descTexture.Usage = D3D10_USAGE_DEFAULT;
+  descTexture.BindFlags = D3D10_BIND_SHADER_RESOURCE;
+  descTexture.CPUAccessFlags = 0;
+  descTexture.MiscFlags = 0;
+  hr = g_pd3dDevice->CreateTexture2D(&descTexture, &initSeafloorData, &g_pTexture);
+  if (FAILED(hr))
+    return hr;
 
+  D3D10_SHADER_RESOURCE_VIEW_DESC descSRV;
+  descSRV.Format = descTexture.Format;
+  descSRV.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
+  descSRV.Texture2D.MostDetailedMip = 0;
+  descSRV.Texture2D.MipLevels = 1;
+  hr = g_pd3dDevice->CreateShaderResourceView(g_pTexture, &descSRV, &g_pTextureShaderResourceView);
+  if (FAILED(hr))
+    return hr;
+
+  // effect
   HRSRC hRes = FindResource(NULL, L"RES_MAIN_FXO", RT_RCDATA);
   if (hRes == NULL) {
     print("FindResource\n");
@@ -273,18 +312,19 @@ HRESULT InitDirect3DDevice()
   g_pTechniqueRenderLight = g_pEffect->GetTechniqueByName("RenderLight");
 
   // variables
-
   g_pWorldVariable = g_pEffect->GetVariableByName("World")->AsMatrix();
   g_pViewVariable = g_pEffect->GetVariableByName("View")->AsMatrix();
   g_pProjectionVariable = g_pEffect->GetVariableByName("Projection")->AsMatrix();
   g_pLightDirVariable = g_pEffect->GetVariableByName("vLightDir")->AsVector();
   g_pLightColorVariable = g_pEffect->GetVariableByName("vLightColor")->AsVector();
   g_pOutputColorVariable = g_pEffect->GetVariableByName("vOutputColor")->AsVector();
+  g_pDiffuseVariable = g_pEffect->GetVariableByName("txDiffuse")->AsShaderResource();
 
   // input layout
   D3D10_INPUT_ELEMENT_DESC layout[] = {
     {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
     {"NORMAL"  , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0},
   };
   UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
 
@@ -309,35 +349,35 @@ HRESULT InitDirect3DDevice()
 
   // vertex buffer
   SimpleVertex vertices[] = {
-    { D3DXVECTOR3(-1.0f,  1.0f, -1.0f), D3DXVECTOR3( 0.0f,  1.0f,  0.0f) },
-    { D3DXVECTOR3( 1.0f,  1.0f, -1.0f), D3DXVECTOR3( 0.0f,  1.0f,  0.0f) },
-    { D3DXVECTOR3( 1.0f,  1.0f,  1.0f), D3DXVECTOR3( 0.0f,  1.0f,  0.0f) },
-    { D3DXVECTOR3(-1.0f,  1.0f,  1.0f), D3DXVECTOR3( 0.0f,  1.0f,  0.0f) },
+    { D3DXVECTOR3(-1.0f,  1.0f, -1.0f), D3DXVECTOR3( 0.0f,  1.0f,  0.0f), D3DXVECTOR2(0.0f, 0.0f) },
+    { D3DXVECTOR3( 1.0f,  1.0f, -1.0f), D3DXVECTOR3( 0.0f,  1.0f,  0.0f), D3DXVECTOR2(1.0f, 0.0f) },
+    { D3DXVECTOR3( 1.0f,  1.0f,  1.0f), D3DXVECTOR3( 0.0f,  1.0f,  0.0f), D3DXVECTOR2(1.0f, 1.0f) },
+    { D3DXVECTOR3(-1.0f,  1.0f,  1.0f), D3DXVECTOR3( 0.0f,  1.0f,  0.0f), D3DXVECTOR2(0.0f, 1.0f) },
 
-    { D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR3( 0.0f, -1.0f,  0.0f) },
-    { D3DXVECTOR3( 1.0f, -1.0f, -1.0f), D3DXVECTOR3( 0.0f, -1.0f,  0.0f) },
-    { D3DXVECTOR3( 1.0f, -1.0f,  1.0f), D3DXVECTOR3( 0.0f, -1.0f,  0.0f) },
-    { D3DXVECTOR3(-1.0f, -1.0f,  1.0f), D3DXVECTOR3( 0.0f, -1.0f,  0.0f) },
+    { D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR3( 0.0f, -1.0f,  0.0f), D3DXVECTOR2(0.0f, 0.0f) },
+    { D3DXVECTOR3( 1.0f, -1.0f, -1.0f), D3DXVECTOR3( 0.0f, -1.0f,  0.0f), D3DXVECTOR2(1.0f, 0.0f) },
+    { D3DXVECTOR3( 1.0f, -1.0f,  1.0f), D3DXVECTOR3( 0.0f, -1.0f,  0.0f), D3DXVECTOR2(1.0f, 1.0f) },
+    { D3DXVECTOR3(-1.0f, -1.0f,  1.0f), D3DXVECTOR3( 0.0f, -1.0f,  0.0f), D3DXVECTOR2(0.0f, 1.0f) },
 
-    { D3DXVECTOR3(-1.0f, -1.0f,  1.0f), D3DXVECTOR3(-1.0f,  0.0f,  0.0f) },
-    { D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR3(-1.0f,  0.0f,  0.0f) },
-    { D3DXVECTOR3(-1.0f,  1.0f, -1.0f), D3DXVECTOR3(-1.0f,  0.0f,  0.0f) },
-    { D3DXVECTOR3(-1.0f,  1.0f,  1.0f), D3DXVECTOR3(-1.0f,  0.0f,  0.0f) },
+    { D3DXVECTOR3(-1.0f, -1.0f,  1.0f), D3DXVECTOR3(-1.0f,  0.0f,  0.0f), D3DXVECTOR2(0.0f, 0.0f) },
+    { D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR3(-1.0f,  0.0f,  0.0f), D3DXVECTOR2(1.0f, 0.0f) },
+    { D3DXVECTOR3(-1.0f,  1.0f, -1.0f), D3DXVECTOR3(-1.0f,  0.0f,  0.0f), D3DXVECTOR2(1.0f, 1.0f) },
+    { D3DXVECTOR3(-1.0f,  1.0f,  1.0f), D3DXVECTOR3(-1.0f,  0.0f,  0.0f), D3DXVECTOR2(0.0f, 1.0f) },
 
-    { D3DXVECTOR3( 1.0f, -1.0f,  1.0f), D3DXVECTOR3( 1.0f,  0.0f,  0.0f) },
-    { D3DXVECTOR3( 1.0f, -1.0f, -1.0f), D3DXVECTOR3( 1.0f,  0.0f,  0.0f) },
-    { D3DXVECTOR3( 1.0f,  1.0f, -1.0f), D3DXVECTOR3( 1.0f,  0.0f,  0.0f) },
-    { D3DXVECTOR3( 1.0f,  1.0f,  1.0f), D3DXVECTOR3( 1.0f,  0.0f,  0.0f) },
+    { D3DXVECTOR3( 1.0f, -1.0f,  1.0f), D3DXVECTOR3( 1.0f,  0.0f,  0.0f), D3DXVECTOR2(0.0f, 0.0f) },
+    { D3DXVECTOR3( 1.0f, -1.0f, -1.0f), D3DXVECTOR3( 1.0f,  0.0f,  0.0f), D3DXVECTOR2(1.0f, 0.0f) },
+    { D3DXVECTOR3( 1.0f,  1.0f, -1.0f), D3DXVECTOR3( 1.0f,  0.0f,  0.0f), D3DXVECTOR2(1.0f, 1.0f) },
+    { D3DXVECTOR3( 1.0f,  1.0f,  1.0f), D3DXVECTOR3( 1.0f,  0.0f,  0.0f), D3DXVECTOR2(0.0f, 1.0f) },
 
-    { D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR3( 0.0f,  0.0f, -1.0f) },
-    { D3DXVECTOR3( 1.0f, -1.0f, -1.0f), D3DXVECTOR3( 0.0f,  0.0f, -1.0f) },
-    { D3DXVECTOR3( 1.0f,  1.0f, -1.0f), D3DXVECTOR3( 0.0f,  0.0f, -1.0f) },
-    { D3DXVECTOR3(-1.0f,  1.0f, -1.0f), D3DXVECTOR3( 0.0f,  0.0f, -1.0f) },
+    { D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR3( 0.0f,  0.0f, -1.0f), D3DXVECTOR2(0.0f, 0.0f) },
+    { D3DXVECTOR3( 1.0f, -1.0f, -1.0f), D3DXVECTOR3( 0.0f,  0.0f, -1.0f), D3DXVECTOR2(1.0f, 0.0f) },
+    { D3DXVECTOR3( 1.0f,  1.0f, -1.0f), D3DXVECTOR3( 0.0f,  0.0f, -1.0f), D3DXVECTOR2(1.0f, 1.0f) },
+    { D3DXVECTOR3(-1.0f,  1.0f, -1.0f), D3DXVECTOR3( 0.0f,  0.0f, -1.0f), D3DXVECTOR2(0.0f, 1.0f) },
 
-    { D3DXVECTOR3(-1.0f, -1.0f,  1.0f), D3DXVECTOR3( 0.0f,  0.0f,  1.0f) },
-    { D3DXVECTOR3( 1.0f, -1.0f,  1.0f), D3DXVECTOR3( 0.0f,  0.0f,  1.0f) },
-    { D3DXVECTOR3( 1.0f,  1.0f,  1.0f), D3DXVECTOR3( 0.0f,  0.0f,  1.0f) },
-    { D3DXVECTOR3(-1.0f,  1.0f,  1.0f), D3DXVECTOR3( 0.0f,  0.0f,  1.0f) },
+    { D3DXVECTOR3(-1.0f, -1.0f,  1.0f), D3DXVECTOR3( 0.0f,  0.0f,  1.0f), D3DXVECTOR2(0.0f, 0.0f) },
+    { D3DXVECTOR3( 1.0f, -1.0f,  1.0f), D3DXVECTOR3( 0.0f,  0.0f,  1.0f), D3DXVECTOR2(1.0f, 0.0f) },
+    { D3DXVECTOR3( 1.0f,  1.0f,  1.0f), D3DXVECTOR3( 0.0f,  0.0f,  1.0f), D3DXVECTOR2(1.0f, 1.0f) },
+    { D3DXVECTOR3(-1.0f,  1.0f,  1.0f), D3DXVECTOR3( 0.0f,  0.0f,  1.0f), D3DXVECTOR2(0.0f, 1.0f) },
   };
   int vertices_length = (sizeof (vertices)) / (sizeof (vertices[0]));
   bd.Usage = D3D10_USAGE_DEFAULT;
@@ -456,6 +496,7 @@ void Render()
   g_pViewVariable->SetMatrix((float *)&g_View);
   g_pProjectionVariable->SetMatrix((float *)&g_Projection);
   g_pWorldVariable->SetMatrix((float *)&g_World1);
+  g_pDiffuseVariable->SetResource(g_pTextureShaderResourceView);
 
   // lights
   g_pLightDirVariable->SetFloatVectorArray((float *)vLightDirs, 0, 2);

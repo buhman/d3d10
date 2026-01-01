@@ -6,16 +6,25 @@ float4 vLightDir[2];
 float4 vLightColor[2];
 float4 vOutputColor;
 
+Texture2D txDiffuse;
+SamplerState samLinear {
+  Filter = MIN_MAG_MIP_LINEAR;
+  AddressU = Wrap;
+  AddressV = Wrap;
+};
+
 struct VS_INPUT
 {
   float4 Pos : POSITION;
-  float4 Normal : NORMAL;
+  float3 Normal : NORMAL;
+  float2 Tex : TEXCOORD;
 };
 
 struct PS_INPUT
 {
   float4 Pos : SV_POSITION;
-  float4 Normal : TEXCOORD0;
+  float3 Normal : TEXCOORD0;
+  float2 Tex : TEXCOORD1;
 };
 
 PS_INPUT VS(VS_INPUT input)
@@ -25,19 +34,21 @@ PS_INPUT VS(VS_INPUT input)
   output.Pos = mul(output.Pos, View);
   output.Pos = mul(output.Pos, Projection);
   output.Normal = mul(input.Normal, World);
+  output.Tex = input.Tex;
   return output;
 }
 
 float4 PS(PS_INPUT input) : SV_Target
 {
-  float4 finalColor = 0;
+  float4 texColor = txDiffuse.Sample(samLinear, input.Tex);
 
+  float4 intensityColor = 0;
   for (int i = 0; i < 2; i++) {
-    finalColor += saturate(dot((float3)vLightDir[i], input.Normal) * vLightColor[i]);
+    intensityColor += saturate(dot((float3)vLightDir[i], input.Normal) * vLightColor[i]);
   }
-  finalColor.a = 1;
+  intensityColor.a = 1;
 
-  return finalColor;
+  return texColor * intensityColor;
 }
 
 float4 PSSolid(PS_INPUT input) : SV_Target
