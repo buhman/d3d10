@@ -37,12 +37,20 @@ HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 HRESULT InitDirect3DDevice();
 void Render();
+BOOL Resize();
 
 struct SimpleVertex {
   D3DXVECTOR3 Pos;
   D3DXVECTOR3 Normal;
   D3DXVECTOR2 Texture;
 };
+
+struct WindowSize {
+  UINT Width;
+  UINT Height;
+};
+
+WindowSize g_ViewportSize;
 
 void print(LPCSTR fmt, ...)
 {
@@ -87,11 +95,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     } else {
-      Render();
+      if (Resize())
+        Render();
     }
   }
 
-  system("pause");
   return 0;
 }
 
@@ -110,10 +118,11 @@ HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow)
     return E_FAIL;
 
   // create window
-  RECT rc = { 0, 0, 640, 480 };
+  RECT rc = { 0, 0, 320, 240 };
+  AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
   UINT width = rc.right - rc.left;
   UINT height = rc.bottom - rc.top;
-  AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
+  print("width height %d %d\n", width, height);
   g_hWnd = CreateWindow(L"d3d10wc",
                         L"d3d10", WS_OVERLAPPEDWINDOW,
                         CW_USEDEFAULT, CW_USEDEFAULT,
@@ -151,6 +160,71 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   }
 
   return 0;
+}
+
+HRESULT InitDirect3DViews()
+{
+  HRESULT hr;
+
+  // back buffer
+  ID3D10Texture2D * pBackBuffer;
+  hr = g_pSwapChain->GetBuffer(0, __uuidof(ID3D10Texture2D), (LPVOID *)&pBackBuffer);
+  if (FAILED(hr)) {
+    print("g_pSwapChain->GetBuffer\n");
+    return hr;
+  }
+
+  D3D10_TEXTURE2D_DESC backBufferSurfaceDesc;
+  pBackBuffer->GetDesc(&backBufferSurfaceDesc);
+
+  hr = g_pd3dDevice->CreateRenderTargetView(pBackBuffer, NULL, &g_pRenderTargetView);
+  pBackBuffer->Release();
+  if (FAILED(hr)) {
+    print("g_pSwapChain->CreateRenderTargetView\n");
+    return hr;
+  }
+
+  // depth buffer
+  D3D10_TEXTURE2D_DESC descDepth;
+  descDepth.Width = backBufferSurfaceDesc.Width;
+  descDepth.Height = backBufferSurfaceDesc.Height;
+  descDepth.MipLevels = 1;
+  descDepth.ArraySize = 1;
+  descDepth.Format = DXGI_FORMAT_D32_FLOAT;
+  descDepth.SampleDesc.Count = 1;
+  descDepth.SampleDesc.Quality = 0;
+  descDepth.Usage = D3D10_USAGE_DEFAULT;
+  descDepth.BindFlags = D3D10_BIND_DEPTH_STENCIL;
+  descDepth.CPUAccessFlags = 0;
+  descDepth.MiscFlags = 0;
+  hr = g_pd3dDevice->CreateTexture2D(&descDepth, NULL, &g_pDepthStencil);
+  if (FAILED(hr))
+    return hr;
+
+  D3D10_DEPTH_STENCIL_VIEW_DESC descDSV;
+  descDSV.Format = descDepth.Format;
+  descDSV.ViewDimension = D3D10_DSV_DIMENSION_TEXTURE2D;
+  descDSV.Texture2D.MipSlice = 0;
+  hr = g_pd3dDevice->CreateDepthStencilView(g_pDepthStencil, &descDSV, &g_pDepthStencilView);
+  if (FAILED(hr))
+    return hr;
+
+  g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetView, g_pDepthStencilView);
+
+  // viewport
+  D3D10_VIEWPORT vp;
+  vp.Width = backBufferSurfaceDesc.Width;
+  vp.Height = backBufferSurfaceDesc.Height;
+  vp.MinDepth = 0.0f;
+  vp.MaxDepth = 1.0f;
+  vp.TopLeftX = 0;
+  vp.TopLeftY = 0;
+  g_pd3dDevice->RSSetViewports(1, &vp);
+
+  g_ViewportSize.Width = backBufferSurfaceDesc.Width;
+  g_ViewportSize.Height = backBufferSurfaceDesc.Height;
+
+  return true;
 }
 
 HRESULT InitDirect3DDevice()
@@ -200,56 +274,7 @@ HRESULT InitDirect3DDevice()
   }
   print("driverType %d\n", driverType);
 
-  // back buffer
-  ID3D10Texture2D * pBackBuffer;
-  hr = g_pSwapChain->GetBuffer(0, __uuidof(ID3D10Texture2D), (LPVOID *)&pBackBuffer);
-  if (FAILED(hr)) {
-    print("g_pSwapChain->GetBuffer\n");
-    return hr;
-  }
-  hr = g_pd3dDevice->CreateRenderTargetView(pBackBuffer, NULL, &g_pRenderTargetView);
-  pBackBuffer->Release();
-  if (FAILED(hr)) {
-    print("g_pSwapChain->CreateRenderTargetView\n");
-    return hr;
-  }
-
-  // depth buffer
-  D3D10_TEXTURE2D_DESC descDepth;
-  descDepth.Width = width;
-  descDepth.Height = height;
-  descDepth.MipLevels = 1;
-  descDepth.ArraySize = 1;
-  descDepth.Format = DXGI_FORMAT_D32_FLOAT;
-  descDepth.SampleDesc.Count = 1;
-  descDepth.SampleDesc.Quality = 0;
-  descDepth.Usage = D3D10_USAGE_DEFAULT;
-  descDepth.BindFlags = D3D10_BIND_DEPTH_STENCIL;
-  descDepth.CPUAccessFlags = 0;
-  descDepth.MiscFlags = 0;
-  hr = g_pd3dDevice->CreateTexture2D(&descDepth, NULL, &g_pDepthStencil);
-  if (FAILED(hr))
-    return hr;
-
-  D3D10_DEPTH_STENCIL_VIEW_DESC descDSV;
-  descDSV.Format = descDepth.Format;
-  descDSV.ViewDimension = D3D10_DSV_DIMENSION_TEXTURE2D;
-  descDSV.Texture2D.MipSlice = 0;
-  hr = g_pd3dDevice->CreateDepthStencilView(g_pDepthStencil, &descDSV, &g_pDepthStencilView);
-  if (FAILED(hr))
-    return hr;
-
-  g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetView, g_pDepthStencilView);
-
-  // viewport
-  D3D10_VIEWPORT vp;
-  vp.Width = width;
-  vp.Height = height;
-  vp.MinDepth = 0.0f;
-  vp.MaxDepth = 1.0f;
-  vp.TopLeftX = 0;
-  vp.TopLeftY = 0;
-  g_pd3dDevice->RSSetViewports(1, &vp);
+  InitDirect3DViews();
 
   // texture
   HRSRC hSeafloorRes = FindResource(NULL, L"RES_SEAFLOOR", RT_RCDATA);
@@ -450,6 +475,46 @@ HRESULT InitDirect3DDevice()
                              fFar);
 
   return S_OK;
+}
+
+BOOL Resize()
+{
+  RECT rc;
+  GetClientRect(g_hWnd, &rc);
+  UINT width = rc.right - rc.left;
+  UINT height = rc.bottom - rc.top;
+
+  if (width == 0 || height == 0)
+    return false;
+
+  // no need to resize if the client area is equal to the current buffer area
+  if (width == g_ViewportSize.Width && height == g_ViewportSize.Height)
+    return true;
+
+  //g_pd3dDevice->OMSetRenderTargets(1, NULL, NULL);
+  g_pRenderTargetView->Release();
+  g_pDepthStencil->Release();
+  g_pDepthStencilView->Release();
+
+  g_pSwapChain->ResizeBuffers(1,
+                              width,
+                              height,
+                              DXGI_FORMAT_R8G8B8A8_UNORM,
+                              0);
+
+  InitDirect3DViews();
+
+  float fFov = (float)D3DX_PI * 0.5f;
+  float fAspect = width / (float)height;
+  float fNear = 0.1f;
+  float fFar = 100.0f;
+  D3DXMatrixPerspectiveFovLH(&g_Projection,
+                             fFov,
+                             fAspect,
+                             fNear,
+                             fFar);
+
+  return true;
 }
 
 void Render()
