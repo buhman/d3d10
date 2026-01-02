@@ -45,6 +45,9 @@ struct SimpleVertex {
   D3DXVECTOR2 Texture;
 };
 
+#include "gltf.h"
+#include "minimal.h"
+
 struct WindowSize {
   UINT Width;
   UINT Height;
@@ -68,16 +71,18 @@ void print(LPCSTR fmt, ...)
                      args);
   va_end(args);
   size_t length = end - &buf[0];
-  HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-  WriteConsoleA(hOutput, buf, (DWORD)length, NULL, NULL);
+  #ifdef _DEBUG
+  OutputDebugStringA(buf);
+  #endif
+  //HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+  //WriteConsoleA(hOutput, buf, (DWORD)length, NULL, NULL);
 }
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
-  FreeConsole();
-  AllocConsole();
-  AttachConsole(GetCurrentProcessId());
-  print("WinMain\n");
+  //FreeConsole();
+  //AllocConsole();
+  //AttachConsole(GetCurrentProcessId());
   if (FAILED(InitWindow(hInstance, nCmdShow))) {
     print("InitWindow\n");
     return 0;
@@ -85,7 +90,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
   if (FAILED(InitDirect3DDevice())) {
     print("InitDirect3DDevice\n");
-    system("pause");
     return 0;
   }
 
@@ -122,7 +126,6 @@ HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow)
   AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
   UINT width = rc.right - rc.left;
   UINT height = rc.bottom - rc.top;
-  print("width height %d %d\n", width, height);
   g_hWnd = CreateWindow(L"d3d10wc",
                         L"d3d10", WS_OVERLAPPEDWINDOW,
                         CW_USEDEFAULT, CW_USEDEFAULT,
@@ -272,7 +275,6 @@ HRESULT InitDirect3DDevice()
     print("D3D10CreateDeviceAndSwapChain\n");
     return hr;
   }
-  print("driverType %d\n", driverType);
 
   InitDirect3DViews();
 
@@ -348,14 +350,13 @@ HRESULT InitDirect3DDevice()
   // input layout
   D3D10_INPUT_ELEMENT_DESC layout[] = {
     {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"NORMAL"  , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    //{"NORMAL"  , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    //{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0},
   };
   UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
 
   D3D10_PASS_DESC passDesc;
   g_pTechniqueRender->GetPassByIndex(0)->GetDesc(&passDesc);
-  print("pass desc: `%s`\n", passDesc.Name);
 
   hr = g_pd3dDevice->CreateInputLayout(layout, numElements,
                                        passDesc.pIAInputSignature,
@@ -372,81 +373,41 @@ HRESULT InitDirect3DDevice()
   D3D10_BUFFER_DESC bd;
   D3D10_SUBRESOURCE_DATA initData;
 
+  //////////////////////////////////////////////////////////////////////
   // vertex buffer
-  SimpleVertex vertices[] = {
-    { D3DXVECTOR3(-1.0f,  1.0f, -1.0f), D3DXVECTOR3( 0.0f,  1.0f,  0.0f), D3DXVECTOR2(0.0f, 0.0f) },
-    { D3DXVECTOR3( 1.0f,  1.0f, -1.0f), D3DXVECTOR3( 0.0f,  1.0f,  0.0f), D3DXVECTOR2(1.0f, 0.0f) },
-    { D3DXVECTOR3( 1.0f,  1.0f,  1.0f), D3DXVECTOR3( 0.0f,  1.0f,  0.0f), D3DXVECTOR2(1.0f, 1.0f) },
-    { D3DXVECTOR3(-1.0f,  1.0f,  1.0f), D3DXVECTOR3( 0.0f,  1.0f,  0.0f), D3DXVECTOR2(0.0f, 1.0f) },
+  //////////////////////////////////////////////////////////////////////
+  #define VERTEX_ACCESSOR accessor_1
 
-    { D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR3( 0.0f, -1.0f,  0.0f), D3DXVECTOR2(0.0f, 0.0f) },
-    { D3DXVECTOR3( 1.0f, -1.0f, -1.0f), D3DXVECTOR3( 0.0f, -1.0f,  0.0f), D3DXVECTOR2(1.0f, 0.0f) },
-    { D3DXVECTOR3( 1.0f, -1.0f,  1.0f), D3DXVECTOR3( 0.0f, -1.0f,  0.0f), D3DXVECTOR2(1.0f, 1.0f) },
-    { D3DXVECTOR3(-1.0f, -1.0f,  1.0f), D3DXVECTOR3( 0.0f, -1.0f,  0.0f), D3DXVECTOR2(0.0f, 1.0f) },
-
-    { D3DXVECTOR3(-1.0f, -1.0f,  1.0f), D3DXVECTOR3(-1.0f,  0.0f,  0.0f), D3DXVECTOR2(0.0f, 0.0f) },
-    { D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR3(-1.0f,  0.0f,  0.0f), D3DXVECTOR2(1.0f, 0.0f) },
-    { D3DXVECTOR3(-1.0f,  1.0f, -1.0f), D3DXVECTOR3(-1.0f,  0.0f,  0.0f), D3DXVECTOR2(1.0f, 1.0f) },
-    { D3DXVECTOR3(-1.0f,  1.0f,  1.0f), D3DXVECTOR3(-1.0f,  0.0f,  0.0f), D3DXVECTOR2(0.0f, 1.0f) },
-
-    { D3DXVECTOR3( 1.0f, -1.0f,  1.0f), D3DXVECTOR3( 1.0f,  0.0f,  0.0f), D3DXVECTOR2(0.0f, 0.0f) },
-    { D3DXVECTOR3( 1.0f, -1.0f, -1.0f), D3DXVECTOR3( 1.0f,  0.0f,  0.0f), D3DXVECTOR2(1.0f, 0.0f) },
-    { D3DXVECTOR3( 1.0f,  1.0f, -1.0f), D3DXVECTOR3( 1.0f,  0.0f,  0.0f), D3DXVECTOR2(1.0f, 1.0f) },
-    { D3DXVECTOR3( 1.0f,  1.0f,  1.0f), D3DXVECTOR3( 1.0f,  0.0f,  0.0f), D3DXVECTOR2(0.0f, 1.0f) },
-
-    { D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR3( 0.0f,  0.0f, -1.0f), D3DXVECTOR2(0.0f, 0.0f) },
-    { D3DXVECTOR3( 1.0f, -1.0f, -1.0f), D3DXVECTOR3( 0.0f,  0.0f, -1.0f), D3DXVECTOR2(1.0f, 0.0f) },
-    { D3DXVECTOR3( 1.0f,  1.0f, -1.0f), D3DXVECTOR3( 0.0f,  0.0f, -1.0f), D3DXVECTOR2(1.0f, 1.0f) },
-    { D3DXVECTOR3(-1.0f,  1.0f, -1.0f), D3DXVECTOR3( 0.0f,  0.0f, -1.0f), D3DXVECTOR2(0.0f, 1.0f) },
-
-    { D3DXVECTOR3(-1.0f, -1.0f,  1.0f), D3DXVECTOR3( 0.0f,  0.0f,  1.0f), D3DXVECTOR2(0.0f, 0.0f) },
-    { D3DXVECTOR3( 1.0f, -1.0f,  1.0f), D3DXVECTOR3( 0.0f,  0.0f,  1.0f), D3DXVECTOR2(1.0f, 0.0f) },
-    { D3DXVECTOR3( 1.0f,  1.0f,  1.0f), D3DXVECTOR3( 0.0f,  0.0f,  1.0f), D3DXVECTOR2(1.0f, 1.0f) },
-    { D3DXVECTOR3(-1.0f,  1.0f,  1.0f), D3DXVECTOR3( 0.0f,  0.0f,  1.0f), D3DXVECTOR2(0.0f, 1.0f) },
-  };
-  int vertices_length = (sizeof (vertices)) / (sizeof (vertices[0]));
   bd.Usage = D3D10_USAGE_DEFAULT;
-  bd.ByteWidth = (sizeof (SimpleVertex)) * vertices_length;
+  bd.ByteWidth = (sizeof (VERTEX_ACCESSOR));
+  //bd.ByteWidth = (sizeof (SimpleVertex)) * vertices_length;
   bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
   bd.CPUAccessFlags = 0;
   bd.MiscFlags = 0;
-  initData.pSysMem = vertices;
+  initData.pSysMem = VERTEX_ACCESSOR;
+  //initData.pSysMem = vertices;
   hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffer);
   if (FAILED(hr)) {
     print("CreateBuffer\n");
     return hr;
   }
-  UINT stride = (sizeof (SimpleVertex));
+  UINT stride = (sizeof (VERTEX_ACCESSOR[0]));
   UINT offset = 0;
   g_pd3dDevice->IASetVertexBuffers(0, 1, &g_pVertexBuffer, &stride, &offset);
 
+  //////////////////////////////////////////////////////////////////////
   // index buffer
-  DWORD indices[] = {
-    3,1,0,
-    2,1,3,
+  //////////////////////////////////////////////////////////////////////
+  #define INDEX_ACCESSOR accessor_0
 
-    6,4,5,
-    7,4,6,
-
-    11,9,8,
-    10,9,11,
-
-    14,12,13,
-    15,12,14,
-
-    19,17,16,
-    18,17,19,
-
-    22,20,21,
-    23,20,22
-  };
-  int indices_length = (sizeof (indices)) / (sizeof (indices[0]));
   bd.Usage = D3D10_USAGE_DEFAULT;
-  bd.ByteWidth = (sizeof (DWORD)) * indices_length;
+  bd.ByteWidth = (sizeof (INDEX_ACCESSOR));
+  //bd.ByteWidth = (sizeof (DWORD)) * indices_length;
   bd.BindFlags = D3D10_BIND_INDEX_BUFFER;
   bd.CPUAccessFlags = 0;
   bd.MiscFlags = 0;
-  initData.pSysMem = indices;
+  initData.pSysMem = INDEX_ACCESSOR;
+  //initData.pSysMem = indices;
   hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pIndexBuffer);
   if (FAILED(hr))
     return hr;
@@ -459,8 +420,8 @@ HRESULT InitDirect3DDevice()
   D3DXMatrixIdentity(&g_World1);
   D3DXMatrixIdentity(&g_World2);
 
-  D3DXVECTOR3 Eye(0.0f, 2.0f, -5.0f);
-  D3DXVECTOR3 At(0.0f, 1.0f, 0.0f);
+  D3DXVECTOR3 Eye(0.0f, 0.0f, -2.0f);
+  D3DXVECTOR3 At(0.0f, 0.0f, 0.0f);
   D3DXVECTOR3 Up(0.0f, 1.0f, 0.0f);
   D3DXMatrixLookAtLH(&g_View, &Eye, &At, &Up);
 
@@ -517,11 +478,48 @@ BOOL Resize()
   return true;
 }
 
+void Animate(float t)
+{
+  const float * frames = accessor_2;
+  const int frames_length = accessor_2_length;
+
+  while (t >= frames[frames_length - 1]) {
+    t -= frames[frames_length - 1];
+  }
+
+  // find frame
+  int prev_ix = -1;
+  for (int i = 0; i < frames_length - 1; i++) {
+    if (frames[i] <= t && frames[i+1] >= t) {
+      prev_ix = i;
+      break;
+    }
+  }
+  if (prev_ix == -1)
+    return;
+  int next_ix = prev_ix + 1;
+  if (next_ix >= frames_length)
+    return;
+
+  float lerp = (t - frames[prev_ix]) / (frames[next_ix] - frames[prev_ix]);
+  print("%f prev %d next %d lerp %f\n", t, prev_ix, next_ix, lerp);
+
+  const D3DXQUATERNION * animation = (D3DXQUATERNION *)accessor_3;
+  D3DXQUATERNION rotation;
+
+  D3DXQuaternionSlerp(&rotation,
+                      &animation[prev_ix],
+                      &animation[next_ix],
+                      lerp);
+
+  D3DXMatrixRotationQuaternion(&g_World1, &rotation);
+}
+
 void Render()
 {
   static float t = 0.0f;
   if (1) {
-    t += (float)D3DX_PI * 0.0125f;
+    t += (float)D3DX_PI * 0.0125f * 0.5;
   } else {
     static DWORD dwTimeStart = 0;
     DWORD dwTimeCur = GetTickCount();
@@ -530,8 +528,10 @@ void Render()
     t = (dwTimeCur - dwTimeStart) / 1000.0f;
   }
 
+  Animate(t);
+
   // first cube
-  D3DXMatrixRotationY(&g_World1, t);
+  //D3DXMatrixRotationZ(&g_World1, t);
 
   // lights
   D3DXVECTOR4 vLightDirs[2] = {
@@ -563,6 +563,9 @@ void Render()
   g_pWorldVariable->SetMatrix((float *)&g_World1);
   g_pDiffuseVariable->SetResource(g_pTextureShaderResourceView);
 
+  // color
+  g_pOutputColorVariable->SetFloatVector((float *)&vLightColors[0]);
+
   // lights
   g_pLightDirVariable->SetFloatVectorArray((float *)vLightDirs, 0, 2);
   g_pLightColorVariable->SetFloatVectorArray((float *)vLightColors, 0, 2);
@@ -572,10 +575,11 @@ void Render()
   g_pTechniqueRender->GetDesc(&techDesc);
   for (UINT p = 0; p < techDesc.Passes; p++) {
     g_pTechniqueRender->GetPassByIndex(p)->Apply(0);
-    g_pd3dDevice->DrawIndexed(36, 0, 0);
+    g_pd3dDevice->DrawIndexed(3, 0, 0);
   }
 
   // render the lights
+  /*
   for (int m = 0; m < 2; m++) {
     D3DXMATRIX mLight;
     D3DXMATRIX mLightScale;
@@ -590,9 +594,10 @@ void Render()
     g_pTechniqueRenderLight->GetDesc( &techDesc );
     for (UINT p = 0; p < techDesc.Passes; p++) {
       g_pTechniqueRenderLight->GetPassByIndex(p)->Apply(0);
-      g_pd3dDevice->DrawIndexed(36, 0, 0);
+      g_pd3dDevice->DrawIndexed(indices_length, 0, 0);
     }
   }
+  */
 
   // present
   g_pSwapChain->Present(0, 0);
