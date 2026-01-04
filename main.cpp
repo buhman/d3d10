@@ -573,10 +573,9 @@ void Animate(float t)
 }
 */
 
-static inline void MatrixTRS(D3DXMATRIX * transform,
-                             const D3DXVECTOR3 * translation,
-                             const D3DXQUATERNION * rotation,
-                             const D3DXVECTOR3 * scaling)
+static inline D3DXMATRIX MatrixTRS(const D3DXVECTOR3 * translation,
+                                   const D3DXQUATERNION * rotation,
+                                   const D3DXVECTOR3 * scaling)
 {
   D3DXMATRIX mTranslation;
   D3DXMatrixTranslation(&mTranslation, translation->x, translation->y, translation->z);
@@ -587,8 +586,7 @@ static inline void MatrixTRS(D3DXMATRIX * transform,
   D3DXMATRIX mScaling;
   D3DXMatrixScaling(&mScaling, scaling->x, scaling->y, scaling->z);
 
-  D3DXMatrixMultiply(transform, &mRotation, &mTranslation);
-  D3DXMatrixMultiply(transform, transform, &mScaling);
+  return mScaling * mRotation * mTranslation;
 }
 
 static inline float fract(float f)
@@ -640,21 +638,13 @@ void Animate(float t)
   const Node * node = skin->joints[1];
 
   // T * R * S
-
-  D3DXMATRIX global_transform;
-  MatrixTRS(&global_transform, &node->translation, &rotation, &node->scale);
+  D3DXMATRIX global_transform = MatrixTRS(&node->translation, &rotation, &node->scale);
 
   D3DXMatrixIdentity(&mJoints[0]);
-  D3DXMatrixIdentity(&mJoints[1]);
 
-  const D3DXMATRIX * inverse_bind_matrix = &skin->inverse_bind_matrices[1];
-  //D3DXMatrixMultiply(&mJoints[1], &global_transform, inverse_bind_matrix);
-  //D3DXMatrixIdentity(&mJoints[1]);
-  //g_World1 = global_transform;
+  const D3DXMATRIX& inverse_bind_matrix = skin->inverse_bind_matrices[1];
 
-  D3DXMatrixMultiply(&mJoints[1], inverse_bind_matrix, &global_transform);
-  //mJoints[1] = global_transform;
-  //g_World1 = *inverse_bind_matrix;
+  mJoints[1] = inverse_bind_matrix * global_transform;
 }
 
 void Render()
