@@ -1,3 +1,6 @@
+#ifndef GLTF_HPP_
+#define GLTF_HPP_
+
 struct Mesh {
   const D3DXVECTOR3 * position;
   const DWORD position_size;
@@ -21,6 +24,7 @@ struct Mesh {
 struct Skin;
 
 struct Node {
+  const DWORD parent_ix;
   const Skin * skin; // skin index (global)
   const Mesh * mesh; // mesh index (global)
   const D3DXVECTOR3 translation;
@@ -30,7 +34,7 @@ struct Node {
 
 struct Skin {
   const D3DXMATRIX * inverse_bind_matrices; // accessor
-  const Node ** joints;
+  const int * joints;
   DWORD joints_length;
 };
 
@@ -50,12 +54,9 @@ struct AnimationSampler {
 struct AnimationChannel {
   const AnimationSampler * sampler; // sampler index, this animation
   struct {
-    const Node * node; // node index
+    const int node_ix;
     const AnimationChannelPath path; // property to animate
   } target;
 };
 
-//struct Animation {
-//  const AnimationChannel * channels;
-//  const AnimationSampler * samplers;
-//};
+#endif
