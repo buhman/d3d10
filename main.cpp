@@ -14,7 +14,10 @@
 //#include "rigged_figure.hpp"
 //#define ROOT_MESH_NODE node_1
 
-#include "cesium_man.hpp"
+//#include "cesium_man.hpp"
+//#define ROOT_MESH_NODE node_2
+
+#include "robot_player.hpp"
 #define ROOT_MESH_NODE node_2
 
 HINSTANCE g_hInstance = NULL;
@@ -318,19 +321,19 @@ HRESULT InitDirect3DDevice()
   InitDirect3DViews();
 
   // texture
-  HRSRC hSeafloorRes = FindResource(NULL, L"RES_SEAFLOOR", RT_RCDATA);
-  if (hSeafloorRes == NULL) {
+  HRSRC hRobotPlayerRes = FindResource(NULL, L"RES_ROBOT_PLAYER", RT_RCDATA);
+  if (hRobotPlayerRes == NULL) {
     print("FindResource\n");
     return -1;
   }
-  DWORD dwSeafloorResSize = SizeofResource(NULL, hSeafloorRes);
-  HGLOBAL hSeafloorData = LoadResource(NULL, hSeafloorRes);
-  D3D10_SUBRESOURCE_DATA initSeafloorData;
-  initSeafloorData.pSysMem = LockResource(hSeafloorData);
-  initSeafloorData.SysMemPitch = 256 * 4;
+  DWORD dwRobotPlayerResSize = SizeofResource(NULL, hRobotPlayerRes);
+  HGLOBAL hRobotPlayerData = LoadResource(NULL, hRobotPlayerRes);
+  D3D10_SUBRESOURCE_DATA initRobotPlayerData;
+  initRobotPlayerData.pSysMem = LockResource(hRobotPlayerData);
+  initRobotPlayerData.SysMemPitch = 64 * 4;
   D3D10_TEXTURE2D_DESC descTexture;
-  descTexture.Width = 256;
-  descTexture.Height = 256;
+  descTexture.Width = 64;
+  descTexture.Height = 64;
   descTexture.MipLevels = 1;
   descTexture.ArraySize = 1;
   descTexture.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -340,7 +343,7 @@ HRESULT InitDirect3DDevice()
   descTexture.BindFlags = D3D10_BIND_SHADER_RESOURCE;
   descTexture.CPUAccessFlags = 0;
   descTexture.MiscFlags = 0;
-  hr = g_pd3dDevice->CreateTexture2D(&descTexture, &initSeafloorData, &g_pTexture);
+  hr = g_pd3dDevice->CreateTexture2D(&descTexture, &initRobotPlayerData, &g_pTexture);
   if (FAILED(hr)) {
     print("CreateTexture2D\n");
     return hr;
@@ -397,7 +400,7 @@ HRESULT InitDirect3DDevice()
     {"TEXCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
     {"TEXCOORD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 2, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
     {"NORMAL"  , 0, DXGI_FORMAT_R32G32B32_FLOAT, 3, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
-    //{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"TEXCOORD", 2, DXGI_FORMAT_R32G32_FLOAT,    4, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
   };
   UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
 
@@ -425,7 +428,7 @@ HRESULT InitDirect3DDevice()
 
   const Mesh * mesh = ROOT_MESH_NODE.mesh;
 
-  const DWORD dwVertexBufferCount = 4;
+  const DWORD dwVertexBufferCount = 5;
   ID3D10Buffer * pVertexBuffers[dwVertexBufferCount];
 
   // position
@@ -480,13 +483,27 @@ HRESULT InitDirect3DDevice()
     return hr;
   }
 
+  // texcoords
+  bd.Usage = D3D10_USAGE_DEFAULT;
+  bd.ByteWidth = mesh->texcoord_0_size;
+  bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
+  bd.CPUAccessFlags = 0;
+  bd.MiscFlags = 0;
+  initData.pSysMem = mesh->texcoord_0;
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &pVertexBuffers[4]);
+  if (FAILED(hr)) {
+    print("CreateBuffer\n");
+    return hr;
+  }
+
   UINT stride[] = {
     (sizeof (mesh->position[0])),
     (sizeof (mesh->weights_0[0])),
     (sizeof (mesh->joints_0[0])),
     (sizeof (mesh->normal[0])),
+    (sizeof (mesh->texcoord_0[0])),
   };
-  UINT offset[] = { 0, 0, 0, 0 };
+  UINT offset[] = { 0, 0, 0, 0, 0 };
   g_pd3dDevice->IASetVertexBuffers(0, dwVertexBufferCount, pVertexBuffers, stride, offset);
 
   //////////////////////////////////////////////////////////////////////
@@ -518,7 +535,7 @@ HRESULT InitDirect3DDevice()
   D3DXMatrixIdentity(&g_World2);
 
   D3DXVECTOR3 Eye(0.0f, 1.0f, -1.5f);
-  D3DXVECTOR3 At(0.0f, 0.5f, 0.0f);
+  D3DXVECTOR3 At(0.0f, 1.0f, 0.0f);
   D3DXVECTOR3 Up(0.0f, 1.0f, 0.0f);
   D3DXMatrixLookAtLH(&g_View, &Eye, &At, &Up);
 
@@ -660,7 +677,7 @@ void Animate(float t)
   const AnimationChannel * channels = animation_0__channels;
   const int channels_length = animation_0__channels__length;
 
-  t = loop(t, 2.0);
+  t = loop(t, 4.166666030883789);
 
   // find frame and lerp (same accessor for all channels)
   const float * input = channels[0].sampler->input;
@@ -668,10 +685,8 @@ void Animate(float t)
 
   int frame_ix = FindFrame(input, input_length, t);
   float lerp = Lerp(input, t, frame_ix);
-  //float lerp = 0.0;
 
   // sample all channels
-  if (1)
   for (int i = 0; i < channels_length; i++) {
     const AnimationSampler * sampler = channels[i].sampler;
     NodeInstance * instance = &node_inst[channels[i].target.node_ix];
@@ -716,7 +731,6 @@ void Animate(float t)
     assert(joint_ix >= 0);
 
     const D3DXMATRIX& inverse_bind_matrix = skin->inverse_bind_matrices[i];
-
     mJoints[i] = inverse_bind_matrix * GlobalTransform(joint_ix);
   }
 }
@@ -743,8 +757,8 @@ void Render()
 
   D3DXMATRIX rx;
   D3DXMATRIX ry;
-  D3DXMatrixRotationY(&ry, (float)D3DX_PI * -0.0f + t * 0.5f);
-  D3DXMatrixRotationZ(&rx, (float)D3DX_PI * -0.0f);
+  D3DXMatrixRotationY(&ry, (float)D3DX_PI * -0.0f + t);
+  D3DXMatrixRotationX(&rx, (float)D3DX_PI * -0.5f);
   D3DXMatrixMultiply(&g_World1,
                      &rx,
                      &ry);

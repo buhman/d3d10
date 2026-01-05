@@ -10,7 +10,7 @@ float4 vOutputColor;
 
 Texture2D txDiffuse;
 SamplerState samLinear {
-  Filter = MIN_MAG_MIP_LINEAR;
+  Filter = MIN_MAG_MIP_POINT;
   AddressU = Wrap;
   AddressV = Wrap;
 };
@@ -21,7 +21,7 @@ struct VS_INPUT
   float4 Weight : TEXCOORD0;
   float4 Joint : TEXCOORD1;
   float3 Normal : NORMAL;
-  //float2 Tex : TEXCOORD;
+  float2 Tex : TEXCOORD2;
 };
 
 struct PS_INPUT
@@ -30,7 +30,7 @@ struct PS_INPUT
   float4 Weight : TEXCOORD0;
   float4 Joint : TEXCOORD1;
   float3 Normal : TEXCOORD2;
-  //float2 Tex : TEXCOORD1;
+  float2 Tex : TEXCOORD3;
 };
 
 PS_INPUT VS(VS_INPUT input)
@@ -51,6 +51,7 @@ PS_INPUT VS(VS_INPUT input)
 
   output.Weight = input.Weight;
   output.Joint = input.Joint;
+  output.Tex = input.Tex;
 
   output.Normal = mul(input.Normal, mSkin);
   output.Normal = mul(output.Normal, World);
@@ -60,13 +61,15 @@ PS_INPUT VS(VS_INPUT input)
 
 float4 PS(PS_INPUT input) : SV_Target
 {
+  float4 texColor = txDiffuse.Sample(samLinear, input.Tex);
+
   float4 intensityColor = float4(0.2, 0.2, 0.2, 0.0);
   for (int i = 0; i < 2; i++) {
     intensityColor += saturate(dot((float3)vLightDir[i], input.Normal) * vLightColor[i]);
   }
   intensityColor.a = 1;
 
-  return intensityColor;
+  return texColor * intensityColor;
 }
 
 float4 PSSolid(PS_INPUT input) : SV_Target

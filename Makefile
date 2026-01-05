@@ -5,14 +5,15 @@ all: $(BUILD_TYPE)/d3d10.exe
 %.fxo: %.fx
 	fxc /Od /Zi /T fx_4_0 /nologo /Fo $@ $<
 
-$(BUILD_TYPE)/%.res: %.rc
+$(BUILD_TYPE)/%.res: %.rc main.fxo
 	rc.exe /d "_UNICODE" /d "UNICODE" /fo $@ $<
 
 $(BUILD_TYPE)/%.obj: %.cpp
 	cl.exe /Fo"$@" /Fd"$(BUILD_TYPE)\vc80.pdb" @"compile_$(BUILD_TYPE).rsp" $<
 
+#$(BUILD_TYPE)/cesium_man.obj
 OBJS = \
-	$(BUILD_TYPE)/cesium_man.obj \
+	$(BUILD_TYPE)/robot_player.obj \
 	$(BUILD_TYPE)/main.obj \
 	$(BUILD_TYPE)/main.res
 
