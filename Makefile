@@ -1,6 +1,7 @@
 BUILD_TYPE ?= debug
 
 all: $(BUILD_TYPE)/d3d10.exe
+	$(BUILD_TYPE)/d3d10.exe
 
 %.fxo: %.fx
 	fxc /Od /Zi /T fx_4_0 /nologo /Fo $@ $<

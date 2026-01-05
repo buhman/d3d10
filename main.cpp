@@ -18,7 +18,7 @@
 //#define ROOT_MESH_NODE node_2
 
 #include "robot_player.hpp"
-#define ROOT_MESH_NODE node_2
+#define ROOT_MESH_NODE node_39
 
 HINSTANCE g_hInstance = NULL;
 HWND g_hWnd = NULL;
@@ -296,8 +296,8 @@ HRESULT InitDirect3DDevice()
   //////////////////////////////////////////////////////////////////////
   D3D10_RASTERIZER_DESC RSDesc;
   RSDesc.FillMode = D3D10_FILL_SOLID;
-  //RSDesc.CullMode = D3D10_CULL_BACK;
-  RSDesc.CullMode = D3D10_CULL_NONE;
+  RSDesc.CullMode = D3D10_CULL_BACK;
+  //RSDesc.CullMode = D3D10_CULL_NONE;
   RSDesc.FrontCounterClockwise = FALSE;
   RSDesc.DepthBias = 0;
   RSDesc.SlopeScaledDepthBias = 0.0f;
@@ -512,12 +512,10 @@ HRESULT InitDirect3DDevice()
 
   bd.Usage = D3D10_USAGE_DEFAULT;
   bd.ByteWidth = mesh->indices_size;
-  //bd.ByteWidth = (sizeof (DWORD)) * indices_length;
   bd.BindFlags = D3D10_BIND_INDEX_BUFFER;
   bd.CPUAccessFlags = 0;
   bd.MiscFlags = 0;
   initData.pSysMem = mesh->indices;
-  //initData.pSysMem = indices;
   hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pIndexBuffer);
   if (FAILED(hr)) {
     print("CreateBuffer\n");
@@ -644,9 +642,6 @@ void InitializeNodeInstances()
     node_inst[i].translation = nodes[i]->translation;
     node_inst[i].rotation = nodes[i]->rotation;
     node_inst[i].scale = nodes[i]->scale;
-    //node_inst[i].translation = D3DXVECTOR3(0, 0, 0);
-    //node_inst[i].rotation = D3DXQUATERNION(0, 0, 0, 1);
-    //node_inst[i].scale = D3DXVECTOR3(1, 1, 1);
   }
 }
 
@@ -665,7 +660,7 @@ D3DXMATRIX GlobalTransform(int node_ix)
   D3DXMATRIX local_transform = MatrixTRS(&instance->translation,
                                          &instance->rotation,
                                          &instance->scale);
-  if (((int)node->parent_ix) >= 0) {
+  if (((int)node->parent_ix) != 40) {
     return local_transform * GlobalTransform(node->parent_ix);
   } else {
     return local_transform;
@@ -674,20 +669,20 @@ D3DXMATRIX GlobalTransform(int node_ix)
 
 void Animate(float t)
 {
-  const AnimationChannel * channels = animation_0__channels;
-  const int channels_length = animation_0__channels__length;
+  const AnimationChannel * channels = animation_1__channels;
+  const int channels_length = animation_1__channels__length;
 
   t = loop(t, 4.166666030883789);
 
-  // find frame and lerp (same accessor for all channels)
-  const float * input = channels[0].sampler->input;
-  const int input_length = channels[0].sampler->length;
-
-  int frame_ix = FindFrame(input, input_length, t);
-  float lerp = Lerp(input, t, frame_ix);
-
   // sample all channels
   for (int i = 0; i < channels_length; i++) {
+
+    // find frame and lerp (same accessor for all channels)
+    const float * input = channels[i].sampler->input;
+    const int input_length = channels[i].sampler->length;
+    int frame_ix = FindFrame(input, input_length, t);
+    float lerp = Lerp(input, t, frame_ix);
+
     const AnimationSampler * sampler = channels[i].sampler;
     NodeInstance * instance = &node_inst[channels[i].target.node_ix];
     switch (channels[i].target.path) {
@@ -757,8 +752,8 @@ void Render()
 
   D3DXMATRIX rx;
   D3DXMATRIX ry;
-  D3DXMatrixRotationY(&ry, (float)D3DX_PI * -0.0f + t);
-  D3DXMatrixRotationX(&rx, (float)D3DX_PI * -0.5f);
+  D3DXMatrixRotationY(&ry, (float)D3DX_PI * -1.0f + t);
+  D3DXMatrixRotationX(&rx, (float)D3DX_PI * -0.0f);
   D3DXMatrixMultiply(&g_World1,
                      &rx,
                      &ry);
