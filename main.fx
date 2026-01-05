@@ -2,7 +2,7 @@ matrix World;
 matrix View;
 matrix Projection;
 
-matrix mJoint[2];
+matrix mJoint[20];
 
 float4 vLightDir[2];
 float4 vLightColor[2];
@@ -20,7 +20,7 @@ struct VS_INPUT
   float4 Pos : POSITION;
   float4 Weight : TEXCOORD0;
   float4 Joint : TEXCOORD1;
-  //float3 Normal : NORMAL;
+  float3 Normal : NORMAL;
   //float2 Tex : TEXCOORD;
 };
 
@@ -29,7 +29,7 @@ struct PS_INPUT
   float4 Pos : SV_POSITION;
   float4 Weight : TEXCOORD0;
   float4 Joint : TEXCOORD1;
-  //float3 Normal : TEXCOORD0;
+  float3 Normal : TEXCOORD2;
   //float2 Tex : TEXCOORD1;
 };
 
@@ -52,30 +52,27 @@ PS_INPUT VS(VS_INPUT input)
   output.Weight = input.Weight;
   output.Joint = input.Joint;
 
-  //output.Normal = mul(input.Normal, World);
-  //output.Tex = input.Tex;
+  output.Normal = mul(input.Normal, mSkin);
+  output.Normal = mul(output.Normal, World);
+
   return output;
 }
 
-/*
 float4 PS(PS_INPUT input) : SV_Target
 {
-  float4 texColor = txDiffuse.Sample(samLinear, input.Tex);
-
-  float4 intensityColor = 0;
+  float4 intensityColor = float4(0.2, 0.2, 0.2, 0.0);
   for (int i = 0; i < 2; i++) {
     intensityColor += saturate(dot((float3)vLightDir[i], input.Normal) * vLightColor[i]);
   }
   intensityColor.a = 1;
 
-  return texColor * intensityColor;
+  return intensityColor;
 }
-*/
 
 float4 PSSolid(PS_INPUT input) : SV_Target
 {
   //return vOutputColor;
-  return float4(input.Weight.xy, input.Joint.y, 1);
+  return float4(input.Weight.xyz, 1);
 }
 
 technique10 Render
@@ -84,7 +81,7 @@ technique10 Render
   {
     SetVertexShader(CompileShader(vs_4_0, VS()));
     SetGeometryShader(NULL);
-    SetPixelShader(CompileShader(ps_4_0, PSSolid()));
+    SetPixelShader(CompileShader(ps_4_0, PS()));
   }
 }
 

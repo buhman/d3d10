@@ -7,9 +7,12 @@
 
 #include "gltf.hpp"
 #include "gltf_instance.hpp"
-#include "rigged_simple.hpp"
 
-#define ROOT_MESH_NODE node_2
+//#include "rigged_simple.hpp"
+//#define ROOT_MESH_NODE node_2
+
+#include "rigged_figure.hpp"
+#define ROOT_MESH_NODE node_1
 
 HINSTANCE g_hInstance = NULL;
 HWND g_hWnd = NULL;
@@ -380,7 +383,7 @@ HRESULT InitDirect3DDevice()
     {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
     {"TEXCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
     {"TEXCOORD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 2, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
-    //{"NORMAL"  , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"NORMAL"  , 0, DXGI_FORMAT_R32G32B32_FLOAT, 3, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
     //{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0},
   };
   UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
@@ -409,7 +412,8 @@ HRESULT InitDirect3DDevice()
 
   const Mesh * mesh = ROOT_MESH_NODE.mesh;
 
-  ID3D10Buffer * pVertexBuffers[3];
+  const DWORD dwVertexBufferCount = 4;
+  ID3D10Buffer * pVertexBuffers[dwVertexBufferCount];
 
   // position
   bd.Usage = D3D10_USAGE_DEFAULT;
@@ -450,17 +454,35 @@ HRESULT InitDirect3DDevice()
     return hr;
   }
 
+  // normals
+  bd.Usage = D3D10_USAGE_DEFAULT;
+  bd.ByteWidth = mesh->normal_size;
+  bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
+  bd.CPUAccessFlags = 0;
+  bd.MiscFlags = 0;
+  initData.pSysMem = mesh->normal;
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &pVertexBuffers[3]);
+  if (FAILED(hr)) {
+    print("CreateBuffer\n");
+    return hr;
+  }
+
   UINT stride[] = {
     (sizeof (mesh->position[0])),
     (sizeof (mesh->weights_0[0])),
     (sizeof (mesh->joints_0[0])),
+    (sizeof (mesh->normal[0])),
   };
-  UINT offset[] = { 0, 0, 0 };
-  g_pd3dDevice->IASetVertexBuffers(0, 3, pVertexBuffers, stride, offset);
+  UINT offset[] = { 0, 0, 0, 0 };
+  g_pd3dDevice->IASetVertexBuffers(0, dwVertexBufferCount, pVertexBuffers, stride, offset);
 
   //////////////////////////////////////////////////////////////////////
   // index buffer
   //////////////////////////////////////////////////////////////////////
+
+  assert(accessor_3_length == accessor_2_length);
+  assert(accessor_3_length == accessor_4_length);
+  assert(accessor_3_length == accessor_1_length);
 
   bd.Usage = D3D10_USAGE_DEFAULT;
   bd.ByteWidth = mesh->indices_size;
@@ -484,8 +506,8 @@ HRESULT InitDirect3DDevice()
   D3DXMatrixIdentity(&g_World1);
   D3DXMatrixIdentity(&g_World2);
 
-  D3DXVECTOR3 Eye(0.0f, 0.0f, -10.0f);
-  D3DXVECTOR3 At(0.0f, 0.0f, 0.0f);
+  D3DXVECTOR3 Eye(0.0f, 1.0f, -1.5f);
+  D3DXVECTOR3 At(0.0f, 0.5f, 0.0f);
   D3DXVECTOR3 Up(0.0f, 1.0f, 0.0f);
   D3DXMatrixLookAtLH(&g_View, &Eye, &At, &Up);
 
@@ -555,6 +577,7 @@ static inline D3DXMATRIX MatrixTRS(const D3DXVECTOR3 * translation,
   D3DXMATRIX mScaling;
   D3DXMatrixScaling(&mScaling, scaling->x, scaling->y, scaling->z);
 
+  //return mScaling * mRotation * mTranslation;
   return mScaling * mRotation * mTranslation;
 }
 
@@ -583,7 +606,8 @@ static inline float Lerp(const float * frames, float t, int frame_ix)
   return (t - frames[frame_ix]) / (frames[frame_ix + 1] - frames[frame_ix]);
 }
 
-D3DXMATRIX mJoints[2];
+const int joints_length = (sizeof (skin_0__joints)) / (sizeof (skin_0__joints[0]));
+D3DXMATRIX mJoints[joints_length];
 
 NodeInstance node_inst[nodes_length];
 
@@ -593,6 +617,9 @@ void InitializeNodeInstances()
     node_inst[i].translation = nodes[i]->translation;
     node_inst[i].rotation = nodes[i]->rotation;
     node_inst[i].scale = nodes[i]->scale;
+    //node_inst[i].translation = D3DXVECTOR3(0, 0, 0);
+    //node_inst[i].rotation = D3DXQUATERNION(0, 0, 0, 1);
+    //node_inst[i].scale = D3DXVECTOR3(1, 1, 1);
   }
 }
 
@@ -602,6 +629,20 @@ void VectorLerp(D3DXVECTOR3 * output,
                 const float t)
 {
   *output = *a + t * (*b - *a);
+}
+
+D3DXMATRIX GlobalTransform(int node_ix)
+{
+  const NodeInstance * instance = &node_inst[node_ix];
+  const Node * node = nodes[node_ix];
+  D3DXMATRIX local_transform = MatrixTRS(&instance->translation,
+                                         &instance->rotation,
+                                         &instance->scale);
+  if (((int)node->parent_ix) >= 0) {
+    return local_transform * GlobalTransform(node->parent_ix);
+  } else {
+    return local_transform;
+  }
 }
 
 void Animate(float t)
@@ -619,6 +660,7 @@ void Animate(float t)
   float lerp = Lerp(input, t, frame_ix);
 
   // sample all channels
+  if (1)
   for (int i = 0; i < channels_length; i++) {
     const AnimationSampler * sampler = channels[i].sampler;
     NodeInstance * instance = &node_inst[channels[i].target.node_ix];
@@ -639,7 +681,6 @@ void Animate(float t)
                             &output[frame_ix],
                             &output[frame_ix+1],
                             lerp);
-
         break;
       }
     case ACP__SCALE:
@@ -659,23 +700,13 @@ void Animate(float t)
 
   // transform all joints
   const Skin * skin = ROOT_MESH_NODE.skin;
-  assert(skin->joints_length == 2);
   for (DWORD i = 0; i < skin->joints_length; i++) {
     const int joint_ix = skin->joints[i];
-    const NodeInstance * instance = &node_inst[joint_ix];
+    assert(joint_ix >= 0);
 
     const D3DXMATRIX& inverse_bind_matrix = skin->inverse_bind_matrices[i];
 
-    // T * R * S
-    //&instance->translation,
-    //&instance->scale
-    D3DXVECTOR3 translation = D3DXVECTOR3(0, 0, 0);
-    D3DXVECTOR3 scale = D3DXVECTOR3(1, 1, 1);
-    D3DXMATRIX global_transform = MatrixTRS(&instance->translation,
-                                            &instance->rotation,
-                                            &instance->scale);
-
-    mJoints[i] = inverse_bind_matrix * global_transform;
+    mJoints[i] = inverse_bind_matrix * GlobalTransform(joint_ix);
   }
 }
 
@@ -692,16 +723,17 @@ void Render()
     t = (dwTimeCur - dwTimeStart) / 1000.0f;
 #endif
 
-  D3DXMatrixIdentity(&mJoints[0]);
-  D3DXMatrixIdentity(&mJoints[1]);
+  for (int i = 0; i < joints_length; i++) {
+    D3DXMatrixIdentity(&mJoints[i]);
+  }
   Animate(t);
 
   // first cube
 
   D3DXMATRIX rx;
   D3DXMATRIX ry;
-  D3DXMatrixRotationX(&ry, D3DX_PI * -0.5);
-  D3DXMatrixRotationZ(&rx, D3DX_PI * 0.5);
+  D3DXMatrixRotationX(&ry, (float)D3DX_PI * -0.5f);
+  D3DXMatrixRotationZ(&rx, (float)D3DX_PI * 0.5f + t * 0.5f);
   D3DXMatrixMultiply(&g_World1,
                      &rx,
                      &ry);
@@ -736,7 +768,7 @@ void Render()
   g_pWorldVariable->SetMatrix((float *)&g_World1);
   g_pDiffuseVariable->SetResource(g_pTextureShaderResourceView);
 
-  g_pJointVariable->SetMatrixArray((float *)mJoints, 0, 2);
+  g_pJointVariable->SetMatrixArray((float *)mJoints, 0, joints_length);
 
   // color
   g_pOutputColorVariable->SetFloatVector((float *)&vLightColors[0]);
