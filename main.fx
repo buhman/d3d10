@@ -2,7 +2,7 @@ matrix World;
 matrix View;
 matrix Projection;
 
-matrix mJoint[20];
+matrix mJoint[39];
 
 float4 vLightDir[2];
 float4 vLightColor[2];

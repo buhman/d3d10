@@ -8,8 +8,6 @@
 /FD
 /EHsc
 /MT
-/Fo"Release\\"
-/Fd"Release\vc80.pdb"
 /W3
 /c
 /Wp64

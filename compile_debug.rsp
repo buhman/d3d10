@@ -8,8 +8,6 @@
 /EHsc
 /RTC1
 /MDd
-/Fo"Debug\\"
-/Fd"Debug\vc80.pdb"
 /W3
 /c
 /Wp64

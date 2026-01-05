@@ -11,8 +11,11 @@
 //#include "rigged_simple.hpp"
 //#define ROOT_MESH_NODE node_2
 
-#include "rigged_figure.hpp"
-#define ROOT_MESH_NODE node_1
+//#include "rigged_figure.hpp"
+//#define ROOT_MESH_NODE node_1
+
+#include "cesium_man.hpp"
+#define ROOT_MESH_NODE node_2
 
 HINSTANCE g_hInstance = NULL;
 HWND g_hWnd = NULL;
@@ -206,16 +209,20 @@ HRESULT InitDirect3DViews()
   descDepth.CPUAccessFlags = 0;
   descDepth.MiscFlags = 0;
   hr = g_pd3dDevice->CreateTexture2D(&descDepth, NULL, &g_pDepthStencil);
-  if (FAILED(hr))
+  if (FAILED(hr)) {
+    print("CreateTexture2D\n");
     return hr;
+  }
 
   D3D10_DEPTH_STENCIL_VIEW_DESC descDSV;
   descDSV.Format = descDepth.Format;
   descDSV.ViewDimension = D3D10_DSV_DIMENSION_TEXTURE2D;
   descDSV.Texture2D.MipSlice = 0;
   hr = g_pd3dDevice->CreateDepthStencilView(g_pDepthStencil, &descDSV, &g_pDepthStencilView);
-  if (FAILED(hr))
+  if (FAILED(hr)) {
+    print("CreateDepthStencilView\n");
     return hr;
+  }
 
   g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetView, g_pDepthStencilView);
 
@@ -299,8 +306,10 @@ HRESULT InitDirect3DDevice()
 
   ID3D10RasterizerState* pRState = NULL;
   hr = g_pd3dDevice->CreateRasterizerState(&RSDesc, &pRState);
-  if (FAILED(hr))
+  if (FAILED(hr)) {
+    print("CreateRasterizerState\n");
     return hr;
+  }
 
   g_pd3dDevice->RSSetState(pRState);
 
@@ -332,8 +341,10 @@ HRESULT InitDirect3DDevice()
   descTexture.CPUAccessFlags = 0;
   descTexture.MiscFlags = 0;
   hr = g_pd3dDevice->CreateTexture2D(&descTexture, &initSeafloorData, &g_pTexture);
-  if (FAILED(hr))
+  if (FAILED(hr)) {
+    print("CreateTexture2D\n");
     return hr;
+  }
 
   D3D10_SHADER_RESOURCE_VIEW_DESC descSRV;
   descSRV.Format = descTexture.Format;
@@ -341,8 +352,10 @@ HRESULT InitDirect3DDevice()
   descSRV.Texture2D.MostDetailedMip = 0;
   descSRV.Texture2D.MipLevels = 1;
   hr = g_pd3dDevice->CreateShaderResourceView(g_pTexture, &descSRV, &g_pTextureShaderResourceView);
-  if (FAILED(hr))
+  if (FAILED(hr)) {
+    print("CreateShaderResourceView\n");
     return hr;
+  }
 
   // effect
   HRSRC hRes = FindResource(NULL, L"RES_MAIN_FXO", RT_RCDATA);
@@ -480,10 +493,6 @@ HRESULT InitDirect3DDevice()
   // index buffer
   //////////////////////////////////////////////////////////////////////
 
-  assert(accessor_3_length == accessor_2_length);
-  assert(accessor_3_length == accessor_4_length);
-  assert(accessor_3_length == accessor_1_length);
-
   bd.Usage = D3D10_USAGE_DEFAULT;
   bd.ByteWidth = mesh->indices_size;
   //bd.ByteWidth = (sizeof (DWORD)) * indices_length;
@@ -493,8 +502,10 @@ HRESULT InitDirect3DDevice()
   initData.pSysMem = mesh->indices;
   //initData.pSysMem = indices;
   hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pIndexBuffer);
-  if (FAILED(hr))
+  if (FAILED(hr)) {
+    print("CreateBuffer\n");
     return hr;
+  }
 
   g_pd3dDevice->IASetIndexBuffer(g_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
@@ -606,14 +617,13 @@ static inline float Lerp(const float * frames, float t, int frame_ix)
   return (t - frames[frame_ix]) / (frames[frame_ix + 1] - frames[frame_ix]);
 }
 
-const int joints_length = (sizeof (skin_0__joints)) / (sizeof (skin_0__joints[0]));
+const int joints_length = skin_0__joints__length;
 D3DXMATRIX mJoints[joints_length];
-
-NodeInstance node_inst[nodes_length];
+NodeInstance node_inst[nodes__length];
 
 void InitializeNodeInstances()
 {
-  for (int i = 0; i < nodes_length; i++) {
+  for (int i = 0; i < nodes__length; i++) {
     node_inst[i].translation = nodes[i]->translation;
     node_inst[i].rotation = nodes[i]->rotation;
     node_inst[i].scale = nodes[i]->scale;
@@ -648,9 +658,9 @@ D3DXMATRIX GlobalTransform(int node_ix)
 void Animate(float t)
 {
   const AnimationChannel * channels = animation_0__channels;
-  const int channels_length = (sizeof (animation_0__channels)) / (sizeof (animation_0__channels[0]));
+  const int channels_length = animation_0__channels__length;
 
-  t = loop(t, 2.0833330154418945);
+  t = loop(t, 2.0);
 
   // find frame and lerp (same accessor for all channels)
   const float * input = channels[0].sampler->input;
@@ -658,6 +668,7 @@ void Animate(float t)
 
   int frame_ix = FindFrame(input, input_length, t);
   float lerp = Lerp(input, t, frame_ix);
+  //float lerp = 0.0;
 
   // sample all channels
   if (1)
@@ -732,8 +743,8 @@ void Render()
 
   D3DXMATRIX rx;
   D3DXMATRIX ry;
-  D3DXMatrixRotationX(&ry, (float)D3DX_PI * -0.5f);
-  D3DXMatrixRotationZ(&rx, (float)D3DX_PI * 0.5f + t * 0.5f);
+  D3DXMatrixRotationY(&ry, (float)D3DX_PI * -0.0f + t * 0.5f);
+  D3DXMatrixRotationZ(&rx, (float)D3DX_PI * -0.0f);
   D3DXMatrixMultiply(&g_World1,
                      &rx,
                      &ry);
