@@ -4,6 +4,8 @@
 /D "_WINDOWS"
 /D "_UNICODE"
 /D "UNICODE"
+/D "_WIN32_WINNT=0x0501"
+/I ".\include"
 /Gm
 /EHsc
 /RTC1

@@ -1,21 +1,14 @@
-#define _WIN32_WINNT 0x0501
 #include <windows.h>
 #include <d3d10.h>
 #include <d3dx10.h>
-#include <strsafe.h>
 #include <assert.h>
+
+#include "globals.hpp"
+#include "print.hpp"
+#include "render_state.hpp"
 
 #include "gltf.hpp"
 #include "gltf_instance.hpp"
-
-//#include "rigged_simple.hpp"
-//#define ROOT_MESH_NODE node_2
-
-//#include "rigged_figure.hpp"
-//#define ROOT_MESH_NODE node_1
-
-//#include "cesium_man.hpp"
-//#define ROOT_MESH_NODE node_2
 
 #include "robot_player.hpp"
 #define ROOT_MESH_NODE node_39
@@ -34,7 +27,6 @@ ID3D10InputLayout * g_pVertexLayout = NULL;
 //ID3D10Buffer * g_pVertexBuffer = NULL;
 ID3D10Buffer * g_pIndexBuffer = NULL;
 
-ID3D10Texture2D * g_pTexture = NULL;
 ID3D10ShaderResourceView * g_pTextureShaderResourceView = NULL;
 
 ID3D10EffectMatrixVariable * g_pWorldVariable = NULL;
@@ -63,29 +55,6 @@ struct WindowSize {
 };
 
 WindowSize g_ViewportSize;
-
-void print(LPCSTR fmt, ...)
-{
-  va_list args;
-  va_start(args, fmt);
-  char buf[512];
-  STRSAFE_LPSTR end;
-
-  StringCbVPrintfExA(buf,
-                     (sizeof (buf)),
-                     &end,
-                     NULL,
-                     STRSAFE_NULL_ON_FAILURE,
-                     fmt,
-                     args);
-  va_end(args);
-  size_t length = end - &buf[0];
-  #ifdef _DEBUG
-  OutputDebugStringA(buf);
-  #endif
-  //HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-  //WriteConsoleA(hOutput, buf, (DWORD)length, NULL, NULL);
-}
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
@@ -320,47 +289,10 @@ HRESULT InitDirect3DDevice()
 
   InitDirect3DViews();
 
-  // texture
-  HRSRC hRobotPlayerRes = FindResource(NULL, L"RES_ROBOT_PLAYER", RT_RCDATA);
-  if (hRobotPlayerRes == NULL) {
-    print("FindResource\n");
-    return -1;
-  }
-  DWORD dwRobotPlayerResSize = SizeofResource(NULL, hRobotPlayerRes);
-  HGLOBAL hRobotPlayerData = LoadResource(NULL, hRobotPlayerRes);
-  D3D10_SUBRESOURCE_DATA initRobotPlayerData;
-  initRobotPlayerData.pSysMem = LockResource(hRobotPlayerData);
-  initRobotPlayerData.SysMemPitch = 64 * 4;
-  D3D10_TEXTURE2D_DESC descTexture;
-  descTexture.Width = 64;
-  descTexture.Height = 64;
-  descTexture.MipLevels = 1;
-  descTexture.ArraySize = 1;
-  descTexture.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-  descTexture.SampleDesc.Count = 1;
-  descTexture.SampleDesc.Quality = 0;
-  descTexture.Usage = D3D10_USAGE_DEFAULT;
-  descTexture.BindFlags = D3D10_BIND_SHADER_RESOURCE;
-  descTexture.CPUAccessFlags = 0;
-  descTexture.MiscFlags = 0;
-  hr = g_pd3dDevice->CreateTexture2D(&descTexture, &initRobotPlayerData, &g_pTexture);
-  if (FAILED(hr)) {
-    print("CreateTexture2D\n");
-    return hr;
-  }
-
-  D3D10_SHADER_RESOURCE_VIEW_DESC descSRV;
-  descSRV.Format = descTexture.Format;
-  descSRV.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
-  descSRV.Texture2D.MostDetailedMip = 0;
-  descSRV.Texture2D.MipLevels = 1;
-  hr = g_pd3dDevice->CreateShaderResourceView(g_pTexture, &descSRV, &g_pTextureShaderResourceView);
-  if (FAILED(hr)) {
-    print("CreateShaderResourceView\n");
-    return hr;
-  }
-
+  //////////////////////////////////////////////////////////////////////
   // effect
+  //////////////////////////////////////////////////////////////////////
+
   HRSRC hRes = FindResource(NULL, L"RES_MAIN_FXO", RT_RCDATA);
   if (hRes == NULL) {
     print("FindResource\n");
@@ -394,7 +326,10 @@ HRESULT InitDirect3DDevice()
   g_pOutputColorVariable = g_pEffect->GetVariableByName("vOutputColor")->AsVector();
   g_pDiffuseVariable = g_pEffect->GetVariableByName("txDiffuse")->AsShaderResource();
 
+  //////////////////////////////////////////////////////////////////////
   // input layout
+  //////////////////////////////////////////////////////////////////////
+
   D3D10_INPUT_ELEMENT_DESC layout[] = {
     {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
     {"TEXCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
@@ -527,8 +462,19 @@ HRESULT InitDirect3DDevice()
   g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
   //////////////////////////////////////////////////////////////////////
+  // textures
+  //////////////////////////////////////////////////////////////////////
+
+  hr = LoadTexture(L"RES_ROBOT_PLAYER", 64, 64, &g_pTextureShaderResourceView);
+  if (FAILED(hr)) {
+    print("LoadTexture\n");
+    return hr;
+  }
+
+  //////////////////////////////////////////////////////////////////////
   // transform matrices
   //////////////////////////////////////////////////////////////////////
+
   D3DXMatrixIdentity(&g_World1);
   D3DXMatrixIdentity(&g_World2);
 
@@ -746,7 +692,7 @@ void Render()
   for (int i = 0; i < joints_length; i++) {
     D3DXMatrixIdentity(&mJoints[i]);
   }
-  Animate(t);
+  //Animate(t);
 
   // first cube
 
