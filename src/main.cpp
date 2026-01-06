@@ -24,8 +24,9 @@ ID3D10Effect * g_pEffect = NULL;
 ID3D10EffectTechnique * g_pTechniqueRender = NULL;
 ID3D10EffectTechnique * g_pTechniqueRenderLight = NULL;
 ID3D10InputLayout * g_pVertexLayout = NULL;
-//ID3D10Buffer * g_pVertexBuffer = NULL;
 ID3D10Buffer * g_pIndexBuffer = NULL;
+const DWORD g_dwVertexBufferCount = 5;
+ID3D10Buffer * g_pVertexBuffers[g_dwVertexBufferCount];
 
 ID3D10ShaderResourceView * g_pTextureShaderResourceView = NULL;
 
@@ -350,21 +351,16 @@ HRESULT InitDirect3DDevice()
     print("CreateInputLayout\n");
     return hr;
   }
-  g_pd3dDevice->IASetInputLayout(g_pVertexLayout);
 
   //
-
-  D3D10_BUFFER_DESC bd;
-  D3D10_SUBRESOURCE_DATA initData;
 
   //////////////////////////////////////////////////////////////////////
   // vertex buffers
   //////////////////////////////////////////////////////////////////////
+  D3D10_BUFFER_DESC bd;
+  D3D10_SUBRESOURCE_DATA initData;
 
   const Mesh * mesh = ROOT_MESH_NODE.mesh;
-
-  const DWORD dwVertexBufferCount = 5;
-  ID3D10Buffer * pVertexBuffers[dwVertexBufferCount];
 
   // position
   bd.Usage = D3D10_USAGE_DEFAULT;
@@ -373,7 +369,7 @@ HRESULT InitDirect3DDevice()
   bd.CPUAccessFlags = 0;
   bd.MiscFlags = 0;
   initData.pSysMem = mesh->position;
-  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &pVertexBuffers[0]);
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffers[0]);
   if (FAILED(hr)) {
     print("CreateBuffer\n");
     return hr;
@@ -386,7 +382,7 @@ HRESULT InitDirect3DDevice()
   bd.CPUAccessFlags = 0;
   bd.MiscFlags = 0;
   initData.pSysMem = mesh->weights_0;
-  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &pVertexBuffers[1]);
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffers[1]);
   if (FAILED(hr)) {
     print("CreateBuffer\n");
     return hr;
@@ -399,7 +395,7 @@ HRESULT InitDirect3DDevice()
   bd.CPUAccessFlags = 0;
   bd.MiscFlags = 0;
   initData.pSysMem = mesh->joints_0;
-  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &pVertexBuffers[2]);
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffers[2]);
   if (FAILED(hr)) {
     print("CreateBuffer\n");
     return hr;
@@ -412,7 +408,7 @@ HRESULT InitDirect3DDevice()
   bd.CPUAccessFlags = 0;
   bd.MiscFlags = 0;
   initData.pSysMem = mesh->normal;
-  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &pVertexBuffers[3]);
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffers[3]);
   if (FAILED(hr)) {
     print("CreateBuffer\n");
     return hr;
@@ -425,21 +421,11 @@ HRESULT InitDirect3DDevice()
   bd.CPUAccessFlags = 0;
   bd.MiscFlags = 0;
   initData.pSysMem = mesh->texcoord_0;
-  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &pVertexBuffers[4]);
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffers[4]);
   if (FAILED(hr)) {
     print("CreateBuffer\n");
     return hr;
   }
-
-  UINT stride[] = {
-    (sizeof (mesh->position[0])),
-    (sizeof (mesh->weights_0[0])),
-    (sizeof (mesh->joints_0[0])),
-    (sizeof (mesh->normal[0])),
-    (sizeof (mesh->texcoord_0[0])),
-  };
-  UINT offset[] = { 0, 0, 0, 0, 0 };
-  g_pd3dDevice->IASetVertexBuffers(0, dwVertexBufferCount, pVertexBuffers, stride, offset);
 
   //////////////////////////////////////////////////////////////////////
   // index buffer
@@ -456,10 +442,6 @@ HRESULT InitDirect3DDevice()
     print("CreateBuffer\n");
     return hr;
   }
-
-  g_pd3dDevice->IASetIndexBuffer(g_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-  g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
   //////////////////////////////////////////////////////////////////////
   // textures
@@ -676,23 +658,12 @@ void Animate(float t)
   }
 }
 
-void Render()
+void RenderModel(float t)
 {
-  static float t = 0.0f;
-#ifdef _DEBUG
-    t += (float)D3DX_PI * 0.0125f * 0.5;
-#else
-    static DWORD dwTimeStart = 0;
-    DWORD dwTimeCur = GetTickCount();
-    if (dwTimeStart == 0)
-      dwTimeStart = dwTimeCur;
-    t = (dwTimeCur - dwTimeStart) / 1000.0f;
-#endif
-
   for (int i = 0; i < joints_length; i++) {
     D3DXMatrixIdentity(&mJoints[i]);
   }
-  //Animate(t);
+  Animate(t);
 
   // first cube
 
@@ -744,6 +715,21 @@ void Render()
   g_pLightColorVariable->SetFloatVectorArray((float *)vLightColors, 0, 2);
 
   // render first cube
+  const Mesh * mesh = ROOT_MESH_NODE.mesh;
+
+  UINT stride[] = {
+    (sizeof (mesh->position[0])),
+    (sizeof (mesh->weights_0[0])),
+    (sizeof (mesh->joints_0[0])),
+    (sizeof (mesh->normal[0])),
+    (sizeof (mesh->texcoord_0[0])),
+  };
+  UINT offset[] = { 0, 0, 0, 0, 0 };
+  g_pd3dDevice->IASetInputLayout(g_pVertexLayout);
+  g_pd3dDevice->IASetVertexBuffers(0, g_dwVertexBufferCount, g_pVertexBuffers, stride, offset);
+  g_pd3dDevice->IASetIndexBuffer(g_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+  g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
   D3D10_TECHNIQUE_DESC techDesc;
   g_pTechniqueRender->GetDesc(&techDesc);
 
@@ -752,6 +738,22 @@ void Render()
     g_pTechniqueRender->GetPassByIndex(p)->Apply(0);
     g_pd3dDevice->DrawIndexed(indices_length, 0, 0);
   }
+}
+
+void Render()
+{
+  static float t = 0.0f;
+#ifdef _DEBUG
+  t += (float)D3DX_PI * 0.0125f * 0.5;
+#else
+  static DWORD dwTimeStart = 0;
+  DWORD dwTimeCur = GetTickCount();
+  if (dwTimeStart == 0)
+    dwTimeStart = dwTimeCur;
+  t = (dwTimeCur - dwTimeStart) / 1000.0f;
+#endif
+
+  RenderModel(t);
 
   // render the lights
   /*
