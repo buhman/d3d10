@@ -6,7 +6,11 @@ all: $(BUILD_TYPE)/d3d10.exe
 %.fxo: %.fx
 	fxc /Od /Zi /T fx_4_0 /nologo /Fo $@ $<
 
-$(BUILD_TYPE)/%.res: %.rc main.fxo
+SHADERS = \
+	main.fxo \
+	font.fxo
+
+$(BUILD_TYPE)/%.res: %.rc $(SHADERS)
 	rc.exe /d "_UNICODE" /d "UNICODE" /fo $@ $<
 
 $(BUILD_TYPE)/%.obj: src/%.cpp
@@ -21,4 +25,4 @@ OBJS = \
 
 $(BUILD_TYPE)/d3d10.exe: $(OBJS)
 	link.exe /OUT:"$(BUILD_TYPE)\d3d10.exe" /PDB:"$(BUILD_TYPE)\d3d10.pdb" @"link_$(BUILD_TYPE).rsp" $(OBJS) /NOLOGO /ERRORREPORT:PROMPT
-	mt.exe -manifest d3d10.exe.${BUILD_TYPE}.manifest -outputresource:$(BUILD_TYPE)\d3d10.exe;1
+	mt.exe -manifest d3d10.exe.${BUILD_TYPE}.manifest -outputresource:$(BUILD_TYPE)\d3d10.exe;1 -nologo

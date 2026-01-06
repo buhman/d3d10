@@ -20,6 +20,9 @@ IDXGISwapChain * g_pSwapChain = NULL;
 ID3D10Texture2D * g_pDepthStencil = NULL;
 ID3D10RenderTargetView * g_pRenderTargetView = NULL;
 ID3D10DepthStencilView * g_pDepthStencilView = NULL;
+
+// mesh
+
 ID3D10Effect * g_pEffect = NULL;
 ID3D10EffectTechnique * g_pTechniqueRender = NULL;
 ID3D10EffectTechnique * g_pTechniqueRenderLight = NULL;
@@ -27,7 +30,6 @@ ID3D10InputLayout * g_pVertexLayout = NULL;
 ID3D10Buffer * g_pIndexBuffer = NULL;
 const DWORD g_dwVertexBufferCount = 5;
 ID3D10Buffer * g_pVertexBuffers[g_dwVertexBufferCount];
-
 ID3D10ShaderResourceView * g_pTextureShaderResourceView = NULL;
 
 ID3D10EffectMatrixVariable * g_pWorldVariable = NULL;
@@ -42,6 +44,15 @@ D3DXMATRIX g_World1;
 D3DXMATRIX g_World2;
 D3DXMATRIX g_View;
 D3DXMATRIX g_Projection;
+
+// font
+
+ID3D10Effect * g_pEffectFont = NULL;
+ID3D10EffectTechnique * g_pTechniqueFont = NULL;
+ID3D10InputLayout * g_pVertexLayoutFont = NULL;
+const DWORD g_dwVertexBufferCountFont = 1;
+ID3D10Buffer * g_pVertexBuffersFont[g_dwVertexBufferCountFont];
+
 
 HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -215,144 +226,9 @@ HRESULT InitDirect3DViews()
   return true;
 }
 
-HRESULT InitDirect3DDevice()
+HRESULT LoadMesh()
 {
-  RECT rc;
-  GetClientRect(g_hWnd, &rc);
-  UINT width = rc.right - rc.left;
-  UINT height = rc.bottom - rc.top;
-
-  DXGI_SWAP_CHAIN_DESC sd = {};
-  sd.BufferCount = 1;
-  sd.BufferDesc.Width = width;
-  sd.BufferDesc.Height = height;
-  sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-  sd.BufferDesc.RefreshRate.Numerator = 60;
-  sd.BufferDesc.RefreshRate.Denominator = 1;
-  sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-  sd.OutputWindow = g_hWnd;
-  sd.SampleDesc.Count = 1;
-  sd.SampleDesc.Quality = 0;
-  sd.Windowed = TRUE;
-
-  D3D10_DRIVER_TYPE driverTypes[] = {
-    D3D10_DRIVER_TYPE_HARDWARE,
-    D3D10_DRIVER_TYPE_REFERENCE,
-  };
-  UINT numDriverTypes = (sizeof (driverTypes)) / (sizeof (driverTypes[0]));
-
   HRESULT hr;
-  D3D10_DRIVER_TYPE driverType = D3D10_DRIVER_TYPE_NULL;
-  for (UINT i = 0; i < numDriverTypes; i++) {
-    driverType = driverTypes[i];
-    hr = D3D10CreateDeviceAndSwapChain(NULL,
-                                       driverType,
-                                       NULL,
-                                       D3D10_CREATE_DEVICE_DEBUG,
-                                       D3D10_SDK_VERSION,
-                                       &sd,
-                                       &g_pSwapChain,
-                                       &g_pd3dDevice);
-    if (SUCCEEDED(hr))
-      break;
-  }
-  if (FAILED(hr)) {
-    print("D3D10CreateDeviceAndSwapChain\n");
-    return hr;
-  }
-
-  //////////////////////////////////////////////////////////////////////
-  // rasterizer state
-  //////////////////////////////////////////////////////////////////////
-  D3D10_RASTERIZER_DESC RSDesc;
-  RSDesc.FillMode = D3D10_FILL_SOLID;
-  RSDesc.CullMode = D3D10_CULL_BACK;
-  //RSDesc.CullMode = D3D10_CULL_NONE;
-  RSDesc.FrontCounterClockwise = FALSE;
-  RSDesc.DepthBias = 0;
-  RSDesc.SlopeScaledDepthBias = 0.0f;
-  RSDesc.DepthBiasClamp= 0;
-  RSDesc.DepthClipEnable = TRUE;
-  RSDesc.ScissorEnable = FALSE;
-  RSDesc.AntialiasedLineEnable = FALSE;
-  RSDesc.MultisampleEnable = FALSE;
-
-  ID3D10RasterizerState* pRState = NULL;
-  hr = g_pd3dDevice->CreateRasterizerState(&RSDesc, &pRState);
-  if (FAILED(hr)) {
-    print("CreateRasterizerState\n");
-    return hr;
-  }
-
-  g_pd3dDevice->RSSetState(pRState);
-
-  //
-
-  InitDirect3DViews();
-
-  //////////////////////////////////////////////////////////////////////
-  // effect
-  //////////////////////////////////////////////////////////////////////
-
-  HRSRC hRes = FindResource(NULL, L"RES_MAIN_FXO", RT_RCDATA);
-  if (hRes == NULL) {
-    print("FindResource\n");
-    return -1;
-  }
-  DWORD dwResSize = SizeofResource(NULL, hRes);
-  HGLOBAL hData = LoadResource(NULL, hRes);
-  void * pData = LockResource(hData);
-  hr = D3D10CreateEffectFromMemory(pData,
-                                   dwResSize,
-                                   0,
-                                   g_pd3dDevice,
-                                   NULL,
-                                   &g_pEffect
-                                   );
-  if (FAILED(hr)) {
-    print("D3D10CreateEffectFromMemory\n");
-    return hr;
-  }
-
-  g_pTechniqueRender = g_pEffect->GetTechniqueByName("Render");
-  g_pTechniqueRenderLight = g_pEffect->GetTechniqueByName("RenderLight");
-
-  // variables
-  g_pWorldVariable = g_pEffect->GetVariableByName("World")->AsMatrix();
-  g_pViewVariable = g_pEffect->GetVariableByName("View")->AsMatrix();
-  g_pProjectionVariable = g_pEffect->GetVariableByName("Projection")->AsMatrix();
-  g_pJointVariable = g_pEffect->GetVariableByName("mJoint")->AsMatrix();
-  g_pLightDirVariable = g_pEffect->GetVariableByName("vLightDir")->AsVector();
-  g_pLightColorVariable = g_pEffect->GetVariableByName("vLightColor")->AsVector();
-  g_pOutputColorVariable = g_pEffect->GetVariableByName("vOutputColor")->AsVector();
-  g_pDiffuseVariable = g_pEffect->GetVariableByName("txDiffuse")->AsShaderResource();
-
-  //////////////////////////////////////////////////////////////////////
-  // input layout
-  //////////////////////////////////////////////////////////////////////
-
-  D3D10_INPUT_ELEMENT_DESC layout[] = {
-    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 2, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"NORMAL"  , 0, DXGI_FORMAT_R32G32B32_FLOAT, 3, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 2, DXGI_FORMAT_R32G32_FLOAT,    4, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
-  };
-  UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
-
-  D3D10_PASS_DESC passDesc;
-  g_pTechniqueRender->GetPassByIndex(0)->GetDesc(&passDesc);
-
-  hr = g_pd3dDevice->CreateInputLayout(layout, numElements,
-                                       passDesc.pIAInputSignature,
-                                       passDesc.IAInputSignatureSize,
-                                       &g_pVertexLayout);
-  if (FAILED(hr)) {
-    print("CreateInputLayout\n");
-    return hr;
-  }
-
-  //
 
   //////////////////////////////////////////////////////////////////////
   // vertex buffers
@@ -450,6 +326,247 @@ HRESULT InitDirect3DDevice()
   hr = LoadTexture(L"RES_ROBOT_PLAYER", 64, 64, &g_pTextureShaderResourceView);
   if (FAILED(hr)) {
     print("LoadTexture\n");
+    return hr;
+  }
+
+  return S_OK;
+}
+
+struct FontVertex {
+  D3DXVECTOR2 Pos;
+};
+
+const FontVertex FontVertices[] = {
+  D3DXVECTOR2( 0.0f,  0.5f),
+  D3DXVECTOR2( 0.5f, -0.5f),
+  D3DXVECTOR2(-0.5f, -0.5f),
+};
+
+HRESULT InitFontBuffers()
+{
+  HRESULT hr;
+
+  //////////////////////////////////////////////////////////////////////
+  // effect
+  //////////////////////////////////////////////////////////////////////
+
+  HRSRC hRes = FindResource(NULL, L"RES_FONT_FXO", RT_RCDATA);
+  if (hRes == NULL) {
+    print("FindResource RES_FONT_FXO\n");
+    return E_FAIL;
+  }
+  DWORD dwResSize = SizeofResource(NULL, hRes);
+  HGLOBAL hData = LoadResource(NULL, hRes);
+  void * pData = LockResource(hData);
+  hr = D3D10CreateEffectFromMemory(pData,
+                                   dwResSize,
+                                   0,
+                                   g_pd3dDevice,
+                                   NULL,
+                                   &g_pEffectFont
+                                   );
+  if (FAILED(hr)) {
+    print("D3D10CreateEffectFromMemory\n");
+    return hr;
+  }
+
+  g_pTechniqueFont = g_pEffectFont->GetTechniqueByName("Font");
+
+  //////////////////////////////////////////////////////////////////////
+  // layout
+  //////////////////////////////////////////////////////////////////////
+
+  D3D10_INPUT_ELEMENT_DESC layout[] = {
+    {"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
+  };
+  UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
+
+  D3D10_PASS_DESC passDesc;
+  g_pTechniqueFont->GetPassByIndex(0)->GetDesc(&passDesc);
+
+  hr = g_pd3dDevice->CreateInputLayout(layout, numElements,
+                                       passDesc.pIAInputSignature,
+                                       passDesc.IAInputSignatureSize,
+                                       &g_pVertexLayoutFont);
+  if (FAILED(hr)) {
+    print("CreateInputLayout\n");
+    return hr;
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // vertex buffers
+  //////////////////////////////////////////////////////////////////////
+
+  D3D10_BUFFER_DESC bd;
+  D3D10_SUBRESOURCE_DATA initData;
+
+  // position
+  bd.Usage = D3D10_USAGE_DEFAULT;
+  bd.ByteWidth = (sizeof (FontVertices));
+  bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
+  bd.CPUAccessFlags = 0;
+  bd.MiscFlags = 0;
+  initData.pSysMem = FontVertices;
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffersFont[0]);
+  if (FAILED(hr)) {
+    print("CreateBuffer\n");
+    return hr;
+  }
+
+  return S_OK;
+}
+
+HRESULT InitDirect3DDevice()
+{
+  RECT rc;
+  GetClientRect(g_hWnd, &rc);
+  UINT width = rc.right - rc.left;
+  UINT height = rc.bottom - rc.top;
+
+  DXGI_SWAP_CHAIN_DESC sd = {};
+  sd.BufferCount = 1;
+  sd.BufferDesc.Width = width;
+  sd.BufferDesc.Height = height;
+  sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+  sd.BufferDesc.RefreshRate.Numerator = 60;
+  sd.BufferDesc.RefreshRate.Denominator = 1;
+  sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+  sd.OutputWindow = g_hWnd;
+  sd.SampleDesc.Count = 1;
+  sd.SampleDesc.Quality = 0;
+  sd.Windowed = TRUE;
+
+  D3D10_DRIVER_TYPE driverTypes[] = {
+    D3D10_DRIVER_TYPE_HARDWARE,
+    D3D10_DRIVER_TYPE_REFERENCE,
+  };
+  UINT numDriverTypes = (sizeof (driverTypes)) / (sizeof (driverTypes[0]));
+
+  HRESULT hr;
+  D3D10_DRIVER_TYPE driverType = D3D10_DRIVER_TYPE_NULL;
+  for (UINT i = 0; i < numDriverTypes; i++) {
+    driverType = driverTypes[i];
+    hr = D3D10CreateDeviceAndSwapChain(NULL,
+                                       driverType,
+                                       NULL,
+                                       D3D10_CREATE_DEVICE_DEBUG,
+                                       D3D10_SDK_VERSION,
+                                       &sd,
+                                       &g_pSwapChain,
+                                       &g_pd3dDevice);
+    if (SUCCEEDED(hr))
+      break;
+  }
+  if (FAILED(hr)) {
+    print("D3D10CreateDeviceAndSwapChain\n");
+    return hr;
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // rasterizer state
+  //////////////////////////////////////////////////////////////////////
+
+  D3D10_RASTERIZER_DESC RSDesc;
+  RSDesc.FillMode = D3D10_FILL_SOLID;
+  RSDesc.CullMode = D3D10_CULL_BACK;
+  //RSDesc.CullMode = D3D10_CULL_NONE;
+  RSDesc.FrontCounterClockwise = FALSE;
+  RSDesc.DepthBias = 0;
+  RSDesc.SlopeScaledDepthBias = 0.0f;
+  RSDesc.DepthBiasClamp= 0;
+  RSDesc.DepthClipEnable = TRUE;
+  RSDesc.ScissorEnable = FALSE;
+  RSDesc.AntialiasedLineEnable = FALSE;
+  RSDesc.MultisampleEnable = FALSE;
+
+  ID3D10RasterizerState* pRState = NULL;
+  hr = g_pd3dDevice->CreateRasterizerState(&RSDesc, &pRState);
+  if (FAILED(hr)) {
+    print("CreateRasterizerState\n");
+    return hr;
+  }
+
+  g_pd3dDevice->RSSetState(pRState);
+
+  //
+
+  InitDirect3DViews();
+
+  //////////////////////////////////////////////////////////////////////
+  // effect
+  //////////////////////////////////////////////////////////////////////
+
+  HRSRC hRes = FindResource(NULL, L"RES_MAIN_FXO", RT_RCDATA);
+  if (hRes == NULL) {
+    print("FindResource RES_MAIN_FXO\n");
+    return E_FAIL;
+  }
+  DWORD dwResSize = SizeofResource(NULL, hRes);
+  HGLOBAL hData = LoadResource(NULL, hRes);
+  void * pData = LockResource(hData);
+  hr = D3D10CreateEffectFromMemory(pData,
+                                   dwResSize,
+                                   0,
+                                   g_pd3dDevice,
+                                   NULL,
+                                   &g_pEffect
+                                   );
+  if (FAILED(hr)) {
+    print("D3D10CreateEffectFromMemory\n");
+    return hr;
+  }
+
+  g_pTechniqueRender = g_pEffect->GetTechniqueByName("Render");
+  g_pTechniqueRenderLight = g_pEffect->GetTechniqueByName("RenderLight");
+
+  // variables
+  g_pWorldVariable = g_pEffect->GetVariableByName("World")->AsMatrix();
+  g_pViewVariable = g_pEffect->GetVariableByName("View")->AsMatrix();
+  g_pProjectionVariable = g_pEffect->GetVariableByName("Projection")->AsMatrix();
+  g_pJointVariable = g_pEffect->GetVariableByName("mJoint")->AsMatrix();
+  g_pLightDirVariable = g_pEffect->GetVariableByName("vLightDir")->AsVector();
+  g_pLightColorVariable = g_pEffect->GetVariableByName("vLightColor")->AsVector();
+  g_pOutputColorVariable = g_pEffect->GetVariableByName("vOutputColor")->AsVector();
+  g_pDiffuseVariable = g_pEffect->GetVariableByName("txDiffuse")->AsShaderResource();
+
+  //////////////////////////////////////////////////////////////////////
+  // input layout
+  //////////////////////////////////////////////////////////////////////
+
+  D3D10_INPUT_ELEMENT_DESC layout[] = {
+    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"TEXCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"TEXCOORD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 2, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"NORMAL"  , 0, DXGI_FORMAT_R32G32B32_FLOAT, 3, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"TEXCOORD", 2, DXGI_FORMAT_R32G32_FLOAT,    4, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
+  };
+  UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
+
+  D3D10_PASS_DESC passDesc;
+  g_pTechniqueRender->GetPassByIndex(0)->GetDesc(&passDesc);
+
+  hr = g_pd3dDevice->CreateInputLayout(layout, numElements,
+                                       passDesc.pIAInputSignature,
+                                       passDesc.IAInputSignatureSize,
+                                       &g_pVertexLayout);
+  if (FAILED(hr)) {
+    print("CreateInputLayout\n");
+    return hr;
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // meshes
+  //////////////////////////////////////////////////////////////////////
+
+  hr = LoadMesh();
+  if (FAILED(hr)) {
+    print("LoadMesh\n");
+    return hr;
+  }
+
+  hr = InitFontBuffers();
+  if (FAILED(hr)) {
+    print("InitFontBuffers\n");
     return hr;
   }
 
@@ -694,11 +811,6 @@ void RenderModel(float t)
   D3DXMatrixRotationY(&mRotate, 0.4f * t);
   D3DXVec3Transform(&vLightDirs[0], (D3DXVECTOR3 *)&vLightDirs[0], &mRotate);
 
-  // clear
-  float ClearColor[4] = { 0.0f, 0.125f, 0.6f, 1.0f };
-  g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetView, ClearColor);
-  g_pd3dDevice->ClearDepthStencilView(g_pDepthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
-
   // matrices
   g_pViewVariable->SetMatrix((float *)&g_View);
   g_pProjectionVariable->SetMatrix((float *)&g_Projection);
@@ -740,6 +852,25 @@ void RenderModel(float t)
   }
 }
 
+void RenderFont()
+{
+  UINT stride[] = {
+    (sizeof (FontVertex)),
+  };
+  UINT offset[] = { 0 };
+  g_pd3dDevice->IASetInputLayout(g_pVertexLayoutFont);
+  g_pd3dDevice->IASetVertexBuffers(0, g_dwVertexBufferCountFont, g_pVertexBuffersFont, stride, offset);
+  g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+  D3D10_TECHNIQUE_DESC techDesc;
+  g_pTechniqueFont->GetDesc(&techDesc);
+
+  for (UINT p = 0; p < techDesc.Passes; p++) {
+    g_pTechniqueFont->GetPassByIndex(p)->Apply(0);
+    g_pd3dDevice->Draw(3, 0);
+  }
+}
+
 void Render()
 {
   static float t = 0.0f;
@@ -753,7 +884,16 @@ void Render()
   t = (dwTimeCur - dwTimeStart) / 1000.0f;
 #endif
 
+  // clear
+
+  float ClearColor[4] = { 0.0f, 0.125f, 0.6f, 1.0f };
+  g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetView, ClearColor);
+  g_pd3dDevice->ClearDepthStencilView(g_pDepthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
+
+  // render
+
   RenderModel(t);
+  RenderFont();
 
   // render the lights
   /*
