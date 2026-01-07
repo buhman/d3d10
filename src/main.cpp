@@ -923,14 +923,14 @@ void RenderFont()
   UINT offset[] = { 0 };
   g_pd3dDevice->IASetInputLayout(g_pVertexLayoutFont);
   g_pd3dDevice->IASetVertexBuffers(0, g_dwVertexBufferCountFont, g_pVertexBuffersFont, stride, offset);
-  g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+  g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_POINTLIST);
 
   D3D10_TECHNIQUE_DESC techDesc;
   g_pTechniqueFont->GetDesc(&techDesc);
 
   for (UINT p = 0; p < techDesc.Passes; p++) {
     g_pTechniqueFont->GetPassByIndex(p)->Apply(0);
-    g_pd3dDevice->Draw(4, 0);
+    g_pd3dDevice->Draw(1, 0);
   }
 }
 
