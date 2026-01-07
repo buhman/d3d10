@@ -1,7 +1,5 @@
 float2 vInvScreenSize;
-float2 vPosition;
 float2 vGlyphScale;
-float2 vCharCoord;
 float2 vTexScale;
 
 Texture2D txDiffuse;
@@ -13,21 +11,26 @@ SamplerState samPoint {
 
 struct VS_INPUT
 {
-  float2 Pos : POSITION;
+  float4 Pos : TEXCOORD;
 };
 
-struct GSPS_INPUT
+struct GS_INPUT
+{
+  float4 Pos : SV_POSITION;
+};
+
+struct PS_INPUT
 {
   float4 Pos : SV_POSITION;
   float2 Tex : TEXCOORD0;
 };
 
-GSPS_INPUT VS(VS_INPUT input)
-{
-  GSPS_INPUT output = (GSPS_INPUT)0;
 
-  output.Pos = float4(0, 0, 0, 0);
-  output.Tex = float2(0, 0);
+GS_INPUT VS(VS_INPUT input)
+{
+  GS_INPUT output;
+
+  output.Pos = input.Pos;
 
   return output;
 }
@@ -40,31 +43,31 @@ static const float2 vertices[] = {
 };
 
 [maxvertexcount(4)]
-void GS (point GSPS_INPUT input[1], inout TriangleStream<GSPS_INPUT> TriStream)
+void GS (point GS_INPUT input[1], inout TriangleStream<PS_INPUT> TriStream)
 {
-  GSPS_INPUT output;
+  PS_INPUT output;
 
   for (int i = 0; i < 4; i++) {
     float2 Pos;
-    Pos = vertices[i] * vGlyphScale + vPosition;
+    Pos = vertices[i] * vGlyphScale + input[0].Pos.xy;
     Pos = Pos * vInvScreenSize + float2(-1, 1);
     output.Pos = float4(Pos.xy, 0, 1);
 
     output.Tex = vertices[i] * float2(1, -1);
-    output.Tex = (output.Tex + vCharCoord) * vTexScale;
+    output.Tex = (output.Tex + input[0].Pos.zw) * vTexScale;
 
     TriStream.Append(output);
   }
   TriStream.RestartStrip();
 }
 
-float4 PS(GSPS_INPUT input) : SV_Target
+float4 PS(PS_INPUT input) : SV_Target
 {
   float4 texColor = txDiffuse.Sample(samPoint, input.Tex);
 
   float c = texColor.x == 0 ? 0.0 : 1.0;
 
-  return float4(c, c, c, 1);
+  return float4(c.xxx, 1);
 }
 
 technique10 Font

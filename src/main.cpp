@@ -54,9 +54,7 @@ const DWORD g_dwVertexBufferCountFont = 1;
 ID3D10Buffer * g_pVertexBuffersFont[g_dwVertexBufferCountFont];
 ID3D10ShaderResourceView * g_pTextureShaderResourceViewFont = NULL;
 ID3D10EffectVectorVariable * g_pInvScreenSizeVariableFont = NULL;
-ID3D10EffectVectorVariable * g_pPositionVariableFont = NULL;
 ID3D10EffectVectorVariable * g_pGlyphScaleVariableFont = NULL;
-ID3D10EffectVectorVariable * g_pCharCoordVariableFont = NULL;
 ID3D10EffectVectorVariable * g_pTexScaleVariableFont = NULL;
 ID3D10EffectShaderResourceVariable * g_pDiffuseVariableFont = NULL;
 
@@ -370,16 +368,8 @@ HRESULT LoadMesh()
   return S_OK;
 }
 
-struct FontVertex {
-  D3DXVECTOR2 Pos;
-};
-
-const FontVertex FontVertices[] = {
-  D3DXVECTOR2( 0.0f,  0.0f), // -- top right
-  D3DXVECTOR2( 1.0f,  0.0f), // -- top left
-  D3DXVECTOR2( 0.0f, -1.0f), // -- bottom right
-  D3DXVECTOR2( 1.0f, -1.0f), // -- bottom left
-};
+const int g_iFontBufferLength = 512;
+typedef D3DXVECTOR4 FontVertex;
 
 HRESULT InitFontBuffers()
 {
@@ -411,9 +401,7 @@ HRESULT InitFontBuffers()
 
   g_pTechniqueFont = g_pEffectFont->GetTechniqueByName("Font");
   g_pInvScreenSizeVariableFont = g_pEffectFont->GetVariableByName("vInvScreenSize")->AsVector();
-  g_pPositionVariableFont = g_pEffectFont->GetVariableByName("vPosition")->AsVector();
   g_pGlyphScaleVariableFont = g_pEffectFont->GetVariableByName("vGlyphScale")->AsVector();
-  g_pCharCoordVariableFont = g_pEffectFont->GetVariableByName("vCharCoord")->AsVector();
   g_pTexScaleVariableFont = g_pEffectFont->GetVariableByName("vTexScale")->AsVector();
   g_pDiffuseVariableFont = g_pEffectFont->GetVariableByName("txDiffuse")->AsShaderResource();
 
@@ -422,7 +410,7 @@ HRESULT InitFontBuffers()
   //////////////////////////////////////////////////////////////////////
 
   D3D10_INPUT_ELEMENT_DESC layout[] = {
-    {"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"TEXCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
   };
   UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
 
@@ -443,16 +431,15 @@ HRESULT InitFontBuffers()
   //////////////////////////////////////////////////////////////////////
 
   D3D10_BUFFER_DESC bd;
-  D3D10_SUBRESOURCE_DATA initData;
 
   // position
-  bd.Usage = D3D10_USAGE_DEFAULT;
-  bd.ByteWidth = (sizeof (FontVertices));
+  bd.Usage = D3D10_USAGE_DYNAMIC;
+  bd.ByteWidth = (sizeof (FontVertex)) * g_iFontBufferLength;
   bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
-  bd.CPUAccessFlags = 0;
+  bd.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
   bd.MiscFlags = 0;
-  initData.pSysMem = FontVertices;
-  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffersFont[0]);
+
+  hr = g_pd3dDevice->CreateBuffer(&bd, NULL, &g_pVertexBuffersFont[0]);
   if (FAILED(hr)) {
     print("CreateBuffer\n");
     return hr;
@@ -899,6 +886,49 @@ void RenderModel(float t)
 
 void RenderFont()
 {
+
+  //////////////////////////////////////////////////////////////////////
+  // dynamic vertex buffer
+  //////////////////////////////////////////////////////////////////////
+
+  FontVertex * pData;
+  HRESULT hr;
+  hr = g_pVertexBuffersFont[0]->Map(D3D10_MAP_WRITE_DISCARD,
+                                    0,
+                                    (void **)&pData);
+  if (FAILED(hr)) {
+    print("g_pVertexBuffersFont->Map");
+  }
+
+  int advance = 10;
+  const char * s = "asdf";
+  int ix = 0;
+  const int charStride = (int)(g_FontSize.Texture.Width / g_FontSize.Glyph.Width);
+  while (ix < g_iFontBufferLength && *s) {
+    char c = *s++;
+
+    float px = (float)advance;
+    float py = -10.0;
+
+    float cx = 0;
+    float cy = 0;
+    if (c >= 0x20 && c <= 0x7f) {
+      c -= 0x20;
+      cx = (float)(c % charStride);
+      cy = (float)(c / charStride);
+      print("%c %f %f\n", c + 0x20, cx, cy);
+    }
+
+    pData[ix++] = FontVertex(px, py, cx, cy);
+
+    advance += g_FontSize.Glyph.Width;
+  }
+  g_pVertexBuffersFont[0]->Unmap();
+
+  //////////////////////////////////////////////////////////////////////
+  // effect variables
+  //////////////////////////////////////////////////////////////////////
+
   D3DXVECTOR2 invScreenSize = D3DXVECTOR2(2.0f / (float)g_ViewportSize.Width,
                                           2.0f / (float)g_ViewportSize.Height);
 
@@ -911,9 +941,7 @@ void RenderFont()
                                      glyphScale.y / (float)g_FontSize.Texture.Height);
 
   g_pInvScreenSizeVariableFont->SetFloatVector((float *)&invScreenSize);
-  g_pPositionVariableFont->SetFloatVector((float *)&position);
   g_pGlyphScaleVariableFont->SetFloatVector((float *)&glyphScale);
-  g_pCharCoordVariableFont->SetFloatVector((float *)&charCoord);
   g_pTexScaleVariableFont->SetFloatVector((float *)&texScale);
   g_pDiffuseVariableFont->SetResource(g_pTextureShaderResourceViewFont);
 
@@ -930,7 +958,7 @@ void RenderFont()
 
   for (UINT p = 0; p < techDesc.Passes; p++) {
     g_pTechniqueFont->GetPassByIndex(p)->Apply(0);
-    g_pd3dDevice->Draw(1, 0);
+    g_pd3dDevice->Draw(4, 0);
   }
 }
 
