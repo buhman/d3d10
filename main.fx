@@ -78,6 +78,11 @@ float4 PSSolid(PS_INPUT input) : SV_Target
   return float4(input.Weight.xyz, 1);
 }
 
+BlendState Blending
+{
+  BlendEnable[0] = FALSE;
+};
+
 technique10 Render
 {
   pass P0
@@ -85,6 +90,7 @@ technique10 Render
     SetVertexShader(CompileShader(vs_4_0, VS()));
     SetGeometryShader(NULL);
     SetPixelShader(CompileShader(ps_4_0, PS()));
+    SetBlendState(Blending, float4(0.0, 0.0, 0.0, 0.0), 0xffffffff);
   }
 }
 
