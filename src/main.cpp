@@ -52,7 +52,13 @@ ID3D10EffectTechnique * g_pTechniqueFont = NULL;
 ID3D10InputLayout * g_pVertexLayoutFont = NULL;
 const DWORD g_dwVertexBufferCountFont = 1;
 ID3D10Buffer * g_pVertexBuffersFont[g_dwVertexBufferCountFont];
-
+ID3D10ShaderResourceView * g_pTextureShaderResourceViewFont = NULL;
+ID3D10EffectVectorVariable * g_pInvScreenSizeVariableFont = NULL;
+ID3D10EffectVectorVariable * g_pPositionVariableFont = NULL;
+ID3D10EffectVectorVariable * g_pGlyphScaleVariableFont = NULL;
+ID3D10EffectVectorVariable * g_pCharCoordVariableFont = NULL;
+ID3D10EffectVectorVariable * g_pTexScaleVariableFont = NULL;
+ID3D10EffectShaderResourceVariable * g_pDiffuseVariableFont = NULL;
 
 HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -64,6 +70,22 @@ void InitializeNodeInstances();
 struct WindowSize {
   UINT Width;
   UINT Height;
+};
+
+struct FontSize {
+  struct {
+    UINT Width;
+    UINT Height;
+  } Glyph;
+  struct {
+    UINT Width;
+    UINT Height;
+  } Texture;
+};
+
+const FontSize g_FontSize = {
+  { 6, 12 },
+  { 128, 64 },
 };
 
 WindowSize g_ViewportSize;
@@ -323,7 +345,23 @@ HRESULT LoadMesh()
   // textures
   //////////////////////////////////////////////////////////////////////
 
-  hr = LoadTexture(L"RES_ROBOT_PLAYER", 64, 64, &g_pTextureShaderResourceView);
+  hr = LoadTexture(L"RES_ROBOT_PLAYER",
+                   64,     // width
+                   64,     // height
+                   64 * 4, // pitch
+                   DXGI_FORMAT_R8G8B8A8_UNORM,
+                   &g_pTextureShaderResourceView);
+  if (FAILED(hr)) {
+    print("LoadTexture\n");
+    return hr;
+  }
+
+  hr = LoadTexture(L"RES_FONT_TERMINUS_6X12",
+                   g_FontSize.Texture.Width,     // width
+                   g_FontSize.Texture.Height,    // height
+                   g_FontSize.Texture.Width * 1, // pitch
+                   DXGI_FORMAT_R8_UNORM,
+                   &g_pTextureShaderResourceViewFont);
   if (FAILED(hr)) {
     print("LoadTexture\n");
     return hr;
@@ -337,9 +375,10 @@ struct FontVertex {
 };
 
 const FontVertex FontVertices[] = {
-  D3DXVECTOR2( 0.0f,  0.5f),
-  D3DXVECTOR2( 0.5f, -0.5f),
-  D3DXVECTOR2(-0.5f, -0.5f),
+  D3DXVECTOR2( 0.0f,  0.0f), // -- top right
+  D3DXVECTOR2( 1.0f,  0.0f), // -- top left
+  D3DXVECTOR2( 0.0f, -1.0f), // -- bottom right
+  D3DXVECTOR2( 1.0f, -1.0f), // -- bottom left
 };
 
 HRESULT InitFontBuffers()
@@ -371,6 +410,12 @@ HRESULT InitFontBuffers()
   }
 
   g_pTechniqueFont = g_pEffectFont->GetTechniqueByName("Font");
+  g_pInvScreenSizeVariableFont = g_pEffectFont->GetVariableByName("vInvScreenSize")->AsVector();
+  g_pPositionVariableFont = g_pEffectFont->GetVariableByName("vPosition")->AsVector();
+  g_pGlyphScaleVariableFont = g_pEffectFont->GetVariableByName("vGlyphScale")->AsVector();
+  g_pCharCoordVariableFont = g_pEffectFont->GetVariableByName("vCharCoord")->AsVector();
+  g_pTexScaleVariableFont = g_pEffectFont->GetVariableByName("vTexScale")->AsVector();
+  g_pDiffuseVariableFont = g_pEffectFont->GetVariableByName("txDiffuse")->AsShaderResource();
 
   //////////////////////////////////////////////////////////////////////
   // layout
@@ -854,20 +899,38 @@ void RenderModel(float t)
 
 void RenderFont()
 {
+  D3DXVECTOR2 invScreenSize = D3DXVECTOR2(2.0f / (float)g_ViewportSize.Width,
+                                          2.0f / (float)g_ViewportSize.Height);
+
+  D3DXVECTOR2 position = D3DXVECTOR2(6, 0);
+  D3DXVECTOR2 glyphScale = D3DXVECTOR2((float)g_FontSize.Glyph.Width,
+                                       (float)g_FontSize.Glyph.Height);
+
+  D3DXVECTOR2 charCoord = D3DXVECTOR2(16, 0);
+  D3DXVECTOR2 texScale = D3DXVECTOR2(glyphScale.x / (float)g_FontSize.Texture.Width,
+                                     glyphScale.y / (float)g_FontSize.Texture.Height);
+
+  g_pInvScreenSizeVariableFont->SetFloatVector((float *)&invScreenSize);
+  g_pPositionVariableFont->SetFloatVector((float *)&position);
+  g_pGlyphScaleVariableFont->SetFloatVector((float *)&glyphScale);
+  g_pCharCoordVariableFont->SetFloatVector((float *)&charCoord);
+  g_pTexScaleVariableFont->SetFloatVector((float *)&texScale);
+  g_pDiffuseVariableFont->SetResource(g_pTextureShaderResourceViewFont);
+
   UINT stride[] = {
     (sizeof (FontVertex)),
   };
   UINT offset[] = { 0 };
   g_pd3dDevice->IASetInputLayout(g_pVertexLayoutFont);
   g_pd3dDevice->IASetVertexBuffers(0, g_dwVertexBufferCountFont, g_pVertexBuffersFont, stride, offset);
-  g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+  g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
   D3D10_TECHNIQUE_DESC techDesc;
   g_pTechniqueFont->GetDesc(&techDesc);
 
   for (UINT p = 0; p < techDesc.Passes; p++) {
     g_pTechniqueFont->GetPassByIndex(p)->Apply(0);
-    g_pd3dDevice->Draw(3, 0);
+    g_pd3dDevice->Draw(4, 0);
   }
 }
 

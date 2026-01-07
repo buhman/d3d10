@@ -11,6 +11,8 @@
 HRESULT LoadTexture(const wchar_t * resourceName,
                     const int width,
                     const int height,
+                    const int pitch,
+                    const DXGI_FORMAT format,
                     ID3D10ShaderResourceView ** pTextureShaderResourceView)
 {
   HRESULT hr;
@@ -22,18 +24,19 @@ HRESULT LoadTexture(const wchar_t * resourceName,
     return -1;
   }
   DWORD dwResourceSize = SizeofResource(NULL, hRobotPlayerRes);
-  assert(width * height * 4 == dwResourceSize);
+  assert(pitch >= width);
+  assert(pitch * height == dwResourceSize);
 
   HGLOBAL hRobotPlayerData = LoadResource(NULL, hRobotPlayerRes);
   D3D10_SUBRESOURCE_DATA subresourceData;
   subresourceData.pSysMem = LockResource(hRobotPlayerData);
-  subresourceData.SysMemPitch = width * 4;
+  subresourceData.SysMemPitch = pitch;
   D3D10_TEXTURE2D_DESC textureDesc;
   textureDesc.Width = width;
   textureDesc.Height = height;
   textureDesc.MipLevels = 1;
   textureDesc.ArraySize = 1;
-  textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+  textureDesc.Format = format;
   textureDesc.SampleDesc.Count = 1;
   textureDesc.SampleDesc.Quality = 0;
   textureDesc.Usage = D3D10_USAGE_DEFAULT;

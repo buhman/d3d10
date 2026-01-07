@@ -1,3 +1,4 @@
 RES_MAIN_FXO RCDATA "main.fxo"
 RES_FONT_FXO RCDATA "font.fxo"
 RES_ROBOT_PLAYER RCDATA "robot_player.data"
+RES_FONT_TERMINUS_6X12 RCDATA "font/terminus_128x64_6x12.data"
