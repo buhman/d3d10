@@ -46,14 +46,15 @@ D3DXMATRIX g_Projection;
 
 // bloom
 ID3D10RenderTargetView * g_pRenderTargetViewTexture[2] = { NULL, NULL };
-ID3D10ShaderResourceView * g_pRenderTargetShaderResourceView[2] = { NULL, NULL };
+ID3D10ShaderResourceView * g_pRenderTargetShaderResourceViewTexture[2] = { NULL, NULL };
 
 ID3D10Effect * g_pEffectBloom = NULL;
 ID3D10EffectTechnique * g_pTechniqueBloom = NULL;
+ID3D10EffectTechnique * g_pTechniqueBloomBlend = NULL;
 ID3D10InputLayout * g_pVertexLayoutBloom = NULL;
 const DWORD g_dwVertexBufferCountBloom = 1;
 ID3D10Buffer * g_pVertexBuffersBloom[g_dwVertexBufferCountBloom];
-ID3D10EffectShaderResourceVariable * g_pDiffuseVariableBloom = NULL;
+ID3D10EffectShaderResourceVariable * g_pDiffuseAVariableBloom = NULL;
 ID3D10EffectVectorVariable * g_pInvScreenSizeVariableBloom = NULL;
 ID3D10EffectVectorVariable * g_pDirVariableBloom = NULL;
 
@@ -82,6 +83,7 @@ ID3D10InputLayout * g_pVertexLayoutStatic = NULL;
 ID3D10EffectMatrixVariable * g_pWorldVariableStatic = NULL;
 ID3D10EffectMatrixVariable * g_pViewVariableStatic = NULL;
 ID3D10EffectMatrixVariable * g_pProjectionVariableStatic = NULL;
+ID3D10EffectMatrixVariable * g_pWorldNormalVariableStatic = NULL;
 ID3D10EffectVectorVariable * g_pOutputColorVariableStatic = NULL;
 
 // cube
@@ -275,7 +277,7 @@ HRESULT InitDirect3DViews()
     hr = CreateTextureRenderTargetView(backBufferSurfaceDesc.Width,
                                        backBufferSurfaceDesc.Height,
                                        &g_pRenderTargetViewTexture[i],
-                                       &g_pRenderTargetShaderResourceView[i]);
+                                       &g_pRenderTargetShaderResourceViewTexture[i]);
     if (FAILED(hr)) {
       return hr;
     }
@@ -533,9 +535,10 @@ HRESULT InitBloomBuffers()
   }
 
   g_pTechniqueBloom = g_pEffectBloom->GetTechniqueByName("Bloom");
+  g_pTechniqueBloomBlend = g_pEffectBloom->GetTechniqueByName("BloomBlend");
   g_pInvScreenSizeVariableBloom = g_pEffectBloom->GetVariableByName("vInvScreenSize")->AsVector();
   g_pDirVariableBloom = g_pEffectBloom->GetVariableByName("vDir")->AsVector();
-  g_pDiffuseVariableBloom = g_pEffectBloom->GetVariableByName("txDiffuse")->AsShaderResource();
+  g_pDiffuseAVariableBloom = g_pEffectBloom->GetVariableByName("txDiffuseA")->AsShaderResource();
 
   //////////////////////////////////////////////////////////////////////
   // layout
@@ -618,8 +621,8 @@ HRESULT InitStaticEffect()
 
   D3D10_INPUT_ELEMENT_DESC layout[] = {
     {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    2, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
   };
   UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
 
@@ -642,6 +645,7 @@ HRESULT InitStaticEffect()
   g_pWorldVariableStatic = g_pEffectStatic->GetVariableByName("World")->AsMatrix();
   g_pViewVariableStatic = g_pEffectStatic->GetVariableByName("View")->AsMatrix();
   g_pProjectionVariableStatic = g_pEffectStatic->GetVariableByName("Projection")->AsMatrix();
+  g_pWorldNormalVariableStatic = g_pEffectStatic->GetVariableByName("WorldNormal")->AsMatrix();
   g_pOutputColorVariableStatic = g_pEffectStatic->GetVariableByName("vOutputColor")->AsVector();
 
   return S_OK;
@@ -835,11 +839,11 @@ HRESULT InitDirect3DDevice()
   //////////////////////////////////////////////////////////////////////
 
   D3D10_INPUT_ELEMENT_DESC layout[] = {
-    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
     {"TEXCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
     {"TEXCOORD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 2, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"NORMAL"  , 0, DXGI_FORMAT_R32G32B32_FLOAT, 3, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 2, DXGI_FORMAT_R32G32_FLOAT,    4, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"NORMAL"  , 0, DXGI_FORMAT_R32G32B32_FLOAT,    3, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"TEXCOORD", 2, DXGI_FORMAT_R32G32_FLOAT,       4, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
   };
   UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
 
@@ -1147,7 +1151,7 @@ void RenderModel(float t)
   }
 }
 
-void RenderMeshStatic(const Mesh * mesh)
+void RenderMeshStatic(const Mesh * mesh, float t)
 {
   g_pViewVariableStatic->SetMatrix((float *)&g_View);
   g_pProjectionVariableStatic->SetMatrix((float *)&g_Projection);
@@ -1171,11 +1175,18 @@ void RenderMeshStatic(const Mesh * mesh)
     D3DXMATRIX mLight;
     D3DXMATRIX mLightScale;
     D3DXVECTOR3 vLightPos = g_vLightDirs[m] * (1.25f * (m + 1));
+    D3DXMATRIX mLightRotate;
+    D3DXMatrixRotationX(&mLightRotate, t * (1 + -2 * m));
     D3DXMatrixTranslation(&mLight, vLightPos.x, vLightPos.y, vLightPos.z);
     D3DXMatrixScaling(&mLightScale, 0.05f, 0.05f, 0.05f);
-    mLight = mLightScale * mLight;
+    mLight = mLightRotate * mLightScale * mLight;
 
     g_pWorldVariableStatic->SetMatrix((float *)&mLight);
+
+    D3DXMATRIX mLightNormal;
+    D3DXMatrixTranspose(&mLightNormal, D3DXMatrixInverse(&mLightNormal, NULL, &mLight));
+    g_pWorldNormalVariableStatic->SetMatrix((float *)&mLightNormal);
+
     g_pOutputColorVariableStatic->SetFloatVector((float *)&g_vLightColors[m]);
 
     for (UINT p = 0; p < techDesc.Passes; p++) {
@@ -1287,26 +1298,55 @@ void RenderBloom()
   D3D10_TECHNIQUE_DESC techDesc;
   g_pTechniqueBloom->GetDesc(&techDesc);
 
-  // horizontal
-
   D3DXVECTOR2 dirHorizontal = D3DXVECTOR2(1.0, 0.0);
-  g_pDirVariableBloom->SetFloatVector((float *)dirHorizontal);
-  g_pDiffuseVariableBloom->SetResource(g_pRenderTargetShaderResourceView[0]);
-  g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetViewTexture[1], NULL);
+  D3DXVECTOR2 dirVertical = D3DXVECTOR2(0.0, 1.0);
 
+  // horizontal
+  g_pDirVariableBloom->SetFloatVector((float *)dirHorizontal);
+  g_pDiffuseAVariableBloom->SetResource(g_pRenderTargetShaderResourceViewTexture[0]);
+  g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetViewTexture[1], NULL);
   for (UINT p = 0; p < techDesc.Passes; p++) {
     g_pTechniqueBloom->GetPassByIndex(p)->Apply(0);
     g_pd3dDevice->Draw(4, 0);
   }
+  g_pd3dDevice->OMSetRenderTargets(0, NULL, NULL);
+
+  ID3D10ShaderResourceView * srv[] = { NULL };
+
+  for (int i = 0; i < 2; i++) {
+    g_pd3dDevice->PSSetShaderResources(0, 1, srv);
+
+    // vertical
+    g_pDirVariableBloom->SetFloatVector((float *)dirVertical);
+    g_pDiffuseAVariableBloom->SetResource(g_pRenderTargetShaderResourceViewTexture[1]);
+    g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetViewTexture[0], NULL);
+    for (UINT p = 0; p < techDesc.Passes; p++) {
+      g_pTechniqueBloom->GetPassByIndex(p)->Apply(0);
+      g_pd3dDevice->Draw(4, 0);
+    }
+
+    g_pd3dDevice->PSSetShaderResources(0, 1, srv);
+
+    // horizontal
+    g_pDirVariableBloom->SetFloatVector((float *)dirHorizontal);
+    g_pDiffuseAVariableBloom->SetResource(g_pRenderTargetShaderResourceViewTexture[0]);
+    g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetViewTexture[1], NULL);
+    for (UINT p = 0; p < techDesc.Passes; p++) {
+      g_pTechniqueBloom->GetPassByIndex(p)->Apply(0);
+      g_pd3dDevice->Draw(4, 0);
+    }
+  }
+
+  D3D10_TECHNIQUE_DESC techDescBlend;
+  g_pTechniqueBloomBlend->GetDesc(&techDescBlend);
 
   // vertical
-  D3DXVECTOR2 dirVertical = D3DXVECTOR2(0.0, 1.0);
   g_pDirVariableBloom->SetFloatVector((float *)dirVertical);
-  g_pDiffuseVariableBloom->SetResource(g_pRenderTargetShaderResourceView[1]);
+  g_pDiffuseAVariableBloom->SetResource(g_pRenderTargetShaderResourceViewTexture[1]);
   g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetView, NULL);
 
-  for (UINT p = 0; p < techDesc.Passes; p++) {
-    g_pTechniqueBloom->GetPassByIndex(p)->Apply(0);
+  for (UINT p = 0; p < techDescBlend.Passes; p++) {
+    g_pTechniqueBloomBlend->GetPassByIndex(p)->Apply(0);
     g_pd3dDevice->Draw(4, 0);
   }
 }
@@ -1346,9 +1386,7 @@ void Render()
 
   // clear
 
-  const float ClearColor[4] = { 0.0f, 0.125f, 0.6f, 1.0f };
-  //g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetViewTexture[0], g_pDepthStencilView);
-  //g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetViewTexture[0], ClearColor);
+  const float ClearColor[4] = { 0.2f, 0.125f, 0.2f, 1.0f };
   g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetView, g_pDepthStencilView);
   g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetView, ClearColor);
   g_pd3dDevice->ClearDepthStencilView(g_pDepthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
@@ -1356,9 +1394,17 @@ void Render()
   // render
   RenderModel(t);
   RenderFont();
-  RenderMeshStatic(cube::node_0.mesh);
 
-  //RenderBloom();
+  const float ClearColorZero[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+  ID3D10RenderTargetView * RenderTargets[] = {
+    g_pRenderTargetView,
+    g_pRenderTargetViewTexture[0],
+  };
+  g_pd3dDevice->OMSetRenderTargets(2, RenderTargets, g_pDepthStencilView);
+  g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetViewTexture[0], ClearColorZero);
+  RenderMeshStatic(cube::node_0.mesh, t);
+
+  RenderBloom();
 
   // present
   g_pSwapChain->Present(0, 0);
