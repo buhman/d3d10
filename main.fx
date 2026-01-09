@@ -6,7 +6,6 @@ matrix mJoint[39];
 
 float4 vLightDir[2];
 float4 vLightColor[2];
-float4 vOutputColor;
 
 Texture2D txDiffuse;
 SamplerState samLinear {
@@ -35,7 +34,7 @@ struct PS_INPUT
 
 PS_INPUT VS(VS_INPUT input)
 {
-  PS_INPUT output = (PS_INPUT)0;
+  PS_INPUT output;
 
   matrix mSkin
     = input.Weight.x * mJoint[int(input.Joint.x)]
@@ -63,7 +62,7 @@ float4 PS(PS_INPUT input) : SV_Target
 {
   float4 texColor = txDiffuse.Sample(samLinear, input.Tex);
 
-  float4 intensityColor = float4(0.2, 0.2, 0.2, 0.0);
+  float4 intensityColor = float4(0.1, 0.1, 0.1, 0.1);
   for (int i = 0; i < 2; i++) {
     intensityColor += saturate(dot((float3)vLightDir[i], input.Normal) * vLightColor[i]);
   }
@@ -72,7 +71,7 @@ float4 PS(PS_INPUT input) : SV_Target
   return texColor * intensityColor;
 }
 
-BlendState Blending
+BlendState DisableBlending
 {
   BlendEnable[0] = FALSE;
 };
@@ -90,7 +89,7 @@ technique10 Render
     SetVertexShader(CompileShader(vs_4_0, VS()));
     SetGeometryShader(NULL);
     SetPixelShader(CompileShader(ps_4_0, PS()));
-    SetBlendState(Blending, float4(0.0, 0.0, 0.0, 0.0), 0xffffffff);
+    SetBlendState(DisableBlending, float4(0.0, 0.0, 0.0, 0.0), 0xffffffff);
     SetDepthStencilState(EnableDepth, 0);
   }
 }

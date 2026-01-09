@@ -12,6 +12,7 @@
 
 #include "robot_player.hpp"
 #define ROOT_MESH_NODE node_39
+#include "cube.hpp"
 
 HINSTANCE g_hInstance = NULL;
 HWND g_hWnd = NULL;
@@ -25,7 +26,6 @@ ID3D10DepthStencilView * g_pDepthStencilView = NULL;
 
 ID3D10Effect * g_pEffect = NULL;
 ID3D10EffectTechnique * g_pTechniqueRender = NULL;
-ID3D10EffectTechnique * g_pTechniqueRenderLight = NULL;
 ID3D10InputLayout * g_pVertexLayout = NULL;
 ID3D10Buffer * g_pIndexBuffer = NULL;
 const DWORD g_dwVertexBufferCount = 5;
@@ -38,7 +38,6 @@ ID3D10EffectMatrixVariable * g_pProjectionVariable = NULL;
 ID3D10EffectMatrixVariable * g_pJointVariable = NULL;
 ID3D10EffectVectorVariable * g_pLightDirVariable = NULL;
 ID3D10EffectVectorVariable * g_pLightColorVariable = NULL;
-ID3D10EffectVectorVariable * g_pOutputColorVariable = NULL;
 ID3D10EffectShaderResourceVariable * g_pDiffuseVariable = NULL;
 D3DXMATRIX g_World1;
 D3DXMATRIX g_World2;
@@ -61,7 +60,6 @@ ID3D10EffectVectorVariable * g_pDirVariableBloom = NULL;
 typedef D3DXVECTOR2 BloomVertex;
 
 // font
-
 ID3D10Effect * g_pEffectFont = NULL;
 ID3D10EffectTechnique * g_pTechniqueFont = NULL;
 ID3D10InputLayout * g_pVertexLayoutFont = NULL;
@@ -75,6 +73,28 @@ ID3D10EffectShaderResourceVariable * g_pDiffuseVariableFont = NULL;
 
 const int g_iFontBufferLength = 512;
 typedef D3DXVECTOR4 FontVertex;
+
+// static
+ID3D10Effect * g_pEffectStatic = NULL;
+ID3D10EffectTechnique * g_pTechniqueStatic = NULL;
+ID3D10InputLayout * g_pVertexLayoutStatic = NULL;
+
+ID3D10EffectMatrixVariable * g_pWorldVariableStatic = NULL;
+ID3D10EffectMatrixVariable * g_pViewVariableStatic = NULL;
+ID3D10EffectMatrixVariable * g_pProjectionVariableStatic = NULL;
+ID3D10EffectVectorVariable * g_pOutputColorVariableStatic = NULL;
+
+// cube
+const DWORD g_dwVertexBufferCountCube = 3;
+ID3D10Buffer * g_pVertexBufferCube[g_dwVertexBufferCountCube];
+ID3D10Buffer * g_pIndexBufferCube = NULL;
+
+// lights
+D3DXVECTOR4 g_vLightDirs[2];
+D3DXVECTOR4 g_vLightColors[2] = {
+  D3DXVECTOR4(0.0f, 0.9f, 0.9f, 1.0f),
+  D3DXVECTOR4(0.9f, 0.0f, 0.0f, 1.0f)
+};
 
 // forward declarations
 
@@ -562,6 +582,140 @@ HRESULT InitBloomBuffers()
   return S_OK;
 }
 
+HRESULT InitStaticEffect()
+{
+  HRESULT hr;
+
+  //////////////////////////////////////////////////////////////////////
+  // effect
+  //////////////////////////////////////////////////////////////////////
+
+  HRSRC hRes = FindResource(NULL, L"RES_STATIC_FXO", RT_RCDATA);
+  if (hRes == NULL) {
+    print("FindResource RES_STATIC_FXO\n");
+    return E_FAIL;
+  }
+  DWORD dwResSize = SizeofResource(NULL, hRes);
+  HGLOBAL hData = LoadResource(NULL, hRes);
+  void * pData = LockResource(hData);
+  hr = D3D10CreateEffectFromMemory(pData,
+                                   dwResSize,
+                                   0,
+                                   g_pd3dDevice,
+                                   NULL,
+                                   &g_pEffectStatic
+                                   );
+  if (FAILED(hr)) {
+    print("D3D10CreateEffectFromMemory\n");
+    return hr;
+  }
+
+  g_pTechniqueStatic = g_pEffectStatic->GetTechniqueByName("Static");
+
+  //////////////////////////////////////////////////////////////////////
+  // layout
+  //////////////////////////////////////////////////////////////////////
+
+  D3D10_INPUT_ELEMENT_DESC layout[] = {
+    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
+  };
+  UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
+
+  D3D10_PASS_DESC passDesc;
+  g_pTechniqueStatic->GetPassByIndex(0)->GetDesc(&passDesc);
+
+  hr = g_pd3dDevice->CreateInputLayout(layout, numElements,
+                                       passDesc.pIAInputSignature,
+                                       passDesc.IAInputSignatureSize,
+                                       &g_pVertexLayoutStatic);
+  if (FAILED(hr)) {
+    print("CreateInputLayout\n");
+    return hr;
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // variables
+  //////////////////////////////////////////////////////////////////////
+
+  g_pWorldVariableStatic = g_pEffectStatic->GetVariableByName("World")->AsMatrix();
+  g_pViewVariableStatic = g_pEffectStatic->GetVariableByName("View")->AsMatrix();
+  g_pProjectionVariableStatic = g_pEffectStatic->GetVariableByName("Projection")->AsMatrix();
+  g_pOutputColorVariableStatic = g_pEffectStatic->GetVariableByName("vOutputColor")->AsVector();
+
+  return S_OK;
+}
+
+HRESULT LoadMeshStatic(const Mesh * mesh)
+{
+  HRESULT hr;
+
+  //////////////////////////////////////////////////////////////////////
+  // vertex buffers
+  //////////////////////////////////////////////////////////////////////
+
+  D3D10_BUFFER_DESC bd;
+  D3D10_SUBRESOURCE_DATA initData;
+
+  // position
+  bd.Usage = D3D10_USAGE_IMMUTABLE;
+  bd.ByteWidth = mesh->position_size;
+  bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
+  bd.CPUAccessFlags = 0;
+  bd.MiscFlags = 0;
+  initData.pSysMem = mesh->position;
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBufferCube[0]);
+  if (FAILED(hr)) {
+    print("CreateBuffer\n");
+    return hr;
+  }
+
+  // normals
+  bd.Usage = D3D10_USAGE_IMMUTABLE;
+  bd.ByteWidth = mesh->normal_size;
+  bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
+  bd.CPUAccessFlags = 0;
+  bd.MiscFlags = 0;
+  initData.pSysMem = mesh->normal;
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBufferCube[1]);
+  if (FAILED(hr)) {
+    print("CreateBuffer\n");
+    return hr;
+  }
+
+  // texcoords
+  bd.Usage = D3D10_USAGE_IMMUTABLE;
+  bd.ByteWidth = mesh->texcoord_0_size;
+  bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
+  bd.CPUAccessFlags = 0;
+  bd.MiscFlags = 0;
+  initData.pSysMem = mesh->texcoord_0;
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBufferCube[2]);
+  if (FAILED(hr)) {
+    print("CreateBuffer\n");
+    return hr;
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // index buffer
+  //////////////////////////////////////////////////////////////////////
+
+  bd.Usage = D3D10_USAGE_IMMUTABLE;
+  bd.ByteWidth = mesh->indices_size;
+  bd.BindFlags = D3D10_BIND_INDEX_BUFFER;
+  bd.CPUAccessFlags = 0;
+  bd.MiscFlags = 0;
+  initData.pSysMem = mesh->indices;
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pIndexBufferCube);
+  if (FAILED(hr)) {
+    print("CreateBuffer\n");
+    return hr;
+  }
+
+  return S_OK;
+}
+
 HRESULT InitDirect3DDevice()
 {
   RECT rc;
@@ -614,8 +768,11 @@ HRESULT InitDirect3DDevice()
 
   D3D10_RASTERIZER_DESC RSDesc;
   RSDesc.FillMode = D3D10_FILL_SOLID;
+#ifdef _DEBUG
   RSDesc.CullMode = D3D10_CULL_BACK;
-  //RSDesc.CullMode = D3D10_CULL_NONE;
+#else
+  RSDesc.CullMode = D3D10_CULL_NONE;
+#endif
   RSDesc.FrontCounterClockwise = FALSE;
   RSDesc.DepthBias = 0;
   RSDesc.SlopeScaledDepthBias = 0.0f;
@@ -663,7 +820,6 @@ HRESULT InitDirect3DDevice()
   }
 
   g_pTechniqueRender = g_pEffect->GetTechniqueByName("Render");
-  g_pTechniqueRenderLight = g_pEffect->GetTechniqueByName("RenderLight");
 
   // variables
   g_pWorldVariable = g_pEffect->GetVariableByName("World")->AsMatrix();
@@ -672,7 +828,6 @@ HRESULT InitDirect3DDevice()
   g_pJointVariable = g_pEffect->GetVariableByName("mJoint")->AsMatrix();
   g_pLightDirVariable = g_pEffect->GetVariableByName("vLightDir")->AsVector();
   g_pLightColorVariable = g_pEffect->GetVariableByName("vLightColor")->AsVector();
-  g_pOutputColorVariable = g_pEffect->GetVariableByName("vOutputColor")->AsVector();
   g_pDiffuseVariable = g_pEffect->GetVariableByName("txDiffuse")->AsShaderResource();
 
   //////////////////////////////////////////////////////////////////////
@@ -722,6 +877,18 @@ HRESULT InitDirect3DDevice()
     return hr;
   }
 
+  hr = InitStaticEffect();
+  if (FAILED(hr)) {
+    print("InitStaticEffect\n");
+    return hr;
+  }
+
+  hr = LoadMeshStatic(cube::node_0.mesh);
+  if (FAILED(hr)) {
+    print("LoadMeshStatic\n");
+    return hr;
+  }
+
   //////////////////////////////////////////////////////////////////////
   // transform matrices
   //////////////////////////////////////////////////////////////////////
@@ -729,7 +896,7 @@ HRESULT InitDirect3DDevice()
   D3DXMatrixIdentity(&g_World1);
   D3DXMatrixIdentity(&g_World2);
 
-  D3DXVECTOR3 Eye(0.0f, 1.0f, -1.5f);
+  D3DXVECTOR3 Eye(0.0f, 1.0f, -2.0f);
   D3DXVECTOR3 At(0.0f, 1.0f, 0.0f);
   D3DXVECTOR3 Up(0.0f, 1.0f, 0.0f);
   D3DXMatrixLookAtLH(&g_View, &Eye, &At, &Up);
@@ -869,7 +1036,7 @@ void Animate(float t)
   const AnimationChannel * channels = animation_1__channels;
   const int channels_length = animation_1__channels__length;
 
-  t = loop(t, 4.166666030883789);
+  t = loop(t, 3.75);
 
   // sample all channels
   for (int i = 0; i < channels_length; i++) {
@@ -934,8 +1101,6 @@ void RenderModel(float t)
   }
   Animate(t);
 
-  // first cube
-
   D3DXMATRIX rx;
   D3DXMATRIX ry;
   D3DXMatrixRotationY(&ry, (float)D3DX_PI * -1.0f + t);
@@ -943,25 +1108,6 @@ void RenderModel(float t)
   D3DXMatrixMultiply(&g_World1,
                      &rx,
                      &ry);
-
-  // lights
-  D3DXVECTOR4 vLightDirs[2] = {
-    D3DXVECTOR4(-0.577f, 0.577f, -0.577f, 1.0f),
-    D3DXVECTOR4(0.0f, 0.0f, -1.0f, 1.0f),
-  };
-  D3DXVECTOR4 vLightColors[2] = {
-    D3DXVECTOR4(0.0f, 0.5f, 0.5f, 1.0f),
-    D3DXVECTOR4(0.5f, 0.0f, 0.0f, 1.0f)
-  };
-
-  // rotate the second light around the origin
-  D3DXMATRIX mRotate;
-  D3DXVECTOR4 vOutDir;
-  D3DXMatrixRotationY(&mRotate, -2.0f * t);
-  D3DXVec3Transform(&vLightDirs[1], (D3DXVECTOR3 *)&vLightDirs[1], &mRotate);
-
-  D3DXMatrixRotationY(&mRotate, 0.4f * t);
-  D3DXVec3Transform(&vLightDirs[0], (D3DXVECTOR3 *)&vLightDirs[0], &mRotate);
 
   // matrices
   g_pViewVariable->SetMatrix((float *)&g_View);
@@ -971,12 +1117,9 @@ void RenderModel(float t)
 
   g_pJointVariable->SetMatrixArray((float *)mJoints, 0, joints_length);
 
-  // color
-  g_pOutputColorVariable->SetFloatVector((float *)&vLightColors[0]);
-
   // lights
-  g_pLightDirVariable->SetFloatVectorArray((float *)vLightDirs, 0, 2);
-  g_pLightColorVariable->SetFloatVectorArray((float *)vLightColors, 0, 2);
+  g_pLightDirVariable->SetFloatVectorArray((float *)g_vLightDirs, 0, 2);
+  g_pLightColorVariable->SetFloatVectorArray((float *)g_vLightColors, 0, 2);
 
   // render first cube
   const Mesh * mesh = ROOT_MESH_NODE.mesh;
@@ -1001,6 +1144,44 @@ void RenderModel(float t)
   for (UINT p = 0; p < techDesc.Passes; p++) {
     g_pTechniqueRender->GetPassByIndex(p)->Apply(0);
     g_pd3dDevice->DrawIndexed(indices_length, 0, 0);
+  }
+}
+
+void RenderMeshStatic(const Mesh * mesh)
+{
+  g_pViewVariableStatic->SetMatrix((float *)&g_View);
+  g_pProjectionVariableStatic->SetMatrix((float *)&g_Projection);
+
+  UINT stride[] = {
+    (sizeof (mesh->position[0])),
+    (sizeof (mesh->normal[0])),
+    (sizeof (mesh->texcoord_0[0])),
+  };
+  UINT offset[] = { 0, 0, 0 };
+  g_pd3dDevice->IASetInputLayout(g_pVertexLayoutStatic);
+  g_pd3dDevice->IASetVertexBuffers(0, g_dwVertexBufferCountCube, g_pVertexBufferCube, stride, offset);
+  g_pd3dDevice->IASetIndexBuffer(g_pIndexBufferCube, DXGI_FORMAT_R32_UINT, 0);
+  g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+  D3D10_TECHNIQUE_DESC techDesc;
+  g_pTechniqueStatic->GetDesc(&techDesc);
+  int indices_length = mesh->indices_size / (sizeof (DWORD));
+
+  for (int m = 0; m < 2; m++) {
+    D3DXMATRIX mLight;
+    D3DXMATRIX mLightScale;
+    D3DXVECTOR3 vLightPos = g_vLightDirs[m] * (1.25f * (m + 1));
+    D3DXMatrixTranslation(&mLight, vLightPos.x, vLightPos.y, vLightPos.z);
+    D3DXMatrixScaling(&mLightScale, 0.05f, 0.05f, 0.05f);
+    mLight = mLightScale * mLight;
+
+    g_pWorldVariableStatic->SetMatrix((float *)&mLight);
+    g_pOutputColorVariableStatic->SetFloatVector((float *)&g_vLightColors[m]);
+
+    for (UINT p = 0; p < techDesc.Passes; p++) {
+      g_pTechniqueStatic->GetPassByIndex(p)->Apply(0);
+      g_pd3dDevice->DrawIndexed(indices_length, 0, 0);
+    }
   }
 }
 
@@ -1130,6 +1311,24 @@ void RenderBloom()
   }
 }
 
+void Update(float t)
+{
+  D3DXVECTOR4 vLightDirs[2] = {
+    D3DXVECTOR4(-0.577f, 0.577f, 0.0, 1.0f),
+    D3DXVECTOR4(1.0f, 1.5f, 0.0f, 1.0f),
+  };
+  D3DXVec4Normalize(&vLightDirs[0], &vLightDirs[0]);
+  D3DXVec4Normalize(&vLightDirs[1], &vLightDirs[1]);
+
+  D3DXMATRIX mRotate;
+  D3DXVECTOR4 vOutDir;
+  D3DXMatrixRotationY(&mRotate, -1.0f * t);
+  D3DXVec3Transform(&g_vLightDirs[1], (D3DXVECTOR3 *)&vLightDirs[1], &mRotate);
+
+  D3DXMatrixRotationY(&mRotate, 0.4f * t);
+  D3DXVec3Transform(&g_vLightDirs[0], (D3DXVECTOR3 *)&vLightDirs[0], &mRotate);
+}
+
 void Render()
 {
   static float t = 0.0f;
@@ -1143,18 +1342,23 @@ void Render()
   t = (dwTimeCur - dwTimeStart) / 1000.0f;
 #endif
 
+  Update(t);
+
   // clear
 
-  g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetViewTexture[0], g_pDepthStencilView);
-  float ClearColor[4] = { 0.0f, 0.125f, 0.6f, 1.0f };
-  g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetViewTexture[0], ClearColor);
+  const float ClearColor[4] = { 0.0f, 0.125f, 0.6f, 1.0f };
+  //g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetViewTexture[0], g_pDepthStencilView);
+  //g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetViewTexture[0], ClearColor);
+  g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetView, g_pDepthStencilView);
+  g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetView, ClearColor);
   g_pd3dDevice->ClearDepthStencilView(g_pDepthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
 
   // render
   RenderModel(t);
   RenderFont();
+  RenderMeshStatic(cube::node_0.mesh);
 
-  RenderBloom();
+  //RenderBloom();
 
   // present
   g_pSwapChain->Present(0, 0);

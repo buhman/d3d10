@@ -4,12 +4,13 @@ all: $(BUILD_TYPE)/d3d10.exe
 	$(BUILD_TYPE)/d3d10.exe
 
 %.fxo: %.fx
-	fxc /Od /Zi /T fx_4_0 /nologo /Fo $@ $<
+	fxc.exe @"shader_$(BUILD_TYPE).rsp" /T fx_4_0 /nologo /Fo $@ $<
 
 SHADERS = \
 	main.fxo \
 	font.fxo \
-	bloom.fxo
+	bloom.fxo \
+	static.fxo
 
 $(BUILD_TYPE)/%.res: %.rc $(SHADERS)
 	rc.exe /d "_UNICODE" /d "UNICODE" /fo $@ $<
@@ -19,6 +20,7 @@ $(BUILD_TYPE)/%.obj: src/%.cpp
 
 OBJS = \
 	$(BUILD_TYPE)/robot_player.obj \
+	$(BUILD_TYPE)/cube.obj \
 	$(BUILD_TYPE)/main.obj \
 	$(BUILD_TYPE)/print.obj \
 	$(BUILD_TYPE)/render_state.obj \
