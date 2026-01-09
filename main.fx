@@ -53,8 +53,8 @@ PS_INPUT VS(VS_INPUT input)
   output.Joint = input.Joint;
   output.Tex = input.Tex;
 
-  output.Normal = mul(input.Normal, mSkin);
-  output.Normal = mul(output.Normal, World);
+  output.Normal = mul(input.Normal, mSkin).xyz;
+  output.Normal = mul(output.Normal, World).xyz;
 
   return output;
 }
@@ -72,15 +72,15 @@ float4 PS(PS_INPUT input) : SV_Target
   return texColor * intensityColor;
 }
 
-float4 PSSolid(PS_INPUT input) : SV_Target
-{
-  //return vOutputColor;
-  return float4(input.Weight.xyz, 1);
-}
-
 BlendState Blending
 {
   BlendEnable[0] = FALSE;
+};
+
+DepthStencilState EnableDepth
+{
+  DepthEnable = TRUE;
+  DepthWriteMask = ALL;
 };
 
 technique10 Render
@@ -91,15 +91,6 @@ technique10 Render
     SetGeometryShader(NULL);
     SetPixelShader(CompileShader(ps_4_0, PS()));
     SetBlendState(Blending, float4(0.0, 0.0, 0.0, 0.0), 0xffffffff);
-  }
-}
-
-technique10 RenderLight
-{
-  pass P0
-  {
-    SetVertexShader(CompileShader(vs_4_0, VS()));
-    SetGeometryShader(NULL);
-    SetPixelShader(CompileShader(ps_4_0, PSSolid()));
+    SetDepthStencilState(EnableDepth, 0);
   }
 }

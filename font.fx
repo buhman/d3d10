@@ -81,6 +81,12 @@ BlendState Blending
   BlendOpAlpha = ADD;
 };
 
+DepthStencilState DisableDepth
+{
+  DepthEnable = FALSE;
+  DepthWriteMask = ZERO;
+};
+
 technique10 Font
 {
   pass P0
@@ -89,5 +95,6 @@ technique10 Font
     SetGeometryShader(CompileShader(gs_4_0, GS()));
     SetPixelShader(CompileShader(ps_4_0, PS()));
     SetBlendState(Blending, float4(0.0, 0.0, 0.0, 0.0), 0xffffffff);
+    SetDepthStencilState(DisableDepth, 0);
   }
 }

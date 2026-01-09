@@ -8,7 +8,8 @@ all: $(BUILD_TYPE)/d3d10.exe
 
 SHADERS = \
 	main.fxo \
-	font.fxo
+	font.fxo \
+	bloom.fxo
 
 $(BUILD_TYPE)/%.res: %.rc $(SHADERS)
 	rc.exe /d "_UNICODE" /d "UNICODE" /fo $@ $<

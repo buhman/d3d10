@@ -8,4 +8,14 @@ HRESULT LoadTexture(const wchar_t * resourceName,
                     const DXGI_FORMAT format,
                     ID3D10ShaderResourceView ** pTextureShaderResourceView);
 
+HRESULT CreateTextureRenderTargetView(const int width,
+                                      const int height,
+                                      ID3D10Texture2D ** pTexture,
+                                      ID3D10RenderTargetView ** pRenderTargetView);
+
+HRESULT CreateTextureRenderTargetView(const int width,
+                                      const int height,
+                                      ID3D10RenderTargetView ** pRenderTargetView,
+                                      ID3D10ShaderResourceView ** pTextureShaderResourceView);
+
 #endif _RENDER_STATE_HPP_

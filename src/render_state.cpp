@@ -39,7 +39,7 @@ HRESULT LoadTexture(const wchar_t * resourceName,
   textureDesc.Format = format;
   textureDesc.SampleDesc.Count = 1;
   textureDesc.SampleDesc.Quality = 0;
-  textureDesc.Usage = D3D10_USAGE_DEFAULT;
+  textureDesc.Usage = D3D10_USAGE_IMMUTABLE;
   textureDesc.BindFlags = D3D10_BIND_SHADER_RESOURCE;
   textureDesc.CPUAccessFlags = 0;
   textureDesc.MiscFlags = 0;
@@ -49,6 +49,54 @@ HRESULT LoadTexture(const wchar_t * resourceName,
   hr = g_pd3dDevice->CreateTexture2D(&textureDesc, &subresourceData, &pTexture);
   if (FAILED(hr)) {
     print("CreateTexture2D\n");
+    return hr;
+  }
+
+  D3D10_SHADER_RESOURCE_VIEW_DESC descSRV;
+  descSRV.Format = textureDesc.Format;
+  descSRV.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
+  descSRV.Texture2D.MostDetailedMip = 0;
+  descSRV.Texture2D.MipLevels = 1;
+  hr = g_pd3dDevice->CreateShaderResourceView(pTexture, &descSRV, pTextureShaderResourceView);
+  if (FAILED(hr)) {
+    print("CreateShaderResourceView\n");
+    return hr;
+  }
+
+  return S_OK;
+}
+
+HRESULT CreateTextureRenderTargetView(const int width,
+                                      const int height,
+                                      ID3D10RenderTargetView ** pRenderTargetView,
+                                      ID3D10ShaderResourceView ** pTextureShaderResourceView)
+{
+  HRESULT hr;
+
+  D3D10_TEXTURE2D_DESC textureDesc;
+  textureDesc.Width = width;
+  textureDesc.Height = height;
+  textureDesc.MipLevels = 1;
+  textureDesc.ArraySize = 1;
+  textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+  textureDesc.SampleDesc.Count = 1;
+  textureDesc.SampleDesc.Quality = 0;
+  textureDesc.Usage = D3D10_USAGE_DEFAULT;
+  textureDesc.BindFlags = D3D10_BIND_RENDER_TARGET | D3D10_BIND_SHADER_RESOURCE;
+  textureDesc.CPUAccessFlags = 0;
+  textureDesc.MiscFlags = 0;
+
+  ID3D10Texture2D * pTexture;
+
+  hr = g_pd3dDevice->CreateTexture2D(&textureDesc, NULL, &pTexture);
+  if (FAILED(hr)) {
+    print("CreateTexture2D\n");
+    return hr;
+  }
+
+  hr = g_pd3dDevice->CreateRenderTargetView(pTexture, NULL, pRenderTargetView);
+  if (FAILED(hr)) {
+    print("g_pd3dDevice->CreateRenderTargetView(pTexture)\n");
     return hr;
   }
 

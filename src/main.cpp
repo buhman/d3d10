@@ -45,6 +45,21 @@ D3DXMATRIX g_World2;
 D3DXMATRIX g_View;
 D3DXMATRIX g_Projection;
 
+// bloom
+ID3D10RenderTargetView * g_pRenderTargetViewTexture[2] = { NULL, NULL };
+ID3D10ShaderResourceView * g_pRenderTargetShaderResourceView[2] = { NULL, NULL };
+
+ID3D10Effect * g_pEffectBloom = NULL;
+ID3D10EffectTechnique * g_pTechniqueBloom = NULL;
+ID3D10InputLayout * g_pVertexLayoutBloom = NULL;
+const DWORD g_dwVertexBufferCountBloom = 1;
+ID3D10Buffer * g_pVertexBuffersBloom[g_dwVertexBufferCountBloom];
+ID3D10EffectShaderResourceVariable * g_pDiffuseVariableBloom = NULL;
+ID3D10EffectVectorVariable * g_pInvScreenSizeVariableBloom = NULL;
+ID3D10EffectVectorVariable * g_pDirVariableBloom = NULL;
+
+typedef D3DXVECTOR2 BloomVertex;
+
 // font
 
 ID3D10Effect * g_pEffectFont = NULL;
@@ -57,6 +72,11 @@ ID3D10EffectVectorVariable * g_pInvScreenSizeVariableFont = NULL;
 ID3D10EffectVectorVariable * g_pGlyphScaleVariableFont = NULL;
 ID3D10EffectVectorVariable * g_pTexScaleVariableFont = NULL;
 ID3D10EffectShaderResourceVariable * g_pDiffuseVariableFont = NULL;
+
+const int g_iFontBufferLength = 512;
+typedef D3DXVECTOR4 FontVertex;
+
+// forward declarations
 
 HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -134,7 +154,7 @@ HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow)
     return E_FAIL;
 
   // create window
-  RECT rc = { 0, 0, 320, 240 };
+  RECT rc = { 0, 0, 160, 120 };
   AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
   UINT width = rc.right - rc.left;
   UINT height = rc.bottom - rc.top;
@@ -195,7 +215,7 @@ HRESULT InitDirect3DViews()
   hr = g_pd3dDevice->CreateRenderTargetView(pBackBuffer, NULL, &g_pRenderTargetView);
   pBackBuffer->Release();
   if (FAILED(hr)) {
-    print("g_pSwapChain->CreateRenderTargetView\n");
+    print("g_pd3dDevice->CreateRenderTargetView(pBackBuffer)\n");
     return hr;
   }
 
@@ -212,6 +232,7 @@ HRESULT InitDirect3DViews()
   descDepth.BindFlags = D3D10_BIND_DEPTH_STENCIL;
   descDepth.CPUAccessFlags = 0;
   descDepth.MiscFlags = 0;
+
   hr = g_pd3dDevice->CreateTexture2D(&descDepth, NULL, &g_pDepthStencil);
   if (FAILED(hr)) {
     print("CreateTexture2D\n");
@@ -222,13 +243,23 @@ HRESULT InitDirect3DViews()
   descDSV.Format = descDepth.Format;
   descDSV.ViewDimension = D3D10_DSV_DIMENSION_TEXTURE2D;
   descDSV.Texture2D.MipSlice = 0;
+
   hr = g_pd3dDevice->CreateDepthStencilView(g_pDepthStencil, &descDSV, &g_pDepthStencilView);
   if (FAILED(hr)) {
     print("CreateDepthStencilView\n");
     return hr;
   }
 
-  g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetView, g_pDepthStencilView);
+  // intermediate render targets
+  for (int i = 0; i < 2; i++) {
+    hr = CreateTextureRenderTargetView(backBufferSurfaceDesc.Width,
+                                       backBufferSurfaceDesc.Height,
+                                       &g_pRenderTargetViewTexture[i],
+                                       &g_pRenderTargetShaderResourceView[i]);
+    if (FAILED(hr)) {
+      return hr;
+    }
+  }
 
   // viewport
   D3D10_VIEWPORT vp;
@@ -259,7 +290,7 @@ HRESULT LoadMesh()
   const Mesh * mesh = ROOT_MESH_NODE.mesh;
 
   // position
-  bd.Usage = D3D10_USAGE_DEFAULT;
+  bd.Usage = D3D10_USAGE_IMMUTABLE;
   bd.ByteWidth = mesh->position_size;
   bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
   bd.CPUAccessFlags = 0;
@@ -272,7 +303,7 @@ HRESULT LoadMesh()
   }
 
   // weights
-  bd.Usage = D3D10_USAGE_DEFAULT;
+  bd.Usage = D3D10_USAGE_IMMUTABLE;
   bd.ByteWidth = mesh->weights_0_size;
   bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
   bd.CPUAccessFlags = 0;
@@ -285,7 +316,7 @@ HRESULT LoadMesh()
   }
 
   // joints
-  bd.Usage = D3D10_USAGE_DEFAULT;
+  bd.Usage = D3D10_USAGE_IMMUTABLE;
   bd.ByteWidth = mesh->joints_0_size;
   bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
   bd.CPUAccessFlags = 0;
@@ -298,7 +329,7 @@ HRESULT LoadMesh()
   }
 
   // normals
-  bd.Usage = D3D10_USAGE_DEFAULT;
+  bd.Usage = D3D10_USAGE_IMMUTABLE;
   bd.ByteWidth = mesh->normal_size;
   bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
   bd.CPUAccessFlags = 0;
@@ -311,7 +342,7 @@ HRESULT LoadMesh()
   }
 
   // texcoords
-  bd.Usage = D3D10_USAGE_DEFAULT;
+  bd.Usage = D3D10_USAGE_IMMUTABLE;
   bd.ByteWidth = mesh->texcoord_0_size;
   bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
   bd.CPUAccessFlags = 0;
@@ -327,7 +358,7 @@ HRESULT LoadMesh()
   // index buffer
   //////////////////////////////////////////////////////////////////////
 
-  bd.Usage = D3D10_USAGE_DEFAULT;
+  bd.Usage = D3D10_USAGE_IMMUTABLE;
   bd.ByteWidth = mesh->indices_size;
   bd.BindFlags = D3D10_BIND_INDEX_BUFFER;
   bd.CPUAccessFlags = 0;
@@ -367,9 +398,6 @@ HRESULT LoadMesh()
 
   return S_OK;
 }
-
-const int g_iFontBufferLength = 512;
-typedef D3DXVECTOR4 FontVertex;
 
 HRESULT InitFontBuffers()
 {
@@ -440,6 +468,92 @@ HRESULT InitFontBuffers()
   bd.MiscFlags = 0;
 
   hr = g_pd3dDevice->CreateBuffer(&bd, NULL, &g_pVertexBuffersFont[0]);
+  if (FAILED(hr)) {
+    print("CreateBuffer\n");
+    return hr;
+  }
+
+  return S_OK;
+}
+
+// +Y is up
+D3DXVECTOR2 vtxBloom[] = {
+  D3DXVECTOR2(-1, -1), // top left
+  D3DXVECTOR2(-1,  1), // top right
+  D3DXVECTOR2( 1, -1), // bottom left
+  D3DXVECTOR2( 1,  1), // bottom right
+};
+
+HRESULT InitBloomBuffers()
+{
+  HRESULT hr;
+
+  //////////////////////////////////////////////////////////////////////
+  // effect
+  //////////////////////////////////////////////////////////////////////
+
+  HRSRC hRes = FindResource(NULL, L"RES_BLOOM_FXO", RT_RCDATA);
+  if (hRes == NULL) {
+    print("FindResource RES_BLOOM_FXO\n");
+    return E_FAIL;
+  }
+  DWORD dwResSize = SizeofResource(NULL, hRes);
+  HGLOBAL hData = LoadResource(NULL, hRes);
+  void * pData = LockResource(hData);
+  hr = D3D10CreateEffectFromMemory(pData,
+                                   dwResSize,
+                                   0,
+                                   g_pd3dDevice,
+                                   NULL,
+                                   &g_pEffectBloom
+                                   );
+  if (FAILED(hr)) {
+    print("D3D10CreateEffectFromMemory\n");
+    return hr;
+  }
+
+  g_pTechniqueBloom = g_pEffectBloom->GetTechniqueByName("Bloom");
+  g_pInvScreenSizeVariableBloom = g_pEffectBloom->GetVariableByName("vInvScreenSize")->AsVector();
+  g_pDirVariableBloom = g_pEffectBloom->GetVariableByName("vDir")->AsVector();
+  g_pDiffuseVariableBloom = g_pEffectBloom->GetVariableByName("txDiffuse")->AsShaderResource();
+
+  //////////////////////////////////////////////////////////////////////
+  // layout
+  //////////////////////////////////////////////////////////////////////
+
+  D3D10_INPUT_ELEMENT_DESC layout[] = {
+    {"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
+  };
+  UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
+
+  D3D10_PASS_DESC passDesc;
+  g_pTechniqueBloom->GetPassByIndex(0)->GetDesc(&passDesc);
+
+  hr = g_pd3dDevice->CreateInputLayout(layout, numElements,
+                                       passDesc.pIAInputSignature,
+                                       passDesc.IAInputSignatureSize,
+                                       &g_pVertexLayoutBloom);
+  if (FAILED(hr)) {
+    print("CreateInputLayout\n");
+    return hr;
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // vertex buffers
+  //////////////////////////////////////////////////////////////////////
+
+  D3D10_BUFFER_DESC bd;
+  D3D10_SUBRESOURCE_DATA initData;
+
+  // position
+  bd.Usage = D3D10_USAGE_IMMUTABLE;
+  bd.ByteWidth = (sizeof (vtxBloom));
+  bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
+  bd.CPUAccessFlags = 0;
+  bd.MiscFlags = 0;
+  initData.pSysMem = vtxBloom;
+
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffersBloom[0]);
   if (FAILED(hr)) {
     print("CreateBuffer\n");
     return hr;
@@ -602,6 +716,12 @@ HRESULT InitDirect3DDevice()
     return hr;
   }
 
+  hr = InitBloomBuffers();
+  if (FAILED(hr)) {
+    print("InitBloomBuffers\n");
+    return hr;
+  }
+
   //////////////////////////////////////////////////////////////////////
   // transform matrices
   //////////////////////////////////////////////////////////////////////
@@ -641,7 +761,7 @@ BOOL Resize()
   if (width == g_ViewportSize.Width && height == g_ViewportSize.Height)
     return true;
 
-  //g_pd3dDevice->OMSetRenderTargets(1, NULL, NULL);
+  g_pd3dDevice->OMSetRenderTargets(0, NULL, NULL);
   g_pRenderTargetView->Release();
   g_pDepthStencil->Release();
   g_pDepthStencilView->Release();
@@ -886,7 +1006,6 @@ void RenderModel(float t)
 
 void RenderFont()
 {
-
   //////////////////////////////////////////////////////////////////////
   // dynamic vertex buffer
   //////////////////////////////////////////////////////////////////////
@@ -916,7 +1035,6 @@ void RenderFont()
       c -= 0x20;
       cx = (float)(c % charStride);
       cy = (float)(c / charStride);
-      print("%c %f %f\n", c + 0x20, cx, cy);
     }
 
     pData[ix++] = FontVertex(px, py, cx, cy);
@@ -945,6 +1063,8 @@ void RenderFont()
   g_pTexScaleVariableFont->SetFloatVector((float *)&texScale);
   g_pDiffuseVariableFont->SetResource(g_pTextureShaderResourceViewFont);
 
+  //////////////////////////////////////////////////////////////////////
+
   UINT stride[] = {
     (sizeof (FontVertex)),
   };
@@ -958,6 +1078,54 @@ void RenderFont()
 
   for (UINT p = 0; p < techDesc.Passes; p++) {
     g_pTechniqueFont->GetPassByIndex(p)->Apply(0);
+    g_pd3dDevice->Draw(4, 0);
+  }
+}
+
+void RenderBloom()
+{
+  //////////////////////////////////////////////////////////////////////
+  // effect variables
+  //////////////////////////////////////////////////////////////////////
+
+  D3DXVECTOR2 invScreenSize = D3DXVECTOR2(1.0f / (float)g_ViewportSize.Width,
+                                          1.0f / (float)g_ViewportSize.Height);
+
+  g_pInvScreenSizeVariableBloom->SetFloatVector((float *)&invScreenSize);
+
+  //////////////////////////////////////////////////////////////////////
+
+  UINT stride[] = {
+    (sizeof (BloomVertex)),
+  };
+  UINT offset[] = { 0 };
+  g_pd3dDevice->IASetInputLayout(g_pVertexLayoutBloom);
+  g_pd3dDevice->IASetVertexBuffers(0, g_dwVertexBufferCountBloom, g_pVertexBuffersBloom, stride, offset);
+  g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+  D3D10_TECHNIQUE_DESC techDesc;
+  g_pTechniqueBloom->GetDesc(&techDesc);
+
+  // horizontal
+
+  D3DXVECTOR2 dirHorizontal = D3DXVECTOR2(1.0, 0.0);
+  g_pDirVariableBloom->SetFloatVector((float *)dirHorizontal);
+  g_pDiffuseVariableBloom->SetResource(g_pRenderTargetShaderResourceView[0]);
+  g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetViewTexture[1], NULL);
+
+  for (UINT p = 0; p < techDesc.Passes; p++) {
+    g_pTechniqueBloom->GetPassByIndex(p)->Apply(0);
+    g_pd3dDevice->Draw(4, 0);
+  }
+
+  // vertical
+  D3DXVECTOR2 dirVertical = D3DXVECTOR2(0.0, 1.0);
+  g_pDirVariableBloom->SetFloatVector((float *)dirVertical);
+  g_pDiffuseVariableBloom->SetResource(g_pRenderTargetShaderResourceView[1]);
+  g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetView, NULL);
+
+  for (UINT p = 0; p < techDesc.Passes; p++) {
+    g_pTechniqueBloom->GetPassByIndex(p)->Apply(0);
     g_pd3dDevice->Draw(4, 0);
   }
 }
@@ -977,35 +1145,16 @@ void Render()
 
   // clear
 
+  g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetViewTexture[0], g_pDepthStencilView);
   float ClearColor[4] = { 0.0f, 0.125f, 0.6f, 1.0f };
-  g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetView, ClearColor);
+  g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetViewTexture[0], ClearColor);
   g_pd3dDevice->ClearDepthStencilView(g_pDepthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
 
   // render
-
   RenderModel(t);
   RenderFont();
 
-  // render the lights
-  /*
-  for (int m = 0; m < 2; m++) {
-    D3DXMATRIX mLight;
-    D3DXMATRIX mLightScale;
-    D3DXVECTOR3 vLightPos = vLightDirs[m] * 4.0f;
-    D3DXMatrixTranslation( &mLight, vLightPos.x, vLightPos.y, vLightPos.z );
-    D3DXMatrixScaling( &mLightScale, 0.2f, 0.2f, 0.2f );
-    mLight = mLightScale * mLight;
-
-    g_pWorldVariable->SetMatrix((float *)&mLight);
-    g_pOutputColorVariable->SetFloatVector((float *)&vLightColors[m]);
-
-    g_pTechniqueRenderLight->GetDesc( &techDesc );
-    for (UINT p = 0; p < techDesc.Passes; p++) {
-      g_pTechniqueRenderLight->GetPassByIndex(p)->Apply(0);
-      g_pd3dDevice->DrawIndexed(indices_length, 0, 0);
-    }
-  }
-  */
+  RenderBloom();
 
   // present
   g_pSwapChain->Present(0, 0);
