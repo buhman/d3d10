@@ -1,5 +1,6 @@
 float2 vInvScreenSize;
 float2 vDir;
+float fExposure;
 
 Texture2D txDiffuseA;
 SamplerState samPoint {
@@ -29,38 +30,28 @@ PS_INPUT VS(VS_INPUT input)
   return output;
 }
 
-static const float offset[11] = {
-  -9.406430666971303,
-  -7.425801606895373,
-  -5.445401742210555,
-  -3.465172537482815,
-  -1.485055021558738,
-  0.4950160492928826,
-  2.4751038298192056,
-  4.455269417428358,
-  6.435576703455285,
-  8.41608382089975,
-  10
+static const float offset[6] = {
+  -4.1802892785260735,
+  -2.3013875682370335,
+  -0.45807799821605544,
+  1.3765284379445557,
+  3.2355245111649937,
+  5
 };
 
-static const float weight[11] = {
-  0.0276904183309881,
-  0.05417056378718292,
-  0.09049273288108622,
-  0.12908964856395883,
-  0.15725301673321052,
-  0.16358389071865348,
-  0.14531705460040129,
-  0.11023607138371759,
-  0.0714102715628023,
-  0.03950209624702099,
-  0.011254235190977919
+static const float weight[6] = {
+  0.019171156084708173,
+  0.16924312602932176,
+  0.4273923867820408,
+  0.31401440082441,
+  0.06672257638049649,
+  0.003456353899022774
 };
 
 float4 PS(PS_INPUT input) : SV_Target
 {
   float4 texColor = float4(0, 0, 0, 0);
-  for (int i = 0; i < 11; i++) {
+  for (int i = 0; i < 6; i++) {
     float2 texOffset = vDir * offset[i] * vInvScreenSize;
     texColor += txDiffuseA.Sample(samPoint, input.Tex + texOffset) * weight[i];
   }
@@ -91,14 +82,8 @@ DepthStencilState DisableDepth
 
 float4 PSBlend(PS_INPUT input) : SV_Target
 {
-  float4 texColor = float4(0, 0, 0, 0);
-  for (int i = 0; i < 11; i++) {
-    float2 texOffset = vDir * offset[i] * vInvScreenSize;
-    texColor += txDiffuseA.Sample(samPoint, input.Tex + texOffset) * weight[i];
-  }
-
-  texColor = float4(1, 1, 1, 1) - exp2(-texColor * 3.0);
-
+  float4 texColor = PS(input);
+  texColor = float4(1, 1, 1, 1) - exp2(-texColor * fExposure);
   return float4(texColor.xyz, 1);
 }
 

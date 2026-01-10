@@ -2,6 +2,7 @@
 #include <d3d10.h>
 #include <d3dx10.h>
 #include <assert.h>
+#include <strsafe.h>
 
 #include "globals.hpp"
 #include "print.hpp"
@@ -57,6 +58,14 @@ ID3D10Buffer * g_pVertexBuffersBloom[g_dwVertexBufferCountBloom];
 ID3D10EffectShaderResourceVariable * g_pDiffuseAVariableBloom = NULL;
 ID3D10EffectVectorVariable * g_pInvScreenSizeVariableBloom = NULL;
 ID3D10EffectVectorVariable * g_pDirVariableBloom = NULL;
+ID3D10EffectScalarVariable * g_pExposureVariableBloom = NULL;
+#ifdef _DEBUG
+int g_bloomPasses = 0;
+float g_exposure = 3.7f;
+#else
+int g_bloomPasses = 4;
+float g_exposure = 3.4f;
+#endif
 
 typedef D3DXVECTOR2 BloomVertex;
 
@@ -150,6 +159,21 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
   MSG msg = {};
   while (msg.message != WM_QUIT) {
     if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+      if (msg.message == WM_KEYDOWN) {
+      } else if (msg.message == WM_CHAR) {
+        switch (msg.wParam) {
+        case 'q': g_bloomPasses -= 1; break;
+        case 'w': g_bloomPasses += 1; break;
+
+        case 'a': g_exposure -= 0.1f; break;
+        case 's': g_exposure += 0.1f; break;
+
+        case 'z': g_exposure -= 0.5f; break;
+        case 'x': g_exposure += 0.5f; break;
+
+        default: break;
+        }
+      }
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     } else {
@@ -538,6 +562,7 @@ HRESULT InitBloomBuffers()
   g_pTechniqueBloomBlend = g_pEffectBloom->GetTechniqueByName("BloomBlend");
   g_pInvScreenSizeVariableBloom = g_pEffectBloom->GetVariableByName("vInvScreenSize")->AsVector();
   g_pDirVariableBloom = g_pEffectBloom->GetVariableByName("vDir")->AsVector();
+  g_pExposureVariableBloom = g_pEffectBloom->GetVariableByName("fExposure")->AsScalar();
   g_pDiffuseAVariableBloom = g_pEffectBloom->GetVariableByName("txDiffuseA")->AsShaderResource();
 
   //////////////////////////////////////////////////////////////////////
@@ -1196,6 +1221,24 @@ void RenderMeshStatic(const Mesh * mesh, float t)
   }
 }
 
+static char sprintbuf[512];
+static inline int sprint(LPCSTR fmt, ...)
+{
+  va_list args;
+  va_start(args, fmt);
+  char * end;
+  StringCbVPrintfExA(sprintbuf,
+                     (sizeof (sprintbuf)),
+                     &end,
+                     NULL,
+                     0,
+                     fmt,
+                     args);
+  va_end(args);
+  int length = (int)(end - sprintbuf);
+  return length;
+}
+
 void RenderFont()
 {
   //////////////////////////////////////////////////////////////////////
@@ -1211,27 +1254,40 @@ void RenderFont()
     print("g_pVertexBuffersFont->Map");
   }
 
-  int advance = 10;
-  const char * s = "asdf";
+  int length = sprint("bloomPasses: %d\n"
+                      "   exposure: %f",
+                      g_bloomPasses,
+                      g_exposure);
+
+  const char start_advance = 10;
+  int hadvance = start_advance;
+  int vadvance = -10;
+  const char * s = sprintbuf;
   int ix = 0;
   const int charStride = (int)(g_FontSize.Texture.Width / g_FontSize.Glyph.Width);
   while (ix < g_iFontBufferLength && *s) {
     char c = *s++;
 
-    float px = (float)advance;
-    float py = -10.0;
+    float px = (float)hadvance;
+    float py = (float)vadvance;
 
     float cx = 0;
     float cy = 0;
-    if (c >= 0x20 && c <= 0x7f) {
+    if (c == '\n') {
+      hadvance = start_advance;
+      vadvance -= g_FontSize.Glyph.Height;
+      continue;
+    } else if (c == ' ') {
+      hadvance += g_FontSize.Glyph.Width;
+      continue;
+    } else if (c >= 0x20 && c <= 0x7f) {
       c -= 0x20;
       cx = (float)(c % charStride);
       cy = (float)(c / charStride);
     }
 
     pData[ix++] = FontVertex(px, py, cx, cy);
-
-    advance += g_FontSize.Glyph.Width;
+    hadvance += g_FontSize.Glyph.Width;
   }
   g_pVertexBuffersFont[0]->Unmap();
 
@@ -1270,7 +1326,7 @@ void RenderFont()
 
   for (UINT p = 0; p < techDesc.Passes; p++) {
     g_pTechniqueFont->GetPassByIndex(p)->Apply(0);
-    g_pd3dDevice->Draw(4, 0);
+    g_pd3dDevice->Draw(length, 0);
   }
 }
 
@@ -1298,6 +1354,8 @@ void RenderBloom()
   D3D10_TECHNIQUE_DESC techDesc;
   g_pTechniqueBloom->GetDesc(&techDesc);
 
+  g_pExposureVariableBloom->SetFloat(g_exposure);
+
   D3DXVECTOR2 dirHorizontal = D3DXVECTOR2(1.0, 0.0);
   D3DXVECTOR2 dirVertical = D3DXVECTOR2(0.0, 1.0);
 
@@ -1313,7 +1371,7 @@ void RenderBloom()
 
   ID3D10ShaderResourceView * srv[] = { NULL };
 
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < g_bloomPasses; i++) {
     g_pd3dDevice->PSSetShaderResources(0, 1, srv);
 
     // vertical
