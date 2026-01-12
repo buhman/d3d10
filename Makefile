@@ -9,6 +9,7 @@ all: $(BUILD_TYPE)/d3d10.exe
 SHADERS = \
 	main.fxo \
 	font.fxo \
+	volume.fxo \
 	bloom.fxo \
 	static.fxo
 

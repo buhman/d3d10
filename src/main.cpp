@@ -84,6 +84,16 @@ ID3D10EffectShaderResourceVariable * g_pDiffuseVariableFont = NULL;
 const int g_iFontBufferLength = 512;
 typedef D3DXVECTOR4 FontVertex;
 
+// perlin
+ID3D10Effect * g_pEffectVolume = NULL;
+ID3D10EffectTechnique * g_pTechniqueVolume = NULL;
+ID3D10InputLayout * g_pVertexLayoutVolume = NULL;
+const DWORD g_dwVertexBufferCountVolume = 1;
+ID3D10Buffer * g_pVertexBuffersVolume[g_dwVertexBufferCountVolume];
+ID3D10ShaderResourceView * g_pTextureShaderResourceViewPerlin = NULL;
+ID3D10EffectScalarVariable * g_pLayerVariableVolume = NULL;
+ID3D10EffectShaderResourceVariable * g_pDiffuseVariableVolume = NULL;
+
 // static
 ID3D10Effect * g_pEffectStatic = NULL;
 ID3D10EffectTechnique * g_pTechniqueStatic = NULL;
@@ -200,7 +210,7 @@ HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow)
     return E_FAIL;
 
   // create window
-  RECT rc = { 0, 0, 160, 120 };
+  RECT rc = { 0, 0, 512, 512 };
   AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
   UINT width = rc.right - rc.left;
   UINT height = rc.bottom - rc.top;
@@ -420,25 +430,38 @@ HRESULT LoadMesh()
   // textures
   //////////////////////////////////////////////////////////////////////
 
-  hr = LoadTexture(L"RES_ROBOT_PLAYER",
-                   64,     // width
-                   64,     // height
-                   64 * 4, // pitch
-                   DXGI_FORMAT_R8G8B8A8_UNORM,
-                   &g_pTextureShaderResourceView);
+  hr = LoadTexture2D(L"RES_ROBOT_PLAYER",
+                     64,     // width
+                     64,     // height
+                     64 * 4, // pitch
+                     DXGI_FORMAT_R8G8B8A8_UNORM,
+                     &g_pTextureShaderResourceView);
   if (FAILED(hr)) {
-    print("LoadTexture\n");
+    print("LoadTexture2D\n");
     return hr;
   }
 
-  hr = LoadTexture(L"RES_FONT_TERMINUS_6X12",
-                   g_FontSize.Texture.Width,     // width
-                   g_FontSize.Texture.Height,    // height
-                   g_FontSize.Texture.Width * 1, // pitch
-                   DXGI_FORMAT_R8_UNORM,
-                   &g_pTextureShaderResourceViewFont);
+  hr = LoadTexture2D(L"RES_FONT_TERMINUS_6X12",
+                     g_FontSize.Texture.Width,     // width
+                     g_FontSize.Texture.Height,    // height
+                     g_FontSize.Texture.Width * 1, // pitch
+                     DXGI_FORMAT_R8_UNORM,
+                     &g_pTextureShaderResourceViewFont);
   if (FAILED(hr)) {
-    print("LoadTexture\n");
+    print("LoadTexture2D\n");
+    return hr;
+  }
+
+  hr = LoadTexture3D(L"RES_PERLIN",
+                     256, // width
+                     256, // height
+                     256, // depth
+                     256 * 1, // pitch
+                     256 * 256 * 1, // slicePitch
+                     DXGI_FORMAT_R8_UNORM,
+                     &g_pTextureShaderResourceViewPerlin);
+  if (FAILED(hr)) {
+    print("LoadTexture2D\n");
     return hr;
   }
 
@@ -514,6 +537,91 @@ HRESULT InitFontBuffers()
   bd.MiscFlags = 0;
 
   hr = g_pd3dDevice->CreateBuffer(&bd, NULL, &g_pVertexBuffersFont[0]);
+  if (FAILED(hr)) {
+    print("CreateBuffer\n");
+    return hr;
+  }
+
+  return S_OK;
+}
+
+HRESULT InitVolumeBuffers()
+{
+  HRESULT hr;
+
+  //////////////////////////////////////////////////////////////////////
+  // effect
+  //////////////////////////////////////////////////////////////////////
+
+  HRSRC hRes = FindResource(NULL, L"RES_VOLUME_FXO", RT_RCDATA);
+  if (hRes == NULL) {
+    print("FindResource RES_VOLUME_FXO\n");
+    return E_FAIL;
+  }
+  DWORD dwResSize = SizeofResource(NULL, hRes);
+  HGLOBAL hData = LoadResource(NULL, hRes);
+  void * pData = LockResource(hData);
+  hr = D3D10CreateEffectFromMemory(pData,
+                                   dwResSize,
+                                   0,
+                                   g_pd3dDevice,
+                                   NULL,
+                                   &g_pEffectVolume
+                                   );
+  if (FAILED(hr)) {
+    print("D3D10CreateEffectFromMemory\n");
+    return hr;
+  }
+
+  g_pTechniqueVolume = g_pEffectVolume->GetTechniqueByName("Volume");
+
+  g_pLayerVariableVolume = g_pEffectVolume->GetVariableByName("layer")->AsScalar();
+  g_pDiffuseVariableVolume = g_pEffectVolume->GetVariableByName("txDiffuse")->AsShaderResource();
+  assert(g_pDiffuseVariableVolume != NULL);
+
+  //////////////////////////////////////////////////////////////////////
+  // layout
+  //////////////////////////////////////////////////////////////////////
+
+  D3D10_INPUT_ELEMENT_DESC layout[] = {
+    {"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
+  };
+  UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
+
+  D3D10_PASS_DESC passDesc;
+  g_pTechniqueVolume->GetPassByIndex(0)->GetDesc(&passDesc);
+
+  hr = g_pd3dDevice->CreateInputLayout(layout, numElements,
+                                       passDesc.pIAInputSignature,
+                                       passDesc.IAInputSignatureSize,
+                                       &g_pVertexLayoutVolume);
+  if (FAILED(hr)) {
+    print("CreateInputLayout\n");
+    return hr;
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // vertex buffers
+  //////////////////////////////////////////////////////////////////////
+
+  D3D10_BUFFER_DESC bd;
+  D3D10_SUBRESOURCE_DATA initData;
+
+  const D3DXVECTOR2 position[] = {
+    D3DXVECTOR2(-1,  1),
+    D3DXVECTOR2( 1,  1),
+    D3DXVECTOR2(-1, -1),
+    D3DXVECTOR2( 1, -1),
+  };
+
+  // position
+  bd.Usage = D3D10_USAGE_DEFAULT;
+  bd.ByteWidth = (sizeof (D3DXVECTOR2)) * 4;
+  bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
+  bd.CPUAccessFlags = 0;
+  bd.MiscFlags = 0;
+  initData.pSysMem = position;
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffersVolume[0]);
   if (FAILED(hr)) {
     print("CreateBuffer\n");
     return hr;
@@ -897,6 +1005,12 @@ HRESULT InitDirect3DDevice()
   hr = InitFontBuffers();
   if (FAILED(hr)) {
     print("InitFontBuffers\n");
+    return hr;
+  }
+
+  hr = InitVolumeBuffers();
+  if (FAILED(hr)) {
+    print("InitVolumeBuffers\n");
     return hr;
   }
 
@@ -1427,6 +1541,30 @@ void Update(float t)
   D3DXVec3Transform(&g_vLightDirs[0], (D3DXVECTOR3 *)&vLightDirs[0], &mRotate);
 }
 
+void RenderVolume(float t)
+{
+
+  UINT stride[] = {
+    (sizeof (D3DXVECTOR2)),
+  };
+  UINT offset[] = { 0 };
+  g_pd3dDevice->IASetInputLayout(g_pVertexLayoutVolume);
+  g_pd3dDevice->IASetVertexBuffers(0, g_dwVertexBufferCountVolume, g_pVertexBuffersVolume, stride, offset);
+  g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+  g_pLayerVariableVolume->SetFloat(t * 0.002f);
+  g_pDiffuseVariableVolume->SetResource(g_pTextureShaderResourceViewPerlin);
+
+  D3D10_TECHNIQUE_DESC techDescVolume;
+  g_pTechniqueVolume->GetDesc(&techDescVolume);
+
+  g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetView, NULL);
+  for (UINT p = 0; p < techDescVolume.Passes; p++) {
+    g_pTechniqueVolume->GetPassByIndex(p)->Apply(0);
+    g_pd3dDevice->Draw(4, 0);
+  }
+}
+
 void Render()
 {
   static float t = 0.0f;
@@ -1450,6 +1588,7 @@ void Render()
   g_pd3dDevice->ClearDepthStencilView(g_pDepthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
 
   // render
+  /*
   RenderModel(t);
   RenderFont();
 
@@ -1463,6 +1602,8 @@ void Render()
   RenderMeshStatic(cube::node_0.mesh, t);
 
   RenderBloom();
+  */
+  RenderVolume(t);
 
   // present
   g_pSwapChain->Present(0, 0);

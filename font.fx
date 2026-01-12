@@ -70,7 +70,7 @@ float4 PS(PS_INPUT input) : SV_Target
   return float4(c.xxx, 1);
 }
 
-BlendState Blending
+BlendState EnableBlending
 {
   BlendEnable[0] = TRUE;
   SrcBlend = ONE;
@@ -94,7 +94,7 @@ technique10 Font
     SetVertexShader(CompileShader(vs_4_0, VS()));
     SetGeometryShader(CompileShader(gs_4_0, GS()));
     SetPixelShader(CompileShader(ps_4_0, PS()));
-    SetBlendState(Blending, float4(0.0, 0.0, 0.0, 0.0), 0xffffffff);
+    SetBlendState(EnableBlending, float4(0.0, 0.0, 0.0, 0.0), 0xffffffff);
     SetDepthStencilState(DisableDepth, 0);
   }
 }

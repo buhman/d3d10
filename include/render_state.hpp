@@ -1,12 +1,21 @@
 #ifndef _RENDER_STATE_HPP_
 #define _RENDER_STATE_HPP_
 
-HRESULT LoadTexture(const wchar_t * resourceName,
-                    const int width,
-                    const int height,
-                    const int pitch,
-                    const DXGI_FORMAT format,
-                    ID3D10ShaderResourceView ** pTextureShaderResourceView);
+HRESULT LoadTexture2D(const wchar_t * resourceName,
+                      const int width,
+                      const int height,
+                      const int pitch,
+                      const DXGI_FORMAT format,
+                      ID3D10ShaderResourceView ** pTextureShaderResourceView);
+
+HRESULT LoadTexture3D(const wchar_t * resourceName,
+                      const int width,
+                      const int height,
+                      const int depth,
+                      const int pitch,
+                      const int slicePitch,
+                      const DXGI_FORMAT format,
+                      ID3D10ShaderResourceView ** pTextureShaderResourceView);
 
 HRESULT CreateTextureRenderTargetView(const int width,
                                       const int height,
