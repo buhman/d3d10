@@ -25,7 +25,7 @@ HRESULT LoadTexture2D(const wchar_t * resourceName,
   }
   DWORD dwResourceSize = SizeofResource(NULL, hRes);
   assert(pitch >= width);
-  assert(pitch * height == dwResourceSize);
+  assert(pitch * height == (int)dwResourceSize);
 
   HGLOBAL hData = LoadResource(NULL, hRes);
   D3D10_SUBRESOURCE_DATA subresourceData;
@@ -85,7 +85,7 @@ HRESULT LoadTexture3D(const wchar_t * resourceName,
   DWORD dwResourceSize = SizeofResource(NULL, hRes);
   assert(pitch >= width);
   assert(slicePitch >= depth);
-  assert(slicePitch * depth == dwResourceSize);
+  assert(slicePitch * depth == (int)dwResourceSize);
 
   HGLOBAL hData = LoadResource(NULL, hRes);
   D3D10_SUBRESOURCE_DATA subresourceData;

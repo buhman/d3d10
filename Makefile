@@ -1,10 +1,29 @@
 BUILD_TYPE ?= debug
 
-all: $(BUILD_TYPE)/d3d10.exe
-	$(BUILD_TYPE)/d3d10.exe
+PREFIX = i686-w64-mingw32-
+WINDRES = $(PREFIX)windres
+CXX = $(PREFIX)g++
+
+OPT = -g -Og
+
+CXXSTD += -std=gnu++14
+
+CFLAGS += -Wall -Werror -Wfatal-errors
+CFLAGS += -Wno-unused-but-set-variable
+CXXFLAGS += -fno-exceptions
+
+CFLAGS += -municode
+
+WOPT += -municode
+
+FXC ?= C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Utilities/bin/x86/fxc.exe
+
+INCLUDE = \
+	-I./include
 
 %.fxo: %.fx
-	fxc.exe @"shader_$(BUILD_TYPE).rsp" /T fx_4_0 /nologo /Fo $@ $<
+	@echo fxc.exe @"shader_$(BUILD_TYPE).rsp" /T fx_4_0 /nologo /Fo $@ $<
+	@wine "$(FXC)" @"shader_$(BUILD_TYPE).rsp" /T fx_4_0 /nologo /Fo $@ $<
 
 SHADERS = \
 	main.fxo \
@@ -14,10 +33,10 @@ SHADERS = \
 	static.fxo
 
 $(BUILD_TYPE)/%.res: %.rc $(SHADERS)
-	rc.exe /d "_UNICODE" /d "UNICODE" /fo $@ $<
+	$(WINDRES) -O coff -o $@ $<
 
 $(BUILD_TYPE)/%.obj: src/%.cpp
-	cl.exe /Fo"$@" /Fd"$(BUILD_TYPE)\vc80.pdb" @"compile_$(BUILD_TYPE).rsp" $<
+	$(CXX) $(CXXSTD) $(CFLAGS) $(CXXFLAGS) $(WOPT) $(OPT) -o $@ $(INCLUDE) -c $<
 
 OBJS = \
 	$(BUILD_TYPE)/robot_player.obj \
@@ -28,5 +47,4 @@ OBJS = \
 	$(BUILD_TYPE)/main.res
 
 $(BUILD_TYPE)/d3d10.exe: $(OBJS)
-	link.exe /OUT:"$(BUILD_TYPE)\d3d10.exe" /PDB:"$(BUILD_TYPE)\d3d10.pdb" @"link_$(BUILD_TYPE).rsp" $(OBJS) /NOLOGO /ERRORREPORT:PROMPT
-	mt.exe -manifest d3d10.exe.${BUILD_TYPE}.manifest -outputresource:$(BUILD_TYPE)\d3d10.exe;1 -nologo
+	$(CXX) $(LDFLAGS) $(WOPT) -o $@ $(OBJS) -ld3dx10 -ld3d10

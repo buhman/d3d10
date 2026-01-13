@@ -18,10 +18,10 @@ void print(LPCSTR fmt, ...)
                      fmt,
                      args);
   va_end(args);
-  size_t length = end - &buf[0];
   #ifdef _DEBUG
   OutputDebugStringA(buf);
   #endif
+  //size_t length = end - &buf[0];
   //HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
   //WriteConsoleA(hOutput, buf, (DWORD)length, NULL, NULL);
 }

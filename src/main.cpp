@@ -97,6 +97,7 @@ ID3D10EffectShaderResourceVariable * g_pDiffuseVariableVolume = NULL;
 // static
 ID3D10Effect * g_pEffectStatic = NULL;
 ID3D10EffectTechnique * g_pTechniqueStatic = NULL;
+ID3D10EffectTechnique * g_pTechniqueStaticInstanced = NULL;
 ID3D10InputLayout * g_pVertexLayoutStatic = NULL;
 
 ID3D10EffectMatrixVariable * g_pWorldVariableStatic = NULL;
@@ -747,6 +748,7 @@ HRESULT InitStaticEffect()
   }
 
   g_pTechniqueStatic = g_pEffectStatic->GetTechniqueByName("Static");
+  g_pTechniqueStaticInstanced = g_pEffectStatic->GetTechniqueByName("StaticInstanced");
 
   //////////////////////////////////////////////////////////////////////
   // layout
@@ -1341,7 +1343,7 @@ static inline int sprint(LPCSTR fmt, ...)
 {
   va_list args;
   va_start(args, fmt);
-  char * end;
+  char * end = sprintbuf;
   StringCbVPrintfExA(sprintbuf,
                      (sizeof (sprintbuf)),
                      &end,
@@ -1568,6 +1570,42 @@ void RenderVolume(float t)
 
 void RenderVolumeMesh()
 {
+  const Mesh * mesh = cube::node_0.mesh;
+  int indices_length = mesh->indices_size / (sizeof (DWORD));
+
+  g_pViewVariableStatic->SetMatrix((float *)&g_View);
+  g_pProjectionVariableStatic->SetMatrix((float *)&g_Projection);
+
+  UINT stride[] = {
+    (sizeof (mesh->position[0])),
+    (sizeof (mesh->normal[0])),
+    (sizeof (mesh->texcoord_0[0])),
+  };
+  UINT offset[] = { 0, 0, 0 };
+  g_pd3dDevice->IASetInputLayout(g_pVertexLayoutStatic);
+  g_pd3dDevice->IASetVertexBuffers(0, g_dwVertexBufferCountCube, g_pVertexBufferCube, stride, offset);
+  g_pd3dDevice->IASetIndexBuffer(g_pIndexBufferCube, DXGI_FORMAT_R32_UINT, 0);
+  g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+  D3D10_TECHNIQUE_DESC techDesc;
+  g_pTechniqueStatic->GetDesc(&techDesc);
+
+  D3DXMATRIX mWorldScale;
+  D3DXMATRIX mWorldTranslate;
+  D3DXMatrixScaling(&mWorldScale, 0.2f, 0.2f, 0.2f);
+  D3DXMatrixTranslation(&mWorldTranslate, 0.5f, 0.5f, 0.5f);
+  D3DXMATRIX mWorld = mWorldScale * mWorldTranslate;
+
+  g_pWorldVariableStatic->SetMatrix((float *)&mWorld);
+  D3DXMatrixIdentity(&mWorld);
+  g_pWorldNormalVariableStatic->SetMatrix((float *)&mWorld);
+  D3DXVECTOR4 vColor = D3DXVECTOR4(0.0f, 0.9f, 0.0f, 1.0f)  ;
+  g_pOutputColorVariableStatic->SetFloatVector((float *)&vColor);
+
+  for (UINT p = 0; p < techDesc.Passes; p++) {
+    g_pTechniqueStatic->GetPassByIndex(p)->Apply(0);
+    g_pd3dDevice->DrawIndexed(indices_length, 0, 0);
+  }
 }
 
 void Render()
@@ -1607,8 +1645,8 @@ void Render()
 
   //RenderBloom();
   //print("%f\n", t);
-  RenderVolume(t);
-  //RenderVolumeMesh();
+  //RenderVolume(t);
+  RenderVolumeMesh();
 
   // present
   g_pSwapChain->Present(0, 0);

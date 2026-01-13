@@ -52,8 +52,8 @@ PS_INPUT VS(VS_INPUT input)
   output.Joint = input.Joint;
   output.Tex = input.Tex;
 
-  output.Normal = mul(input.Normal, mSkin).xyz;
-  output.Normal = mul(output.Normal, World).xyz;
+  output.Normal = mul(float4(input.Normal, 0), mSkin).xyz;
+  output.Normal = mul(float4(output.Normal, 0), World).xyz;
 
   return output;
 }
