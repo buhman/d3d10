@@ -3,10 +3,12 @@ BUILD_TYPE ?= debug
 ifeq ($(BUILD_TYPE),debug)
 OPT = -g -Og
 CFLAGS += -D_DEBUG
+LDFLAGS += -mconsole
 LDOPT =
 else
 OPT = -O2
 LDOPT = -flto
+LDFLAGS += -mwindows
 endif
 
 PREFIX = i686-w64-mingw32-
@@ -19,8 +21,8 @@ CFLAGS += -march=core2
 CFLAGS += -Wall -Werror -Wfatal-errors
 CFLAGS += -Wno-unused-but-set-variable
 CFLAGS += -Wno-unknown-pragmas
-CFLAGS += -municode
 CFLAGS += -I./include
+CFLAGS += -municode
 LDFLAGS += -municode
 LIBS += -ld3d10
 
@@ -63,3 +65,14 @@ OBJS = \
 $(BUILD_TYPE)/d3d10.exe: $(OBJS)
 	@mkdir -p $(@D)
 	$(CXX) $(LDFLAGS) $(LDOPT) -o $@ $(OBJS) $(LIBS)
+
+.SUFFIXES:
+.INTERMEDIATE:
+.SECONDARY:
+.PHONY: all clean
+
+%: RCS/%,v
+%: RCS/%
+%: %,v
+%: s.%
+%: SCCS/s.%
