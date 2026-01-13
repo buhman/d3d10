@@ -4,4 +4,4 @@
 void print(LPCSTR fmt, ...);
 void printW(LPCWSTR fmt, ...);
 
-#endif _PRINT_HPP_
+#endif

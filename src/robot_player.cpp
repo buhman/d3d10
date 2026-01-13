@@ -1,4 +1,4 @@
-#include <d3dx10.h>
+#include <d3dx9.h>
 #include "gltf.hpp"
 #include "robot_player.hpp"
 const D3DXVECTOR3 accessor_0[] = {
@@ -11220,7 +11220,7 @@ const Node node_0 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.0000000f,  0.2498147f,  0.0000000f), // translation
-  D3DXVECTOR4( 0.0460666f, -0.0000356f,  0.0064854f,  0.9989173f), // rotation
+  D3DXQUATERNION( 0.0460666f, -0.0000356f,  0.0064854f,  0.9989173f), // rotation
   D3DXVECTOR3( 0.9999999f,  0.9999999f,  1.0000000f), // scale
 };
 
@@ -11229,7 +11229,7 @@ const Node node_1 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.1015303f, -0.0197356f, -0.0097731f), // translation
-  D3DXVECTOR4( 0.9995915f,  0.0019270f,  0.0000546f,  0.0285151f), // rotation
+  D3DXQUATERNION( 0.9995915f,  0.0019270f,  0.0000546f,  0.0285151f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  1.0000026f), // scale
 };
 
@@ -11238,7 +11238,7 @@ const Node node_2 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.0000000f,  0.3056018f,  0.0000000f), // translation
-  D3DXVECTOR4( 0.0327397f,  0.0000000f,  0.0000000f,  0.9994639f), // rotation
+  D3DXQUATERNION( 0.0327397f,  0.0000000f,  0.0000000f,  0.9994639f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  1.0000001f), // scale
 };
 
@@ -11247,7 +11247,7 @@ const Node node_3 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.0000000f,  0.3082168f, -0.0000000f), // translation
-  D3DXVECTOR4(-0.0651667f, -0.0000004f,  0.0015632f,  0.9978732f), // rotation
+  D3DXQUATERNION(-0.0651667f, -0.0000004f,  0.0015632f,  0.9978732f), // rotation
   D3DXVECTOR3( 0.9999999f,  0.9999998f,  0.9999999f), // scale
 };
 
@@ -11256,7 +11256,7 @@ const Node node_4 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.2405819f,  0.2553854f,  0.0044682f), // translation
-  D3DXVECTOR4(-0.9994694f, -0.0026905f,  0.0000869f,  0.0324617f), // rotation
+  D3DXQUATERNION(-0.9994694f, -0.0026905f,  0.0000869f,  0.0324617f), // rotation
   D3DXVECTOR3( 1.0000001f,  0.9999999f,  1.0000046f), // scale
 };
 
@@ -11265,7 +11265,7 @@ const Node node_5 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.2488541f,  0.2033314f, -0.0450287f), // translation
-  D3DXVECTOR4(-0.1444001f,  0.0000000f, -0.0000000f,  0.9895194f), // rotation
+  D3DXQUATERNION(-0.1444001f,  0.0000000f, -0.0000000f,  0.9895194f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  1.0000000f), // scale
 };
 
@@ -11274,7 +11274,7 @@ const Node node_6 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.0013047f,  0.3463302f,  0.0044682f), // translation
-  D3DXVECTOR4(-0.0000001f, -0.0000000f,  0.0011287f,  0.9999994f), // rotation
+  D3DXQUATERNION(-0.0000001f, -0.0000000f,  0.0011287f,  0.9999994f), // rotation
   D3DXVECTOR3( 0.9999999f,  0.9999999f,  1.0000000f), // scale
 };
 
@@ -11283,7 +11283,7 @@ const Node node_7 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.0000000f,  0.1024318f, -0.0000000f), // translation
-  D3DXVECTOR4( 0.0383830f,  0.0004671f,  0.0000142f,  0.9992630f), // rotation
+  D3DXQUATERNION( 0.0383830f,  0.0004671f,  0.0000142f,  0.9992630f), // rotation
   D3DXVECTOR3( 1.0000001f,  1.0000000f,  1.0000001f), // scale
 };
 
@@ -11292,7 +11292,7 @@ const Node node_8 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.0000000f,  0.1012803f,  0.0000000f), // translation
-  D3DXVECTOR4( 0.0250839f, -0.0004247f,  0.0000082f,  0.9996853f), // rotation
+  D3DXQUATERNION( 0.0250839f, -0.0004247f,  0.0000082f,  0.9996853f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  0.9999999f), // scale
 };
 
@@ -11301,7 +11301,7 @@ const Node node_9 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.0000000f,  0.1033667f,  0.0000000f), // translation
-  D3DXVECTOR4( 0.0181256f,  0.0003339f,  0.0000077f,  0.9998357f), // rotation
+  D3DXQUATERNION( 0.0181256f,  0.0003339f,  0.0000077f,  0.9998357f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  0.9999999f), // scale
 };
 
@@ -11310,7 +11310,7 @@ const Node node_10 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.0000000f,  0.1026060f,  0.0000000f), // translation
-  D3DXVECTOR4( 0.0140155f,  0.0000431f,  0.0000006f,  0.9999018f), // rotation
+  D3DXQUATERNION( 0.0140155f,  0.0000431f,  0.0000006f,  0.9999018f), // rotation
   D3DXVECTOR3( 1.0000000f,  0.9999999f,  1.0000000f), // scale
 };
 
@@ -11319,7 +11319,7 @@ const Node node_11 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.0000000f,  0.1024613f, -0.0000000f), // translation
-  D3DXVECTOR4( 0.0113911f,  0.0000000f, -0.0000000f,  0.9999352f), // rotation
+  D3DXQUATERNION( 0.0113911f,  0.0000000f, -0.0000000f,  0.9999352f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000002f,  1.0000001f), // scale
 };
 
@@ -11328,7 +11328,7 @@ const Node node_12 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.2396202f,  0.2553876f,  0.0044682f), // translation
-  D3DXVECTOR4(-0.0000482f,  0.0425160f, -0.9990951f,  0.0011277f), // rotation
+  D3DXQUATERNION(-0.0000482f,  0.0425160f, -0.9990951f,  0.0011277f), // rotation
   D3DXVECTOR3( 0.9999999f,  1.0000001f,  1.0000131f), // scale
 };
 
@@ -11337,7 +11337,7 @@ const Node node_13 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.0000000f,  0.3056017f,  0.0000000f), // translation
-  D3DXVECTOR4( 0.0327397f, -0.0000000f, -0.0000000f,  0.9994639f), // rotation
+  D3DXQUATERNION( 0.0327397f, -0.0000000f, -0.0000000f,  0.9994639f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  1.0000001f), // scale
 };
 
@@ -11346,7 +11346,7 @@ const Node node_14 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.0000000f,  0.3082169f,  0.0000000f), // translation
-  D3DXVECTOR4(-0.0651667f,  0.0000004f, -0.0015633f,  0.9978732f), // rotation
+  D3DXQUATERNION(-0.0651667f,  0.0000004f, -0.0015633f,  0.9978732f), // rotation
   D3DXVECTOR3( 1.0000000f,  0.9999999f,  0.9999999f), // scale
 };
 
@@ -11355,7 +11355,7 @@ const Node node_15 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.2435993f,  0.2564784f,  0.0044683f), // translation
-  D3DXVECTOR4(-0.9994729f,  0.0004344f, -0.0000141f,  0.0324618f), // rotation
+  D3DXQUATERNION(-0.9994729f,  0.0004344f, -0.0000141f,  0.0324618f), // rotation
   D3DXVECTOR3( 0.9999999f,  1.0000000f,  1.0000043f), // scale
 };
 
@@ -11364,7 +11364,7 @@ const Node node_16 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.0000000f,  0.1024322f,  0.0000000f), // translation
-  D3DXVECTOR4( 0.0382110f, -0.0004670f, -0.0000141f,  0.9992696f), // rotation
+  D3DXQUATERNION( 0.0382110f, -0.0004670f, -0.0000141f,  0.9992696f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  0.9999999f), // scale
 };
 
@@ -11373,7 +11373,7 @@ const Node node_17 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.0000000f,  0.1012807f,  0.0000000f), // translation
-  D3DXVECTOR4( 0.0250840f,  0.0004248f, -0.0000082f,  0.9996853f), // rotation
+  D3DXQUATERNION( 0.0250840f,  0.0004248f, -0.0000082f,  0.9996853f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  1.0000001f), // scale
 };
 
@@ -11382,7 +11382,7 @@ const Node node_18 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.0000000f,  0.1033668f,  0.0000000f), // translation
-  D3DXVECTOR4( 0.0181256f, -0.0003326f, -0.0000077f,  0.9998357f), // rotation
+  D3DXQUATERNION( 0.0181256f, -0.0003326f, -0.0000077f,  0.9998357f), // rotation
   D3DXVECTOR3( 0.9999999f,  0.9999998f,  0.9999999f), // scale
 };
 
@@ -11391,7 +11391,7 @@ const Node node_19 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.0000000f,  0.1026065f, -0.0000000f), // translation
-  D3DXVECTOR4( 0.0140155f, -0.0000444f, -0.0000006f,  0.9999018f), // rotation
+  D3DXQUATERNION( 0.0140155f, -0.0000444f, -0.0000006f,  0.9999018f), // rotation
   D3DXVECTOR3( 1.0000000f,  0.9999999f,  0.9999999f), // scale
 };
 
@@ -11400,7 +11400,7 @@ const Node node_20 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.0000000f,  0.1024597f, -0.0000000f), // translation
-  D3DXVECTOR4( 0.0113909f, -0.0000002f, -0.0000000f,  0.9999352f), // rotation
+  D3DXQUATERNION( 0.0113909f, -0.0000002f, -0.0000000f,  0.9999352f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000001f,  1.0000000f), // scale
 };
 
@@ -11409,7 +11409,7 @@ const Node node_21 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.2426377f,  0.2564762f,  0.0044682f), // translation
-  D3DXVECTOR4(-0.0000471f,  0.0425161f, -0.9990951f,  0.0011277f), // rotation
+  D3DXQUATERNION(-0.0000471f,  0.0425161f, -0.9990951f,  0.0011277f), // rotation
   D3DXVECTOR3( 0.9999999f,  1.0000000f,  1.0000130f), // scale
 };
 
@@ -11418,7 +11418,7 @@ const Node node_22 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.0000000f,  0.1116755f,  0.0000000f), // translation
-  D3DXVECTOR4( 0.0000000f,  0.0000000f, -0.0011287f,  0.9999994f), // rotation
+  D3DXQUATERNION( 0.0000000f,  0.0000000f, -0.0011287f,  0.9999994f), // rotation
   D3DXVECTOR3( 0.9999999f,  0.9999999f,  1.0000000f), // scale
 };
 
@@ -11427,7 +11427,7 @@ const Node node_23 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.0000000f,  0.1347095f,  0.0000000f), // translation
-  D3DXVECTOR4( 0.0000001f,  0.0000000f,  0.0000000f,  1.0000000f), // rotation
+  D3DXQUATERNION( 0.0000001f,  0.0000000f,  0.0000000f,  1.0000000f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  1.0000000f), // scale
 };
 
@@ -11436,7 +11436,7 @@ const Node node_24 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.0000000f,  0.2498148f, -0.0000000f), // translation
-  D3DXVECTOR4( 0.0460732f,  0.0000356f, -0.0064861f,  0.9989170f), // rotation
+  D3DXQUATERNION( 0.0460732f,  0.0000356f, -0.0064861f,  0.9989170f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  1.0000000f), // scale
 };
 
@@ -11445,7 +11445,7 @@ const Node node_25 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.1057032f, -0.0197356f, -0.0097731f), // translation
-  D3DXVECTOR4( 0.9995847f, -0.0020122f,  0.0037813f,  0.0284986f), // rotation
+  D3DXQUATERNION( 0.9995847f, -0.0020122f,  0.0037813f,  0.0284986f), // rotation
   D3DXVECTOR3( 0.9999999f,  1.0000000f,  1.0000025f), // scale
 };
 
@@ -11454,7 +11454,7 @@ const Node node_26 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.0020865f,  0.6493472f, -0.0044682f), // translation
-  D3DXVECTOR4(-0.0000001f,  0.0000000f,  0.0000000f,  1.0000000f), // rotation
+  D3DXQUATERNION(-0.0000001f,  0.0000000f,  0.0000000f,  1.0000000f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  1.0000000f), // scale
 };
 
@@ -11463,7 +11463,7 @@ const Node node_27 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.2411295f,  0.5391477f, -0.0000001f), // translation
-  D3DXVECTOR4(-0.4999999f, -0.5000001f,  0.5000001f,  0.4999999f), // rotation
+  D3DXQUATERNION(-0.4999999f, -0.5000001f,  0.5000001f,  0.4999999f), // rotation
   D3DXVECTOR3( 0.9999999f,  0.9999998f,  0.9999999f), // scale
 };
 
@@ -11472,7 +11472,7 @@ const Node node_28 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.2411295f,  0.8440942f, -0.0870393f), // translation
-  D3DXVECTOR4(-0.7071068f,  0.0000000f,  0.0000000f,  0.7071068f), // rotation
+  D3DXQUATERNION(-0.7071068f,  0.0000000f,  0.0000000f,  0.7071068f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  1.0000000f), // scale
 };
 
@@ -11481,7 +11481,7 @@ const Node node_29 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.0000000f,  0.1196966f,  0.0000000f), // translation
-  D3DXVECTOR4( 0.0162064f,  0.0000001f,  0.3402117f,  0.9402092f), // rotation
+  D3DXQUATERNION( 0.0162064f,  0.0000001f,  0.3402117f,  0.9402092f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  1.0000000f), // scale
 };
 
@@ -11490,7 +11490,7 @@ const Node node_30 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.0000000f,  0.0919261f,  0.0000000f), // translation
-  D3DXVECTOR4(-0.6492796f, -0.2451639f,  0.6809445f,  0.2337631f), // rotation
+  D3DXQUATERNION(-0.6492796f, -0.2451639f,  0.6809445f,  0.2337631f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  0.9999996f), // scale
 };
 
@@ -11499,7 +11499,7 @@ const Node node_31 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.1054246f,  0.0000000f, -0.0106811f), // translation
-  D3DXVECTOR4( 0.7084953f,  0.0000003f,  0.0000003f,  0.7057156f), // rotation
+  D3DXQUATERNION( 0.7084953f,  0.0000003f,  0.0000003f,  0.7057156f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  0.9999999f), // scale
 };
 
@@ -11508,7 +11508,7 @@ const Node node_32 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.1026551f,  0.3802050f,  0.2318209f), // translation
-  D3DXVECTOR4( 0.7071055f,  0.0013631f,  0.0013631f,  0.7071055f), // rotation
+  D3DXQUATERNION( 0.7071055f,  0.0013631f,  0.0013631f,  0.7071055f), // rotation
   D3DXVECTOR3( 0.9999999f,  1.0000000f,  0.9999999f), // scale
 };
 
@@ -11517,7 +11517,7 @@ const Node node_33 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.2411295f,  0.5391477f, -0.0000001f), // translation
-  D3DXVECTOR4(-0.4999999f,  0.5000001f, -0.5000001f,  0.4999999f), // rotation
+  D3DXQUATERNION(-0.4999999f,  0.5000001f, -0.5000001f,  0.4999999f), // rotation
   D3DXVECTOR3( 0.9999999f,  0.9999998f,  0.9999999f), // scale
 };
 
@@ -11526,7 +11526,7 @@ const Node node_34 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.2411295f,  0.8440942f, -0.0870393f), // translation
-  D3DXVECTOR4(-0.7071068f,  0.0000000f,  0.0000000f,  0.7071068f), // rotation
+  D3DXQUATERNION(-0.7071068f,  0.0000000f,  0.0000000f,  0.7071068f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  1.0000000f), // scale
 };
 
@@ -11535,7 +11535,7 @@ const Node node_35 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3(-0.0000000f,  0.1196966f,  0.0000000f), // translation
-  D3DXVECTOR4( 0.0162064f, -0.0000001f, -0.3402117f,  0.9402092f), // rotation
+  D3DXQUATERNION( 0.0162064f, -0.0000001f, -0.3402117f,  0.9402092f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  1.0000000f), // scale
 };
 
@@ -11544,7 +11544,7 @@ const Node node_36 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.0000000f,  0.0919261f,  0.0000000f), // translation
-  D3DXVECTOR4(-0.6492796f,  0.2451639f, -0.6809445f,  0.2337631f), // rotation
+  D3DXQUATERNION(-0.6492796f,  0.2451639f, -0.6809445f,  0.2337631f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  0.9999996f), // scale
 };
 
@@ -11553,7 +11553,7 @@ const Node node_37 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.1054246f,  0.0000000f, -0.0106811f), // translation
-  D3DXVECTOR4( 0.7084953f, -0.0000003f, -0.0000003f,  0.7057156f), // rotation
+  D3DXQUATERNION( 0.7084953f, -0.0000003f, -0.0000003f,  0.7057156f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  0.9999999f), // scale
 };
 
@@ -11562,7 +11562,7 @@ const Node node_38 = {
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.1026551f,  0.3802050f,  0.2318209f), // translation
-  D3DXVECTOR4( 0.7071055f, -0.0013631f, -0.0013631f,  0.7071055f), // rotation
+  D3DXQUATERNION( 0.7071055f, -0.0013631f, -0.0013631f,  0.7071055f), // rotation
   D3DXVECTOR3( 0.9999999f,  1.0000000f,  0.9999999f), // scale
 };
 
@@ -11571,16 +11571,16 @@ const Node node_39 = {
   &skin_0, // skin
   &mesh_0, // mesh
   D3DXVECTOR3( 0.0000000f,  0.0000000f,  0.0000000f), // translation
-  D3DXVECTOR4( 0.0000000f,  0.0000000f,  0.0000000f,  1.0000000f), // rotation
+  D3DXQUATERNION( 0.0000000f,  0.0000000f,  0.0000000f,  1.0000000f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  1.0000000f), // scale
 };
 
 const Node node_40 = {
-  -1, // parent_ix
+  (DWORD)-1, // parent_ix
   NULL, // skin
   NULL, // mesh
   D3DXVECTOR3( 0.0000000f,  0.0000000f,  0.0000000f), // translation
-  D3DXVECTOR4( 0.0000000f,  0.0000000f,  0.0000000f,  1.0000000f), // rotation
+  D3DXQUATERNION( 0.0000000f,  0.0000000f,  0.0000000f,  1.0000000f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  1.0000000f), // scale
 };
 
@@ -18125,4 +18125,3 @@ const AnimationChannel animation_4__channels[] = {
     ACP__SCALE, // target path
   },
 };
-

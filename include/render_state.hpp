@@ -27,4 +27,4 @@ HRESULT CreateTextureRenderTargetView(const int width,
                                       ID3D10RenderTargetView ** pRenderTargetView,
                                       ID3D10ShaderResourceView ** pTextureShaderResourceView);
 
-#endif _RENDER_STATE_HPP_
+#endif

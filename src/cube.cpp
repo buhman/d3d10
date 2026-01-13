@@ -1,4 +1,4 @@
-#include <d3dx10.h>
+#include <d3dx9.h>
 #include "gltf.hpp"
 #include "cube.hpp"
 namespace cube {
@@ -138,11 +138,11 @@ const Mesh mesh_0 = {
 };
 
 const Node node_0 = {
-  -1, // parent_ix
+  (DWORD)-1, // parent_ix
   NULL, // skin
   &mesh_0, // mesh
   D3DXVECTOR3( 0.0000000f,  0.0000000f,  0.0000000f), // translation
-  D3DXVECTOR4( 0.0000000f,  0.0000000f,  0.0000000f,  1.0000000f), // rotation
+  D3DXQUATERNION( 0.0000000f,  0.0000000f,  0.0000000f,  1.0000000f), // rotation
   D3DXVECTOR3( 1.0000000f,  1.0000000f,  1.0000000f), // scale
 };
 

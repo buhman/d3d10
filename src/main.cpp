@@ -1,6 +1,6 @@
 #include <windows.h>
 #include <d3d10.h>
-#include <d3dx10.h>
+#include <d3dx9.h>
 #include <assert.h>
 #include <strsafe.h>
 
@@ -1313,7 +1313,8 @@ void RenderMeshStatic(const Mesh * mesh, float t)
   for (int m = 0; m < 2; m++) {
     D3DXMATRIX mLight;
     D3DXMATRIX mLightScale;
-    D3DXVECTOR3 vLightPos = g_vLightDirs[m] * (1.25f * (m + 1));
+    D3DXVECTOR3 vDir = D3DXVECTOR3(g_vLightDirs[m]);
+    D3DXVECTOR3 vLightPos = vDir * (1.25f * (m + 1));
     D3DXMATRIX mLightRotate;
     D3DXMatrixRotationX(&mLightRotate, t * (1 + -2 * m));
     D3DXMatrixTranslation(&mLight, vLightPos.x, vLightPos.y, vLightPos.z);
@@ -1552,7 +1553,7 @@ void RenderVolume(float t)
   g_pd3dDevice->IASetVertexBuffers(0, g_dwVertexBufferCountVolume, g_pVertexBuffersVolume, stride, offset);
   g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-  g_pLayerVariableVolume->SetFloat(t * 0.002f);
+  g_pLayerVariableVolume->SetFloat(t * 0.1f);
   g_pDiffuseVariableVolume->SetResource(g_pTextureShaderResourceViewPerlin);
 
   D3D10_TECHNIQUE_DESC techDescVolume;
@@ -1563,6 +1564,10 @@ void RenderVolume(float t)
     g_pTechniqueVolume->GetPassByIndex(p)->Apply(0);
     g_pd3dDevice->Draw(4, 0);
   }
+}
+
+void RenderVolumeMesh()
+{
 }
 
 void Render()
@@ -1588,7 +1593,6 @@ void Render()
   g_pd3dDevice->ClearDepthStencilView(g_pDepthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
 
   // render
-  /*
   RenderModel(t);
   RenderFont();
 
@@ -1601,9 +1605,10 @@ void Render()
   g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetViewTexture[0], ClearColorZero);
   RenderMeshStatic(cube::node_0.mesh, t);
 
-  RenderBloom();
-  */
+  //RenderBloom();
+  //print("%f\n", t);
   RenderVolume(t);
+  //RenderVolumeMesh();
 
   // present
   g_pSwapChain->Present(0, 0);
