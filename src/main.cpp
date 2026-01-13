@@ -60,13 +60,8 @@ ID3D10EffectShaderResourceVariable * g_pDiffuseAVariableBloom = NULL;
 ID3D10EffectVectorVariable * g_pInvScreenSizeVariableBloom = NULL;
 ID3D10EffectVectorVariable * g_pDirVariableBloom = NULL;
 ID3D10EffectScalarVariable * g_pExposureVariableBloom = NULL;
-#ifdef _DEBUG
-int g_bloomPasses = 0;
-float g_exposure = 3.7f;
-#else
 int g_bloomPasses = 4;
 float g_exposure = 3.4f;
-#endif
 
 typedef XMFLOAT2 BloomVertex;
 
@@ -908,11 +903,7 @@ HRESULT InitDirect3DDevice()
 
   D3D10_RASTERIZER_DESC RSDesc;
   RSDesc.FillMode = D3D10_FILL_SOLID;
-#ifdef _DEBUG
   RSDesc.CullMode = D3D10_CULL_BACK;
-#else
-  RSDesc.CullMode = D3D10_CULL_NONE;
-#endif
   RSDesc.FrontCounterClockwise = FALSE;
   RSDesc.DepthBias = 0;
   RSDesc.SlopeScaledDepthBias = 0.0f;
@@ -1584,16 +1575,11 @@ void RenderVolumeMesh()
 
 void Render()
 {
-  static float t = 0.0f;
-#ifdef _DEBUG
-  t += XM_PI * 0.0125f * 0.5f;
-#else
   static DWORD dwTimeStart = 0;
   DWORD dwTimeCur = GetTickCount();
   if (dwTimeStart == 0)
     dwTimeStart = dwTimeCur;
-  t = (dwTimeCur - dwTimeStart) / 1000.0f;
-#endif
+  float t = (dwTimeCur - dwTimeStart) / 1000.0f;
 
   Update(t);
 

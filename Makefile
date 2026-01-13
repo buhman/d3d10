@@ -2,6 +2,7 @@ BUILD_TYPE ?= debug
 
 ifeq ($(BUILD_TYPE),debug)
 OPT = -g -Og
+CFLAGS += -D_DEBUG
 LDOPT =
 else
 OPT = -O2
