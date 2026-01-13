@@ -8,6 +8,7 @@ OPT = -g -Og
 
 CXXSTD += -std=gnu++14
 
+CFLAGS += -march=core2
 CFLAGS += -Wall -Werror -Wfatal-errors
 CFLAGS += -Wno-unused-but-set-variable
 CFLAGS += -Wno-unknown-pragmas
@@ -17,14 +18,16 @@ CFLAGS += -municode
 
 WOPT += -municode
 
-FXC ?= C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Utilities/bin/x86/fxc.exe
-
 INCLUDE = \
 	-I./include
 
 %.fxo: %.fx
+ifeq ($(OS),Windows_NT)
+	fxc.exe @"shader_$(BUILD_TYPE).rsp" /T fx_4_0 /nologo /Fo $@ $<
+else
 	@echo fxc.exe @"shader_$(BUILD_TYPE).rsp" /T fx_4_0 /nologo /Fo $@ $<
-	@wine "$(FXC)" @"shader_$(BUILD_TYPE).rsp" /T fx_4_0 /nologo /Fo $@ $<
+	@wine fxc.exe @"shader_$(BUILD_TYPE).rsp" /T fx_4_0 /nologo /Fo $@ $<
+endif
 
 SHADERS = \
 	main.fxo \
