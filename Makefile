@@ -10,6 +10,7 @@ CXXSTD += -std=gnu++14
 
 CFLAGS += -Wall -Werror -Wfatal-errors
 CFLAGS += -Wno-unused-but-set-variable
+CFLAGS += -Wno-unknown-pragmas
 CXXFLAGS += -fno-exceptions
 
 CFLAGS += -municode
@@ -47,4 +48,4 @@ OBJS = \
 	$(BUILD_TYPE)/main.res
 
 $(BUILD_TYPE)/d3d10.exe: $(OBJS)
-	$(CXX) $(LDFLAGS) $(WOPT) -o $@ $(OBJS) -ld3dx10 -ld3d10
+	$(CXX) $(LDFLAGS) $(WOPT) -o $@ $(OBJS) -ld3d10

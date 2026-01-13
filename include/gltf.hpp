@@ -2,40 +2,40 @@
 #define GLTF_HPP_
 
 struct Mesh {
-  const D3DXVECTOR3 * position;
-  const DWORD position_size;
+  const XMFLOAT3 * position;
+  const int position_size;
 
-  const D3DXVECTOR3 * normal;
-  const DWORD normal_size;
+  const XMFLOAT3 * normal;
+  const int normal_size;
 
-  const D3DXVECTOR2 * texcoord_0;
-  const DWORD texcoord_0_size;
+  const XMFLOAT2 * texcoord_0;
+  const int texcoord_0_size;
 
-  const D3DXVECTOR4 * weights_0;
-  const DWORD weights_0_size;
+  const XMFLOAT4 * weights_0;
+  const int weights_0_size;
 
-  const D3DXVECTOR4 * joints_0;
-  const DWORD joints_0_size;
+  const XMFLOAT4 * joints_0;
+  const int joints_0_size;
 
-  const DWORD * indices;
-  const DWORD indices_size;
+  const int * indices;
+  const int indices_size;
 };
 
 struct Skin;
 
 struct Node {
-  const DWORD parent_ix;
+  const int parent_ix;
   const Skin * skin; // skin index (global)
   const Mesh * mesh; // mesh index (global)
-  const D3DXVECTOR3 translation;
-  const D3DXQUATERNION rotation;
-  const D3DXVECTOR3 scale;
+  const XMFLOAT3 translation;
+  const XMFLOAT4 rotation;
+  const XMFLOAT3 scale;
 };
 
 struct Skin {
-  const D3DXMATRIX * inverse_bind_matrices; // accessor
+  const XMMATRIX * inverse_bind_matrices; // accessor
   const int * joints;
-  DWORD joints_length;
+  int joints_length;
 };
 
 enum AnimationChannelPath {

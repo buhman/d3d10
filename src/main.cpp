@@ -1,8 +1,9 @@
 #include <windows.h>
 #include <d3d10.h>
-#include <d3dx9.h>
 #include <assert.h>
 #include <strsafe.h>
+
+#include "directxmath/directxmath.h"
 
 #include "globals.hpp"
 #include "print.hpp"
@@ -12,7 +13,7 @@
 #include "gltf_instance.hpp"
 
 #include "robot_player.hpp"
-#define ROOT_MESH_NODE node_39
+#define ROOT_MESH_NODE robot_player::node_39
 #include "cube.hpp"
 
 HINSTANCE g_hInstance = NULL;
@@ -40,10 +41,10 @@ ID3D10EffectMatrixVariable * g_pJointVariable = NULL;
 ID3D10EffectVectorVariable * g_pLightDirVariable = NULL;
 ID3D10EffectVectorVariable * g_pLightColorVariable = NULL;
 ID3D10EffectShaderResourceVariable * g_pDiffuseVariable = NULL;
-D3DXMATRIX g_World1;
-D3DXMATRIX g_World2;
-D3DXMATRIX g_View;
-D3DXMATRIX g_Projection;
+XMMATRIX g_World1;
+XMMATRIX g_World2;
+XMMATRIX g_View;
+XMMATRIX g_Projection;
 
 // bloom
 ID3D10RenderTargetView * g_pRenderTargetViewTexture[2] = { NULL, NULL };
@@ -67,7 +68,7 @@ int g_bloomPasses = 4;
 float g_exposure = 3.4f;
 #endif
 
-typedef D3DXVECTOR2 BloomVertex;
+typedef XMFLOAT2 BloomVertex;
 
 // font
 ID3D10Effect * g_pEffectFont = NULL;
@@ -82,7 +83,7 @@ ID3D10EffectVectorVariable * g_pTexScaleVariableFont = NULL;
 ID3D10EffectShaderResourceVariable * g_pDiffuseVariableFont = NULL;
 
 const int g_iFontBufferLength = 512;
-typedef D3DXVECTOR4 FontVertex;
+typedef XMFLOAT4 FontVertex;
 
 // perlin
 ID3D10Effect * g_pEffectVolume = NULL;
@@ -112,10 +113,10 @@ ID3D10Buffer * g_pVertexBufferCube[g_dwVertexBufferCountCube];
 ID3D10Buffer * g_pIndexBufferCube = NULL;
 
 // lights
-D3DXVECTOR4 g_vLightDirs[2];
-D3DXVECTOR4 g_vLightColors[2] = {
-  D3DXVECTOR4(0.0f, 0.9f, 0.9f, 1.0f),
-  D3DXVECTOR4(0.9f, 0.0f, 0.0f, 1.0f)
+XMFLOAT4 g_vLightDirs[2];
+XMFLOAT4 g_vLightColors[2] = {
+  XMFLOAT4(0.0f, 0.9f, 0.9f, 1.0f),
+  XMFLOAT4(0.9f, 0.0f, 0.0f, 1.0f)
 };
 
 // forward declarations
@@ -608,16 +609,16 @@ HRESULT InitVolumeBuffers()
   D3D10_BUFFER_DESC bd;
   D3D10_SUBRESOURCE_DATA initData;
 
-  const D3DXVECTOR2 position[] = {
-    D3DXVECTOR2(-1,  1),
-    D3DXVECTOR2( 1,  1),
-    D3DXVECTOR2(-1, -1),
-    D3DXVECTOR2( 1, -1),
+  const XMFLOAT2 position[] = {
+    XMFLOAT2(-1,  1),
+    XMFLOAT2( 1,  1),
+    XMFLOAT2(-1, -1),
+    XMFLOAT2( 1, -1),
   };
 
   // position
   bd.Usage = D3D10_USAGE_DEFAULT;
-  bd.ByteWidth = (sizeof (D3DXVECTOR2)) * 4;
+  bd.ByteWidth = (sizeof (XMFLOAT2)) * 4;
   bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
   bd.CPUAccessFlags = 0;
   bd.MiscFlags = 0;
@@ -632,11 +633,11 @@ HRESULT InitVolumeBuffers()
 }
 
 // +Y is up
-D3DXVECTOR2 vtxBloom[] = {
-  D3DXVECTOR2(-1, -1), // top left
-  D3DXVECTOR2(-1,  1), // top right
-  D3DXVECTOR2( 1, -1), // bottom left
-  D3DXVECTOR2( 1,  1), // bottom right
+XMFLOAT2 vtxBloom[] = {
+  XMFLOAT2(-1, -1), // top left
+  XMFLOAT2(-1,  1), // top right
+  XMFLOAT2( 1, -1), // bottom left
+  XMFLOAT2( 1,  1), // bottom right
 };
 
 HRESULT InitBloomBuffers()
@@ -1038,23 +1039,22 @@ HRESULT InitDirect3DDevice()
   // transform matrices
   //////////////////////////////////////////////////////////////////////
 
-  D3DXMatrixIdentity(&g_World1);
-  D3DXMatrixIdentity(&g_World2);
+  g_World1 = XMMatrixIdentity();
+  g_World2 = XMMatrixIdentity();
 
-  D3DXVECTOR3 Eye(0.0f, 1.0f, -2.0f);
-  D3DXVECTOR3 At(0.0f, 1.0f, 0.0f);
-  D3DXVECTOR3 Up(0.0f, 1.0f, 0.0f);
-  D3DXMatrixLookAtLH(&g_View, &Eye, &At, &Up);
+  XMVECTOR Eye = XMVectorSet(0.0f, 1.0f, -2.0f, 0.0f);
+  XMVECTOR At = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+  XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+  g_View = XMMatrixLookAtLH(Eye, At, Up);
 
-  float fFov = (float)D3DX_PI * 0.5f;
+  float fFov = XM_PI * 0.5f;
   float fAspect = width / (float)height;
   float fNear = 0.1f;
   float fFar = 100.0f;
-  D3DXMatrixPerspectiveFovLH(&g_Projection,
-                             fFov,
-                             fAspect,
-                             fNear,
-                             fFar);
+  g_Projection = XMMatrixPerspectiveFovLH(fFov,
+                                          fAspect,
+                                          fNear,
+                                          fFar);
 
   return S_OK;
 }
@@ -1086,31 +1086,27 @@ BOOL Resize()
 
   InitDirect3DViews();
 
-  float fFov = (float)D3DX_PI * 0.5f;
+  float fFov = XM_PI * 0.5f;
   float fAspect = width / (float)height;
   float fNear = 0.1f;
   float fFar = 100.0f;
-  D3DXMatrixPerspectiveFovLH(&g_Projection,
-                             fFov,
-                             fAspect,
-                             fNear,
-                             fFar);
+  g_Projection = XMMatrixPerspectiveFovLH(fFov,
+                                          fAspect,
+                                          fNear,
+                                          fFar);
 
   return true;
 }
 
-static inline D3DXMATRIX MatrixTRS(const D3DXVECTOR3 * translation,
-                                   const D3DXQUATERNION * rotation,
-                                   const D3DXVECTOR3 * scaling)
+static inline XMMATRIX MatrixTRS(FXMVECTOR translation,
+                                 FXMVECTOR rotation,
+                                 FXMVECTOR scaling)
 {
-  D3DXMATRIX mTranslation;
-  D3DXMatrixTranslation(&mTranslation, translation->x, translation->y, translation->z);
+  XMMATRIX mTranslation = XMMatrixTranslationFromVector(translation);
 
-  D3DXMATRIX mRotation;
-  D3DXMatrixRotationQuaternion(&mRotation, rotation);
+  XMMATRIX mRotation = XMMatrixRotationQuaternion(rotation);
 
-  D3DXMATRIX mScaling;
-  D3DXMatrixScaling(&mScaling, scaling->x, scaling->y, scaling->z);
+  XMMATRIX mScaling = XMMatrixScalingFromVector(scaling);
 
   //return mScaling * mRotation * mTranslation;
   return mScaling * mRotation * mTranslation;
@@ -1141,34 +1137,27 @@ static inline float Lerp(const float * frames, float t, int frame_ix)
   return (t - frames[frame_ix]) / (frames[frame_ix + 1] - frames[frame_ix]);
 }
 
-const int joints_length = skin_0__joints__length;
-D3DXMATRIX mJoints[joints_length];
-NodeInstance node_inst[nodes__length];
+const int joints_length = robot_player::skin_0__joints__length;
+XMMATRIX mJoints[joints_length];
+NodeInstance node_inst[robot_player::nodes__length];
 
 void InitializeNodeInstances()
 {
-  for (int i = 0; i < nodes__length; i++) {
-    node_inst[i].translation = nodes[i]->translation;
-    node_inst[i].rotation = nodes[i]->rotation;
-    node_inst[i].scale = nodes[i]->scale;
+  const Node ** nodes = robot_player::nodes;
+  for (int i = 0; i < robot_player::nodes__length; i++) {
+    node_inst[i].translation = XMLoadFloat3((const XMFLOAT3 *)&nodes[i]->translation);
+    node_inst[i].rotation = XMLoadFloat4((const XMFLOAT4 *)&nodes[i]->rotation);
+    node_inst[i].scale = XMLoadFloat3((const XMFLOAT3 *)&nodes[i]->scale);
   }
 }
 
-void VectorLerp(D3DXVECTOR3 * output,
-                const D3DXVECTOR3 * a,
-                const D3DXVECTOR3 * b,
-                const float t)
-{
-  *output = *a + t * (*b - *a);
-}
-
-D3DXMATRIX GlobalTransform(int node_ix)
+XMMATRIX GlobalTransform(int node_ix)
 {
   const NodeInstance * instance = &node_inst[node_ix];
-  const Node * node = nodes[node_ix];
-  D3DXMATRIX local_transform = MatrixTRS(&instance->translation,
-                                         &instance->rotation,
-                                         &instance->scale);
+  const Node * node = robot_player::nodes[node_ix];
+  XMMATRIX local_transform = MatrixTRS(XMLoadFloat3((const XMFLOAT3*)&instance->translation),
+                                       XMLoadFloat4((const XMFLOAT4*)&instance->rotation),
+                                       XMLoadFloat3((const XMFLOAT3*)&instance->scale));
   if (((int)node->parent_ix) != 40) {
     return local_transform * GlobalTransform(node->parent_ix);
   } else {
@@ -1178,8 +1167,8 @@ D3DXMATRIX GlobalTransform(int node_ix)
 
 void Animate(float t)
 {
-  const AnimationChannel * channels = animation_1__channels;
-  const int channels_length = animation_1__channels__length;
+  const AnimationChannel * channels = robot_player::animation_1__channels;
+  const int channels_length = robot_player::animation_1__channels__length;
 
   t = loop(t, 3.75);
 
@@ -1197,29 +1186,26 @@ void Animate(float t)
     switch (channels[i].target.path) {
     case ACP__TRANSLATION:
       {
-        const D3DXVECTOR3 * output = (const D3DXVECTOR3 *)sampler->output;
-        VectorLerp(&instance->translation,
-                   &output[frame_ix],
-                   &output[frame_ix+1],
-                   lerp);
+        const XMFLOAT3 * output = (const XMFLOAT3 *)sampler->output;
+        instance->translation = XMVectorLerp(XMLoadFloat3(&output[frame_ix]),
+                                             XMLoadFloat3(&output[frame_ix+1]),
+                                             lerp);
         break;
       }
     case ACP__ROTATION:
       {
-        const D3DXQUATERNION * output = (const D3DXQUATERNION *)sampler->output;
-        D3DXQuaternionSlerp(&instance->rotation,
-                            &output[frame_ix],
-                            &output[frame_ix+1],
-                            lerp);
+        const XMFLOAT4 * output = (const XMFLOAT4 *)sampler->output;
+        instance->rotation = XMQuaternionSlerp(XMLoadFloat4(&output[frame_ix]),
+                                               XMLoadFloat4(&output[frame_ix+1]),
+                                               lerp);
         break;
       }
     case ACP__SCALE:
       {
-        const D3DXVECTOR3 * output = (const D3DXVECTOR3 *)sampler->output;
-        VectorLerp(&instance->scale,
-                   &output[frame_ix],
-                   &output[frame_ix+1],
-                   lerp);
+        const XMFLOAT3 * output = (const XMFLOAT3 *)sampler->output;
+        instance->scale = XMVectorLerp(XMLoadFloat3(&output[frame_ix]),
+                                       XMLoadFloat3(&output[frame_ix+1]),
+                                       lerp);
         break;
       }
     default:
@@ -1230,11 +1216,11 @@ void Animate(float t)
 
   // transform all joints
   const Skin * skin = ROOT_MESH_NODE.skin;
-  for (DWORD i = 0; i < skin->joints_length; i++) {
+  for (int i = 0; i < skin->joints_length; i++) {
     const int joint_ix = skin->joints[i];
     assert(joint_ix >= 0);
 
-    const D3DXMATRIX& inverse_bind_matrix = skin->inverse_bind_matrices[i];
+    const XMMATRIX inverse_bind_matrix = XMMATRIX((const float*)&skin->inverse_bind_matrices[i]);
     mJoints[i] = inverse_bind_matrix * GlobalTransform(joint_ix);
   }
 }
@@ -1242,17 +1228,13 @@ void Animate(float t)
 void RenderModel(float t)
 {
   for (int i = 0; i < joints_length; i++) {
-    D3DXMatrixIdentity(&mJoints[i]);
+    mJoints[i] = XMMatrixIdentity();
   }
   Animate(t);
 
-  D3DXMATRIX rx;
-  D3DXMATRIX ry;
-  D3DXMatrixRotationY(&ry, (float)D3DX_PI * -1.0f + t);
-  D3DXMatrixRotationX(&rx, (float)D3DX_PI * -0.0f);
-  D3DXMatrixMultiply(&g_World1,
-                     &rx,
-                     &ry);
+  XMMATRIX rx = XMMatrixRotationX(XM_PI * -0.0f);
+  XMMATRIX ry = XMMatrixRotationY(XM_PI * -1.0f + t);
+  g_World1 = XMMatrixMultiply(rx, ry);
 
   // matrices
   g_pViewVariable->SetMatrix((float *)&g_View);
@@ -1313,20 +1295,18 @@ void RenderMeshStatic(const Mesh * mesh, float t)
   int indices_length = mesh->indices_size / (sizeof (DWORD));
 
   for (int m = 0; m < 2; m++) {
-    D3DXMATRIX mLight;
-    D3DXMATRIX mLightScale;
-    D3DXVECTOR3 vDir = D3DXVECTOR3(g_vLightDirs[m]);
-    D3DXVECTOR3 vLightPos = vDir * (1.25f * (m + 1));
-    D3DXMATRIX mLightRotate;
-    D3DXMatrixRotationX(&mLightRotate, t * (1 + -2 * m));
-    D3DXMatrixTranslation(&mLight, vLightPos.x, vLightPos.y, vLightPos.z);
-    D3DXMatrixScaling(&mLightScale, 0.05f, 0.05f, 0.05f);
-    mLight = mLightRotate * mLightScale * mLight;
+    XMVECTOR vDir = XMLoadFloat4(&g_vLightDirs[m]);
+    XMVECTOR vLightPos = vDir * (1.25f * (m + 1));
+
+    XMMATRIX mLightRotate = XMMatrixRotationX(t * (1 + -2 * m));
+    XMMATRIX mLightTranslation = XMMatrixTranslationFromVector(vLightPos);
+    XMMATRIX mLightScale = XMMatrixScaling(0.05f, 0.05f, 0.05f);
+
+    XMMATRIX mLight = mLightRotate * mLightScale * mLightTranslation;
 
     g_pWorldVariableStatic->SetMatrix((float *)&mLight);
 
-    D3DXMATRIX mLightNormal;
-    D3DXMatrixTranspose(&mLightNormal, D3DXMatrixInverse(&mLightNormal, NULL, &mLight));
+    XMMATRIX mLightNormal = XMMatrixTranspose(XMMatrixInverse(NULL, mLight));
     g_pWorldNormalVariableStatic->SetMatrix((float *)&mLightNormal);
 
     g_pOutputColorVariableStatic->SetFloatVector((float *)&g_vLightColors[m]);
@@ -1412,16 +1392,14 @@ void RenderFont()
   // effect variables
   //////////////////////////////////////////////////////////////////////
 
-  D3DXVECTOR2 invScreenSize = D3DXVECTOR2(2.0f / (float)g_ViewportSize.Width,
-                                          2.0f / (float)g_ViewportSize.Height);
+  XMFLOAT2 invScreenSize = XMFLOAT2(2.0f / (float)g_ViewportSize.Width,
+                                    2.0f / (float)g_ViewportSize.Height);
 
-  D3DXVECTOR2 position = D3DXVECTOR2(6, 0);
-  D3DXVECTOR2 glyphScale = D3DXVECTOR2((float)g_FontSize.Glyph.Width,
-                                       (float)g_FontSize.Glyph.Height);
+  XMFLOAT2 glyphScale = XMFLOAT2((float)g_FontSize.Glyph.Width,
+                                 (float)g_FontSize.Glyph.Height);
 
-  D3DXVECTOR2 charCoord = D3DXVECTOR2(16, 0);
-  D3DXVECTOR2 texScale = D3DXVECTOR2(glyphScale.x / (float)g_FontSize.Texture.Width,
-                                     glyphScale.y / (float)g_FontSize.Texture.Height);
+  XMFLOAT2 texScale = XMFLOAT2(glyphScale.x / (float)g_FontSize.Texture.Width,
+                               glyphScale.y / (float)g_FontSize.Texture.Height);
 
   g_pInvScreenSizeVariableFont->SetFloatVector((float *)&invScreenSize);
   g_pGlyphScaleVariableFont->SetFloatVector((float *)&glyphScale);
@@ -1453,8 +1431,8 @@ void RenderBloom()
   // effect variables
   //////////////////////////////////////////////////////////////////////
 
-  D3DXVECTOR2 invScreenSize = D3DXVECTOR2(1.0f / (float)g_ViewportSize.Width,
-                                          1.0f / (float)g_ViewportSize.Height);
+  XMFLOAT2 invScreenSize = XMFLOAT2(1.0f / (float)g_ViewportSize.Width,
+                                      1.0f / (float)g_ViewportSize.Height);
 
   g_pInvScreenSizeVariableBloom->SetFloatVector((float *)&invScreenSize);
 
@@ -1473,11 +1451,11 @@ void RenderBloom()
 
   g_pExposureVariableBloom->SetFloat(g_exposure);
 
-  D3DXVECTOR2 dirHorizontal = D3DXVECTOR2(1.0, 0.0);
-  D3DXVECTOR2 dirVertical = D3DXVECTOR2(0.0, 1.0);
+  XMFLOAT2 dirHorizontal = XMFLOAT2(1.0, 0.0);
+  XMFLOAT2 dirVertical = XMFLOAT2(0.0, 1.0);
 
   // horizontal
-  g_pDirVariableBloom->SetFloatVector((float *)dirHorizontal);
+  g_pDirVariableBloom->SetFloatVector((float *)&dirHorizontal);
   g_pDiffuseAVariableBloom->SetResource(g_pRenderTargetShaderResourceViewTexture[0]);
   g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetViewTexture[1], NULL);
   for (UINT p = 0; p < techDesc.Passes; p++) {
@@ -1492,7 +1470,7 @@ void RenderBloom()
     g_pd3dDevice->PSSetShaderResources(0, 1, srv);
 
     // vertical
-    g_pDirVariableBloom->SetFloatVector((float *)dirVertical);
+    g_pDirVariableBloom->SetFloatVector((float *)&dirVertical);
     g_pDiffuseAVariableBloom->SetResource(g_pRenderTargetShaderResourceViewTexture[1]);
     g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetViewTexture[0], NULL);
     for (UINT p = 0; p < techDesc.Passes; p++) {
@@ -1503,7 +1481,7 @@ void RenderBloom()
     g_pd3dDevice->PSSetShaderResources(0, 1, srv);
 
     // horizontal
-    g_pDirVariableBloom->SetFloatVector((float *)dirHorizontal);
+    g_pDirVariableBloom->SetFloatVector((float *)&dirHorizontal);
     g_pDiffuseAVariableBloom->SetResource(g_pRenderTargetShaderResourceViewTexture[0]);
     g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetViewTexture[1], NULL);
     for (UINT p = 0; p < techDesc.Passes; p++) {
@@ -1516,7 +1494,7 @@ void RenderBloom()
   g_pTechniqueBloomBlend->GetDesc(&techDescBlend);
 
   // vertical
-  g_pDirVariableBloom->SetFloatVector((float *)dirVertical);
+  g_pDirVariableBloom->SetFloatVector((float *)&dirVertical);
   g_pDiffuseAVariableBloom->SetResource(g_pRenderTargetShaderResourceViewTexture[1]);
   g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetView, NULL);
 
@@ -1528,27 +1506,25 @@ void RenderBloom()
 
 void Update(float t)
 {
-  D3DXVECTOR4 vLightDirs[2] = {
-    D3DXVECTOR4(-0.577f, 0.577f, 0.0, 1.0f),
-    D3DXVECTOR4(1.0f, 1.5f, 0.0f, 1.0f),
+  XMVECTOR vLightDirs[2] = {
+    {-0.577f, 0.577f, 0.0, 1.0},
+    {1.0f, 1.5f, 0.0f, 1.0},
   };
-  D3DXVec4Normalize(&vLightDirs[0], &vLightDirs[0]);
-  D3DXVec4Normalize(&vLightDirs[1], &vLightDirs[1]);
 
-  D3DXMATRIX mRotate;
-  D3DXVECTOR4 vOutDir;
-  D3DXMatrixRotationY(&mRotate, -1.0f * t);
-  D3DXVec3Transform(&g_vLightDirs[1], (D3DXVECTOR3 *)&vLightDirs[1], &mRotate);
+  XMMATRIX mRotate1 = XMMatrixRotationY(-1.0f * t);
+  XMVECTOR lightDir1 = XMVector4Transform(vLightDirs[1], mRotate1);
+  XMStoreFloat4(&g_vLightDirs[1], lightDir1);
 
-  D3DXMatrixRotationY(&mRotate, 0.4f * t);
-  D3DXVec3Transform(&g_vLightDirs[0], (D3DXVECTOR3 *)&vLightDirs[0], &mRotate);
+  XMMATRIX mRotate0 = XMMatrixRotationY(0.4f * t);
+  XMVECTOR lightDir0 = XMVector4Transform(vLightDirs[0], mRotate0);
+  XMStoreFloat4(&g_vLightDirs[0], lightDir0);
 }
 
 void RenderVolume(float t)
 {
 
   UINT stride[] = {
-    (sizeof (D3DXVECTOR2)),
+    (sizeof (XMFLOAT2)),
   };
   UINT offset[] = { 0 };
   g_pd3dDevice->IASetInputLayout(g_pVertexLayoutVolume);
@@ -1590,16 +1566,14 @@ void RenderVolumeMesh()
   D3D10_TECHNIQUE_DESC techDesc;
   g_pTechniqueStatic->GetDesc(&techDesc);
 
-  D3DXMATRIX mWorldScale;
-  D3DXMATRIX mWorldTranslate;
-  D3DXMatrixScaling(&mWorldScale, 0.2f, 0.2f, 0.2f);
-  D3DXMatrixTranslation(&mWorldTranslate, 0.5f, 0.5f, 0.5f);
-  D3DXMATRIX mWorld = mWorldScale * mWorldTranslate;
+  XMMATRIX mWorldScale = XMMatrixScaling(0.2f, 0.2f, 0.2f);
+  XMMATRIX mWorldTranslate = XMMatrixTranslation(0.5f, 0.5f, 0.5f);
+  XMMATRIX mWorld = mWorldScale * mWorldTranslate;
 
   g_pWorldVariableStatic->SetMatrix((float *)&mWorld);
-  D3DXMatrixIdentity(&mWorld);
-  g_pWorldNormalVariableStatic->SetMatrix((float *)&mWorld);
-  D3DXVECTOR4 vColor = D3DXVECTOR4(0.0f, 0.9f, 0.0f, 1.0f)  ;
+  XMMATRIX mWorldNormal = XMMatrixIdentity();
+  g_pWorldNormalVariableStatic->SetMatrix((float *)&mWorldNormal);
+  XMVECTOR vColor = XMVectorSet(0.0f, 0.9f, 0.0f, 1.0f);
   g_pOutputColorVariableStatic->SetFloatVector((float *)&vColor);
 
   for (UINT p = 0; p < techDesc.Passes; p++) {
@@ -1612,7 +1586,7 @@ void Render()
 {
   static float t = 0.0f;
 #ifdef _DEBUG
-  t += (float)D3DX_PI * 0.0125f * 0.5;
+  t += XM_PI * 0.0125f * 0.5f;
 #else
   static DWORD dwTimeStart = 0;
   DWORD dwTimeCur = GetTickCount();
@@ -1646,7 +1620,7 @@ void Render()
   //RenderBloom();
   //print("%f\n", t);
   //RenderVolume(t);
-  RenderVolumeMesh();
+  //RenderVolumeMesh();
 
   // present
   g_pSwapChain->Present(0, 0);

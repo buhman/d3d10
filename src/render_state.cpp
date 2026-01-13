@@ -2,7 +2,6 @@
 #include <assert.h>
 
 #include <d3d10.h>
-#include <d3dx9.h>
 
 #include "globals.hpp"
 #include "print.hpp"
