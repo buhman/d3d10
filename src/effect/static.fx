@@ -67,7 +67,7 @@ PS_INPUT VSInstanced(VS_INPUT_INSTANCED input)
 {
   VS_INPUT input_vs = (VS_INPUT)0;
 
-  input_vs.Pos = mul(float4(input.Pos.xyz, 1), input.mTransform);
+  input_vs.Pos = mul(float4(input.Pos.xyz * 0.3f, 1), input.mTransform);
   //input_vs.Pos = float4(input.Pos.xyz, 1) + float4(0, input.InstanceID * 3, 0, 0);
   input_vs.Normal = input.Normal;
   input_vs.Tex = input.Tex;

@@ -28,7 +28,7 @@ HRESULT InitInput(HINSTANCE hInstance)
   for (int i = 0; i < libs_length; i++) {
     hLib = LoadLibraryA(libs[i]);
     if (hLib != NULL) {
-      print("using xinput: %s\n", libs[i]);
+      //print("using xinput: %s\n", libs[i]);
       break;
     }
   }

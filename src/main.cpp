@@ -120,12 +120,18 @@ XMFLOAT4 g_vLightColors[2] = {
   XMFLOAT4(0.9f, 0.0f, 0.0f, 1.0f)
 };
 
+//
+
+XMVECTOR g_Eye = XMVectorSet(0.0f, 0.0f, -2.0f, 1.0f);
+XMVECTOR g_At = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+
 // forward declarations
 
 HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 HRESULT InitDirect3DDevice();
-void Render();
+void Render(float t);
+void Update(float t);
 BOOL Resize();
 void InitializeNodeInstances();
 
@@ -151,6 +157,17 @@ const FontSize g_FontSize = {
 };
 
 WindowSize g_ViewportSize;
+
+float GetTime()
+{
+  static DWORD dwTimeStart = 0;
+  DWORD dwTimeCur = GetTickCount();
+  if (dwTimeStart == 0)
+    dwTimeStart = dwTimeCur;
+  float t = (dwTimeCur - dwTimeStart) / 1000.0f;
+
+  return t;
+}
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
@@ -195,9 +212,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     } else {
-      UpdateInput();
-      if (Resize())
-        Render();
+      if (Resize()) {
+        UpdateInput();
+        float t = GetTime();
+        Update(t);
+        Render(t);
+      }
     }
   }
 
@@ -1136,11 +1156,6 @@ HRESULT InitDirect3DDevice()
   g_World1 = XMMatrixIdentity();
   g_World2 = XMMatrixIdentity();
 
-  XMVECTOR Eye = XMVectorSet(0.0f, 0.0f, -2.0f, 0.0f);
-  XMVECTOR At = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-  XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-  g_View = XMMatrixLookAtLH(Eye, At, Up);
-
   float fFov = XM_PI * 0.5f;
   float fAspect = width / (float)height;
   float fNear = 0.1f;
@@ -1611,6 +1626,16 @@ void RenderBloom()
   }
 }
 
+float deadzone(float f)
+{
+  const float threshold = 0.25f;
+  if (fabsf(f) <= threshold)
+    return 0.0f;
+  else {
+    return copysignf(fabsf(f) - threshold, f);
+  }
+}
+
 void Update(float t)
 {
   XMVECTOR vLightDirs[2] = {
@@ -1625,6 +1650,19 @@ void Update(float t)
   XMMATRIX mRotate0 = XMMatrixRotationY(0.4f * t);
   XMVECTOR lightDir0 = XMVector4Transform(vLightDirs[0], mRotate0);
   XMStoreFloat4(&g_vLightDirs[0], lightDir0);
+
+  // view
+  XMMATRIX mRotateView = XMMatrixRotationY(deadzone(g_Joystate.thumbLX) * 0.002f);
+
+  XMMATRIX mTranslateView = XMMatrixTranslation(deadzone(g_Joystate.thumbRX) * 0.002f,
+                                                0.0f,
+                                                deadzone(g_Joystate.thumbRY) * 0.002f);
+
+  g_Eye = XMVector4Transform(g_Eye, mTranslateView * mRotateView);
+  XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+  g_View = XMMatrixLookAtLH(g_Eye, g_At, Up);
+
 }
 
 void RenderVolume(float t)
@@ -1700,16 +1738,8 @@ void RenderVolumeMesh()
   }
 }
 
-void Render()
+void Render(float t)
 {
-  static DWORD dwTimeStart = 0;
-  DWORD dwTimeCur = GetTickCount();
-  if (dwTimeStart == 0)
-    dwTimeStart = dwTimeCur;
-  float t = (dwTimeCur - dwTimeStart) / 1000.0f;
-
-  Update(t);
-
   // clear
 
   const float ClearColor[4] = { 0.2f, 0.125f, 0.2f, 1.0f };
