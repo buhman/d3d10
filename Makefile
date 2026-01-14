@@ -24,9 +24,10 @@ CFLAGS += -Wno-unknown-pragmas
 CFLAGS += -I./include
 CFLAGS += -municode
 LDFLAGS += -municode
-LIBS += -ld3d10
 
 CXXFLAGS += -fno-exceptions
+
+LIBS = -ld3d10
 
 all: $(BUILD_TYPE)/d3d10.exe
 
@@ -60,6 +61,7 @@ OBJS = \
 	$(BUILD_TYPE)/main.obj \
 	$(BUILD_TYPE)/print.obj \
 	$(BUILD_TYPE)/render_state.obj \
+	$(BUILD_TYPE)/input.obj \
 	$(BUILD_TYPE)/main.res
 
 $(BUILD_TYPE)/d3d10.exe: $(OBJS)

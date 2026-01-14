@@ -8,6 +8,7 @@
 #include "globals.hpp"
 #include "print.hpp"
 #include "render_state.hpp"
+#include "input.hpp"
 
 #include "gltf.hpp"
 #include "gltf_instance.hpp"
@@ -168,6 +169,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
   InitializeNodeInstances();
 
+  if (FAILED(InitInput(hInstance))) {
+    print("InitInput\n");
+    return 0;
+  }
+
   MSG msg = {};
   while (msg.message != WM_QUIT) {
     if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -189,6 +195,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     } else {
+      UpdateInput();
       if (Resize())
         Render();
     }
@@ -1439,10 +1446,22 @@ void RenderFont()
     print("g_pVertexBuffersFont->Map");
   }
 
-  int length = sprint("bloomPasses: %d\n"
-                      "   exposure: %f",
-                      g_bloomPasses,
-                      g_exposure);
+  sprint("bloomPasses: %d\n"
+         "   exposure: %f\n\n"
+         "triggerL: % 5.3f\n"
+         "triggerR: % 5.3f\n"
+         " thumbLX: % 5.3f\n"
+         " thumbLY: % 5.3f\n"
+         " thumbRX: % 5.3f\n"
+         " thumbRY: % 5.3f",
+         g_bloomPasses,
+         g_exposure,
+         g_Joystate.triggerL,
+         g_Joystate.triggerR,
+         g_Joystate.thumbLX,
+         g_Joystate.thumbLY,
+         g_Joystate.thumbRX,
+         g_Joystate.thumbRY);
 
   const char start_advance = 10;
   int hadvance = start_advance;
@@ -1509,7 +1528,7 @@ void RenderFont()
 
   for (UINT p = 0; p < techDesc.Passes; p++) {
     g_pTechniqueFont->GetPassByIndex(p)->Apply(0);
-    g_pd3dDevice->Draw(length, 0);
+    g_pd3dDevice->Draw(ix, 0);
   }
 }
 
