@@ -103,10 +103,12 @@ ID3D10EffectMatrixVariable * g_pViewVariableStatic = NULL;
 ID3D10EffectMatrixVariable * g_pProjectionVariableStatic = NULL;
 ID3D10EffectMatrixVariable * g_pWorldNormalVariableStatic = NULL;
 ID3D10EffectVectorVariable * g_pOutputColorVariableStatic = NULL;
+ID3D10EffectShaderResourceVariable * g_pDiffuseVariableStatic = NULL;
 
 // instance data
 ID3D10Buffer * g_pVolumeMeshInstanceData = NULL;
-const int g_iNumVolumeMeshInstances = 8;
+const int g_iMeshInstanceDim = 20;
+const int g_iNumVolumeMeshInstances = g_iMeshInstanceDim * g_iMeshInstanceDim * g_iMeshInstanceDim;
 
 // cube
 const DWORD g_dwVertexBufferCountCube = 3;
@@ -606,7 +608,6 @@ HRESULT InitVolumeBuffers()
 
   g_pLayerVariableVolume = g_pEffectVolume->GetVariableByName("layer")->AsScalar();
   g_pDiffuseVariableVolume = g_pEffectVolume->GetVariableByName("txDiffuse")->AsShaderResource();
-  assert(g_pDiffuseVariableVolume != NULL);
 
   //////////////////////////////////////////////////////////////////////
   // layout
@@ -840,8 +841,13 @@ HRESULT InitStaticEffect()
   g_pProjectionVariableStatic = g_pEffectStatic->GetVariableByName("Projection")->AsMatrix();
   g_pWorldNormalVariableStatic = g_pEffectStatic->GetVariableByName("WorldNormal")->AsMatrix();
   g_pOutputColorVariableStatic = g_pEffectStatic->GetVariableByName("vOutputColor")->AsVector();
+  g_pDiffuseVariableStatic = g_pEffectStatic->GetVariableByName("txDiffuse")->AsShaderResource();
 
   return S_OK;
+}
+
+static inline float lerp(float a, float b, float t) {
+  return a + t * (b - a);
 }
 
 HRESULT InitInstancedVertexBuffer()
@@ -879,18 +885,24 @@ HRESULT InitInstancedVertexBuffer()
     print("g_pVolumeMeshInstanceData->Map");
   }
 
-  float offset = 4.0f;
-  XMMATRIX transforms[8] = {
-    XMMatrixTranslation( offset,  offset, offset),
-    XMMatrixTranslation( offset, -offset, offset),
-    XMMatrixTranslation(-offset, -offset, offset),
-    XMMatrixTranslation(-offset,  offset, offset),
+  XMMATRIX transforms[g_iNumVolumeMeshInstances];
+  const float dim = 1.0f / (float)(g_iMeshInstanceDim - 1);
+  int ix = 0;
+  for (int z = 0; z < g_iMeshInstanceDim; z++) {
+    for (int y = 0; y < g_iMeshInstanceDim; y++) {
+      for (int x = 0; x < g_iMeshInstanceDim; x++) {
+        float fx = (float)x * dim;
+        float fy = (float)y * dim;
+        float fz = (float)z * dim;
 
-    XMMatrixTranslation( offset,  offset, -offset),
-    XMMatrixTranslation( offset, -offset, -offset),
-    XMMatrixTranslation(-offset, -offset, -offset),
-    XMMatrixTranslation(-offset,  offset, -offset),
-  };
+        float px = lerp(-1.0f, 1.0f, fx);
+        float py = lerp(-1.0f, 1.0f, fy);
+        float pz = lerp(-1.0f, 1.0f, fz);
+
+        transforms[ix++] = XMMatrixTranslation(px, py, pz);
+      }
+    }
+  }
 
   memcpy(pData, transforms, (sizeof (XMMATRIX)) * g_iNumVolumeMeshInstances);
 
@@ -1343,7 +1355,8 @@ void RenderModel(float t)
 
   XMMATRIX rx = XMMatrixRotationX(XM_PI * -0.0f);
   XMMATRIX ry = XMMatrixRotationY(XM_PI * -1.0f + t);
-  g_World1 = XMMatrixMultiply(rx, ry);
+  XMMATRIX mWorldTranslate = XMMatrixTranslation(0.0f, 0.0f, 2.0f);
+  g_World1 = XMMatrixMultiply(rx, ry) * mWorldTranslate;
 
   // matrices
   g_pViewVariable->SetMatrix((float *)&g_View);
@@ -1405,13 +1418,15 @@ void RenderMeshStatic(const Mesh * mesh, float t)
 
   for (int m = 0; m < 2; m++) {
     XMVECTOR vDir = XMLoadFloat4(&g_vLightDirs[m]);
-    XMVECTOR vLightPos = vDir * (1.25f * (m + 1));
+    XMVECTOR vLightPos = vDir * (0.8f * m + 1.0f);
 
     XMMATRIX mLightRotate = XMMatrixRotationX(t * (1 + -2 * m));
     XMMATRIX mLightTranslation = XMMatrixTranslationFromVector(vLightPos);
     XMMATRIX mLightScale = XMMatrixScaling(0.05f, 0.05f, 0.05f);
 
-    XMMATRIX mLight = mLightRotate * mLightScale * mLightTranslation;
+    XMMATRIX mWorldTranslate = XMMatrixTranslation(0.0f, 0.0f, 2.0f);
+
+    XMMATRIX mLight = mLightRotate * mLightScale * mLightTranslation * mWorldTranslate;
 
     g_pWorldVariableStatic->SetMatrix((float *)&mLight);
 
@@ -1652,7 +1667,9 @@ void Update(float t)
   XMStoreFloat4(&g_vLightDirs[0], lightDir0);
 
   // view
-  XMMATRIX mRotateView = XMMatrixRotationY(deadzone(g_Joystate.thumbLX) * 0.002f);
+  XMMATRIX mRotateView
+    = XMMatrixRotationY(deadzone(g_Joystate.thumbLX) * 0.002f)
+    * XMMatrixRotationX(deadzone(g_Joystate.thumbLY) * 0.002f);
 
   XMMATRIX mTranslateView = XMMatrixTranslation(deadzone(g_Joystate.thumbRX) * 0.002f,
                                                 0.0f,
@@ -1697,6 +1714,8 @@ void RenderVolumeMesh()
   g_pViewVariableStatic->SetMatrix((float *)&g_View);
   g_pProjectionVariableStatic->SetMatrix((float *)&g_Projection);
 
+  g_pDiffuseVariableStatic->SetResource(g_pTextureShaderResourceViewPerlin);
+
   ID3D10Buffer * pVB[4] = {
     g_pVertexBufferCube[0],
     g_pVertexBufferCube[1],
@@ -1720,7 +1739,7 @@ void RenderVolumeMesh()
   g_pTechniqueStaticInstanced->GetDesc(&techDesc);
 
   XMMATRIX mWorldScale = XMMatrixScaling(0.2f, 0.2f, 0.2f);
-  XMMATRIX mWorldTranslate = XMMatrixTranslation(0.0f, 0.0f, 1.5f);
+  XMMATRIX mWorldTranslate = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
   XMMATRIX mWorld = mWorldScale * mWorldTranslate;
 
   g_pWorldVariableStatic->SetMatrix((float *)&mWorld);
@@ -1749,7 +1768,6 @@ void Render(float t)
 
   // render
   RenderModel(t);
-  RenderFont();
 
   const float ClearColorZero[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
   ID3D10RenderTargetView * RenderTargets[] = {
@@ -1764,6 +1782,8 @@ void Render(float t)
   //print("%f\n", t);
   //RenderVolume(t);
   RenderVolumeMesh();
+
+  RenderFont();
 
   // present
   g_pSwapChain->Present(0, 0);

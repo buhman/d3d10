@@ -5,15 +5,6 @@ struct VS_INPUT
   float2 Tex : TEXCOORD0;
 };
 
-struct VS_INPUT_INSTANCED
-{
-  float4 Pos : POSITION;
-  float3 Normal : NORMAL;
-  float2 Tex : TEXCOORD0;
-  row_major float4x4 mTransform : mTransform;
-  uint InstanceID : SV_InstanceID;
-};
-
 struct PS_INPUT
 {
   float4 Pos : SV_POSITION;
@@ -25,6 +16,28 @@ struct PS_OUTPUT
 {
   float4 color0 : SV_TARGET0;
   float4 color1 : SV_TARGET1;
+};
+
+struct VS_INPUT_INSTANCED
+{
+  float4 Pos : POSITION;
+  float3 Normal : NORMAL;
+  float2 Tex : TEXCOORD0;
+  row_major float4x4 mTransform : mTransform;
+  uint InstanceID : SV_InstanceID;
+};
+
+struct PS_INPUT_INSTANCED
+{
+  float4 Pos : SV_POSITION;
+  float4 Color : TEXCOORD0;
+};
+
+Texture3D txDiffuse;
+SamplerState samLinear {
+  Filter = MIN_MAG_MIP_LINEAR;
+  AddressU = Wrap;
+  AddressV = Wrap;
 };
 
 cbuffer ceveryframe
@@ -63,21 +76,29 @@ PS_OUTPUT PS(PS_INPUT input)
   return output;
 }
 
-PS_INPUT VSInstanced(VS_INPUT_INSTANCED input)
+PS_INPUT_INSTANCED VSInstanced(VS_INPUT_INSTANCED input)
 {
-  VS_INPUT input_vs = (VS_INPUT)0;
+  PS_INPUT_INSTANCED output = (PS_INPUT_INSTANCED)0;
 
-  input_vs.Pos = mul(float4(input.Pos.xyz * 0.3f, 1), input.mTransform);
-  //input_vs.Pos = float4(input.Pos.xyz, 1) + float4(0, input.InstanceID * 3, 0, 0);
-  input_vs.Normal = input.Normal;
-  input_vs.Tex = input.Tex;
+  output.Pos = mul(float4(input.Pos.xyz * 0.01f, 1), input.mTransform);
+  output.Pos = float4(output.Pos.xyz * 4.0f, 1.0f);
+  output.Pos = mul(output.Pos, World);
+  output.Pos = mul(output.Pos, View);
+  output.Pos = mul(output.Pos, Projection);
 
-  return VS(input_vs);
+  output.Color = input.mTransform[3] * 0.5 + 0.5;
+
+  return output;
 }
 
-float4 PSInstanced(PS_INPUT input) : SV_TARGET0
+float4 PSInstanced(PS_INPUT_INSTANCED input) : SV_TARGET0
 {
-  return float4(1, 1, 1, 1);
+  float4 texColor = txDiffuse.Sample(samLinear, input.Color.xyz);
+
+  float c = pow(texColor.x, 3);
+
+  //return input.Color;
+  return float4(c, c, c, 1);
 }
 
 BlendState DisableBlending
