@@ -19,10 +19,10 @@ void print(LPCSTR fmt, ...)
                      args);
   va_end(args);
   #ifdef _DEBUG
-  //OutputDebugStringA(buf);
-  size_t length = end - &buf[0];
-  HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-  WriteConsoleA(hOutput, buf, (DWORD)length, NULL, NULL);
+  OutputDebugStringA(buf);
+  //size_t length = end - &buf[0];
+  //HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+  //WriteConsoleA(hOutput, buf, (DWORD)length, NULL, NULL);
   #endif
 }
 
@@ -42,9 +42,9 @@ void printW(LPCWSTR fmt, ...)
                      args);
   va_end(args);
   #ifdef _DEBUG
-  //OutputDebugStringW(buf);
-  size_t length = end - &buf[0];
-  HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-  WriteConsoleW(hOutput, buf, (DWORD)length, NULL, NULL);
+  OutputDebugStringW(buf);
+  //size_t length = end - &buf[0];
+  //HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+  //WriteConsoleW(hOutput, buf, (DWORD)length, NULL, NULL);
   #endif
 }

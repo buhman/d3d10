@@ -11,6 +11,7 @@ struct VS_INPUT_INSTANCED
   float3 Normal : NORMAL;
   float2 Tex : TEXCOORD0;
   row_major float4x4 mTransform : mTransform;
+  uint InstanceID : SV_InstanceID;
 };
 
 struct PS_INPUT
@@ -54,23 +55,29 @@ PS_INPUT VS(VS_INPUT input)
   return output;
 }
 
-PS_INPUT VSInstanced(VS_INPUT_INSTANCED input)
-{
-  VS_INPUT input_vs = (VS_INPUT)0;
-
-  input_vs.Pos = mul(input.Pos, input.mTransform);
-  input_vs.Normal = input.Normal;
-  input_vs.Tex = input.Tex;
-
-  return VS(input_vs);
-}
-
 PS_OUTPUT PS(PS_INPUT input)
 {
   PS_OUTPUT output;
   output.color0 = float4(vOutputColor, 1.0);
   output.color1 = float4(vOutputColor, 1.0);
   return output;
+}
+
+PS_INPUT VSInstanced(VS_INPUT_INSTANCED input)
+{
+  VS_INPUT input_vs = (VS_INPUT)0;
+
+  input_vs.Pos = mul(float4(input.Pos.xyz, 1), input.mTransform);
+  //input_vs.Pos = float4(input.Pos.xyz, 1) + float4(0, input.InstanceID * 3, 0, 0);
+  input_vs.Normal = input.Normal;
+  input_vs.Tex = input.Tex;
+
+  return VS(input_vs);
+}
+
+float4 PSInstanced(PS_INPUT input) : SV_TARGET0
+{
+  return float4(1, 1, 1, 1);
 }
 
 BlendState DisableBlending
@@ -102,7 +109,7 @@ technique10 StaticInstanced
   {
     SetVertexShader(CompileShader(vs_4_0, VSInstanced()));
     SetGeometryShader(NULL);
-    SetPixelShader(CompileShader(ps_4_0, PS()));
+    SetPixelShader(CompileShader(ps_4_0, PSInstanced()));
     SetBlendState(DisableBlending, float4(0.0, 0.0, 0.0, 0.0), 0xffffffff);
     SetDepthStencilState(EnableDepth, 0);
   }

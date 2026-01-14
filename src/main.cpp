@@ -95,12 +95,17 @@ ID3D10Effect * g_pEffectStatic = NULL;
 ID3D10EffectTechnique * g_pTechniqueStatic = NULL;
 ID3D10EffectTechnique * g_pTechniqueStaticInstanced = NULL;
 ID3D10InputLayout * g_pVertexLayoutStatic = NULL;
+ID3D10InputLayout * g_pVertexLayoutStaticInstanced = NULL;
 
 ID3D10EffectMatrixVariable * g_pWorldVariableStatic = NULL;
 ID3D10EffectMatrixVariable * g_pViewVariableStatic = NULL;
 ID3D10EffectMatrixVariable * g_pProjectionVariableStatic = NULL;
 ID3D10EffectMatrixVariable * g_pWorldNormalVariableStatic = NULL;
 ID3D10EffectVectorVariable * g_pOutputColorVariableStatic = NULL;
+
+// instance data
+ID3D10Buffer * g_pVolumeMeshInstanceData = NULL;
+const int g_iNumVolumeMeshInstances = 8;
 
 // cube
 const DWORD g_dwVertexBufferCountCube = 3;
@@ -746,27 +751,57 @@ HRESULT InitStaticEffect()
   g_pTechniqueStatic = g_pEffectStatic->GetTechniqueByName("Static");
   g_pTechniqueStaticInstanced = g_pEffectStatic->GetTechniqueByName("StaticInstanced");
 
+
   //////////////////////////////////////////////////////////////////////
   // layout
   //////////////////////////////////////////////////////////////////////
 
-  D3D10_INPUT_ELEMENT_DESC layout[] = {
-    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    2, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
-  };
-  UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
+  // static
+  {
+    D3D10_INPUT_ELEMENT_DESC layout[] = {
+      {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
+      {"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
+      {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    2, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
+    };
+    UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
 
-  D3D10_PASS_DESC passDesc;
-  g_pTechniqueStatic->GetPassByIndex(0)->GetDesc(&passDesc);
+    D3D10_PASS_DESC passDesc;
+    g_pTechniqueStatic->GetPassByIndex(0)->GetDesc(&passDesc);
 
-  hr = g_pd3dDevice->CreateInputLayout(layout, numElements,
-                                       passDesc.pIAInputSignature,
-                                       passDesc.IAInputSignatureSize,
-                                       &g_pVertexLayoutStatic);
-  if (FAILED(hr)) {
-    print("CreateInputLayout\n");
-    return hr;
+    hr = g_pd3dDevice->CreateInputLayout(layout, numElements,
+                                         passDesc.pIAInputSignature,
+                                         passDesc.IAInputSignatureSize,
+                                         &g_pVertexLayoutStatic);
+    if (FAILED(hr)) {
+      print("CreateInputLayout\n");
+      return hr;
+    }
+  }
+
+  // static instanced
+  {
+    D3D10_INPUT_ELEMENT_DESC layout[] = {
+      {"POSITION",   0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0 , D3D10_INPUT_PER_VERTEX_DATA,   0},
+      {"NORMAL",     0, DXGI_FORMAT_R32G32B32_FLOAT,    1, 0 , D3D10_INPUT_PER_VERTEX_DATA,   0},
+      {"TEXCOORD",   0, DXGI_FORMAT_R32G32_FLOAT,       2, 0 , D3D10_INPUT_PER_VERTEX_DATA,   0},
+      {"mTransform", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 3, 0 , D3D10_INPUT_PER_INSTANCE_DATA, 1},
+      {"mTransform", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 3, 16, D3D10_INPUT_PER_INSTANCE_DATA, 1},
+      {"mTransform", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 3, 32, D3D10_INPUT_PER_INSTANCE_DATA, 1},
+      {"mTransform", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 3, 48, D3D10_INPUT_PER_INSTANCE_DATA, 1},
+    };
+    UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
+
+    D3D10_PASS_DESC passDesc;
+    g_pTechniqueStaticInstanced->GetPassByIndex(0)->GetDesc(&passDesc);
+
+    hr = g_pd3dDevice->CreateInputLayout(layout, numElements,
+                                         passDesc.pIAInputSignature,
+                                         passDesc.IAInputSignatureSize,
+                                         &g_pVertexLayoutStaticInstanced);
+    if (FAILED(hr)) {
+      print("CreateInputLayout\n");
+      return hr;
+    }
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -778,6 +813,61 @@ HRESULT InitStaticEffect()
   g_pProjectionVariableStatic = g_pEffectStatic->GetVariableByName("Projection")->AsMatrix();
   g_pWorldNormalVariableStatic = g_pEffectStatic->GetVariableByName("WorldNormal")->AsMatrix();
   g_pOutputColorVariableStatic = g_pEffectStatic->GetVariableByName("vOutputColor")->AsVector();
+
+  return S_OK;
+}
+
+HRESULT InitInstancedVertexBuffer()
+{
+  HRESULT hr;
+
+  //////////////////////////////////////////////////////////////////////
+  // vertex buffers
+  //////////////////////////////////////////////////////////////////////
+
+  D3D10_BUFFER_DESC bd;
+
+  // mTransform
+  bd.Usage = D3D10_USAGE_DYNAMIC;
+  bd.ByteWidth = (sizeof (XMMATRIX)) * g_iNumVolumeMeshInstances;
+  bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
+  bd.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
+  bd.MiscFlags = 0;
+
+  hr = g_pd3dDevice->CreateBuffer(&bd, NULL, &g_pVolumeMeshInstanceData);
+  if (FAILED(hr)) {
+    print("CreateBuffer\n");
+    return hr;
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // vertex buffer data
+  //////////////////////////////////////////////////////////////////////
+
+  FontVertex * pData;
+  hr = g_pVolumeMeshInstanceData->Map(D3D10_MAP_WRITE_DISCARD,
+                                      0,
+                                      (void **)&pData);
+  if (FAILED(hr)) {
+    print("g_pVolumeMeshInstanceData->Map");
+  }
+
+  float offset = 4.0f;
+  XMMATRIX transforms[8] = {
+    XMMatrixTranslation( offset,  offset, offset),
+    XMMatrixTranslation( offset, -offset, offset),
+    XMMatrixTranslation(-offset, -offset, offset),
+    XMMatrixTranslation(-offset,  offset, offset),
+
+    XMMatrixTranslation( offset,  offset, -offset),
+    XMMatrixTranslation( offset, -offset, -offset),
+    XMMatrixTranslation(-offset, -offset, -offset),
+    XMMatrixTranslation(-offset,  offset, -offset),
+  };
+
+  memcpy(pData, transforms, (sizeof (XMMATRIX)) * g_iNumVolumeMeshInstances);
+
+  g_pVolumeMeshInstanceData->Unmap();
 
   return S_OK;
 }
@@ -1026,6 +1116,12 @@ HRESULT InitDirect3DDevice()
     return hr;
   }
 
+  hr = InitInstancedVertexBuffer();
+  if (FAILED(hr)) {
+    print("InitInstancedVertexBuffer\n");
+    return hr;
+  }
+
   //////////////////////////////////////////////////////////////////////
   // transform matrices
   //////////////////////////////////////////////////////////////////////
@@ -1033,8 +1129,8 @@ HRESULT InitDirect3DDevice()
   g_World1 = XMMatrixIdentity();
   g_World2 = XMMatrixIdentity();
 
-  XMVECTOR Eye = XMVectorSet(0.0f, 1.0f, -2.0f, 0.0f);
-  XMVECTOR At = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+  XMVECTOR Eye = XMVectorSet(0.0f, 0.0f, -2.0f, 0.0f);
+  XMVECTOR At = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
   XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
   g_View = XMMatrixLookAtLH(Eye, At, Up);
 
@@ -1329,12 +1425,13 @@ static inline int sprint(LPCSTR fmt, ...)
 
 void RenderFont()
 {
+  HRESULT hr;
+
   //////////////////////////////////////////////////////////////////////
   // dynamic vertex buffer
   //////////////////////////////////////////////////////////////////////
 
   FontVertex * pData;
-  HRESULT hr;
   hr = g_pVertexBuffersFont[0]->Map(D3D10_MAP_WRITE_DISCARD,
                                     0,
                                     (void **)&pData);
@@ -1538,38 +1635,49 @@ void RenderVolume(float t)
 void RenderVolumeMesh()
 {
   const Mesh * mesh = cube::node_0.mesh;
-  int indices_length = mesh->indices_size / (sizeof (DWORD));
+  int index_count_per_instance = mesh->indices_size / (sizeof (DWORD));
 
   g_pViewVariableStatic->SetMatrix((float *)&g_View);
   g_pProjectionVariableStatic->SetMatrix((float *)&g_Projection);
+
+  ID3D10Buffer * pVB[4] = {
+    g_pVertexBufferCube[0],
+    g_pVertexBufferCube[1],
+    g_pVertexBufferCube[2],
+    g_pVolumeMeshInstanceData,
+  };
 
   UINT stride[] = {
     (sizeof (mesh->position[0])),
     (sizeof (mesh->normal[0])),
     (sizeof (mesh->texcoord_0[0])),
+    (sizeof (XMMATRIX)),
   };
-  UINT offset[] = { 0, 0, 0 };
-  g_pd3dDevice->IASetInputLayout(g_pVertexLayoutStatic);
-  g_pd3dDevice->IASetVertexBuffers(0, g_dwVertexBufferCountCube, g_pVertexBufferCube, stride, offset);
+  UINT offset[] = { 0, 0, 0, 0 };
+  g_pd3dDevice->IASetInputLayout(g_pVertexLayoutStaticInstanced);
+  g_pd3dDevice->IASetVertexBuffers(0, 4, pVB, stride, offset);
   g_pd3dDevice->IASetIndexBuffer(g_pIndexBufferCube, DXGI_FORMAT_R32_UINT, 0);
   g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
   D3D10_TECHNIQUE_DESC techDesc;
-  g_pTechniqueStatic->GetDesc(&techDesc);
+  g_pTechniqueStaticInstanced->GetDesc(&techDesc);
 
   XMMATRIX mWorldScale = XMMatrixScaling(0.2f, 0.2f, 0.2f);
-  XMMATRIX mWorldTranslate = XMMatrixTranslation(0.5f, 0.5f, 0.5f);
+  XMMATRIX mWorldTranslate = XMMatrixTranslation(0.0f, 0.0f, 1.5f);
   XMMATRIX mWorld = mWorldScale * mWorldTranslate;
 
   g_pWorldVariableStatic->SetMatrix((float *)&mWorld);
   XMMATRIX mWorldNormal = XMMatrixIdentity();
   g_pWorldNormalVariableStatic->SetMatrix((float *)&mWorldNormal);
-  XMVECTOR vColor = XMVectorSet(0.0f, 0.9f, 0.0f, 1.0f);
+  XMVECTOR vColor = XMVectorSet(0.0f, 0.4f, 0.3f, 1.0f);
   g_pOutputColorVariableStatic->SetFloatVector((float *)&vColor);
 
+  int instance_count = g_iNumVolumeMeshInstances;
   for (UINT p = 0; p < techDesc.Passes; p++) {
-    g_pTechniqueStatic->GetPassByIndex(p)->Apply(0);
-    g_pd3dDevice->DrawIndexed(indices_length, 0, 0);
+    g_pTechniqueStaticInstanced->GetPassByIndex(p)->Apply(0);
+    g_pd3dDevice->DrawIndexedInstanced(index_count_per_instance,
+                                       instance_count,
+                                       0, 0, 0);
   }
 }
 
@@ -1606,7 +1714,7 @@ void Render()
   //RenderBloom();
   //print("%f\n", t);
   //RenderVolume(t);
-  //RenderVolumeMesh();
+  RenderVolumeMesh();
 
   // present
   g_pSwapChain->Present(0, 0);
