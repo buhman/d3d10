@@ -1006,21 +1006,34 @@ HRESULT InitDirect3DDevice()
   };
   UINT numDriverTypes = (sizeof (driverTypes)) / (sizeof (driverTypes[0]));
 
+  D3D10_CREATE_DEVICE_FLAG flags[] = {
+    D3D10_CREATE_DEVICE_DEBUG,
+    (D3D10_CREATE_DEVICE_FLAG)0,
+  };
+  UINT numFlags = (sizeof (flags)) / (sizeof (flags[0]));  
+
   HRESULT hr;
   D3D10_DRIVER_TYPE driverType = D3D10_DRIVER_TYPE_NULL;
   for (UINT i = 0; i < numDriverTypes; i++) {
-    driverType = driverTypes[i];
-    hr = D3D10CreateDeviceAndSwapChain(NULL,
-                                       driverType,
-                                       NULL,
-                                       D3D10_CREATE_DEVICE_DEBUG,
-                                       D3D10_SDK_VERSION,
-                                       &sd,
-                                       &g_pSwapChain,
-                                       &g_pd3dDevice);
-    if (SUCCEEDED(hr))
-      break;
+    for (UINT j = 0; j < numFlags; j++) {
+      driverType = driverTypes[i];
+      hr = D3D10CreateDeviceAndSwapChain(NULL,
+					 driverType,
+					 NULL,
+					 flags[j],
+					 D3D10_SDK_VERSION,
+					 &sd,
+					 &g_pSwapChain,
+					 &g_pd3dDevice);
+      if (SUCCEEDED(hr)) {
+	if (j != 0) {
+	  print("no debug layers\n");
+	}
+	goto end_driver_loop;
+      }
+    }
   }
+ end_driver_loop:
   if (FAILED(hr)) {
     print("D3D10CreateDeviceAndSwapChain\n");
     return hr;
