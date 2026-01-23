@@ -24,6 +24,7 @@ CFLAGS += -Wno-unknown-pragmas
 CFLAGS += -I./include
 CFLAGS += -municode
 LDFLAGS += -municode
+LDFLAGS += -static-libgcc
 
 CXXFLAGS += -fno-exceptions
 
