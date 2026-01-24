@@ -1,9 +1,6 @@
 from lxml import etree
-import collada_types as types
+from collada import types
 from functools import partial
-
-with open("cube_material.DAE") as f:
-    tree = etree.parse(f)
 
 xml_namespace = "http://www.collada.org/2005/11/COLLADASchema"
 
@@ -267,6 +264,37 @@ def parse_vertices(lookup, root):
     lookup_add(lookup, id, vertices)
     return vertices
 
+def parse_name_array(lookup, root):
+    count = int(root.attrib["count"])
+    id = root.attrib.get("id")
+    name = root.attrib.get("name")
+
+    assert len(root.getchildren()) == 0
+    names = root.text.strip().split()
+
+    name_array = types.NameArray(count, id, name, names)
+    lookup_add(lookup, id, name_array)
+    return name_array
+
+def parse_bool(s):
+    if s == "false":
+        return False
+    if s == "true":
+        return True
+    assert False, s
+
+def parse_bool_array(lookup, root):
+    count = int(root.attrib["count"])
+    id = root.attrib.get("id")
+    name = root.attrib.get("name")
+
+    assert len(root.getchildren()) == 0
+    bools = [parse_bool(s) for s in root.text.strip().split()]
+
+    bool_array = types.BoolArray(count, id, name, bools)
+    lookup_add(lookup, id, bool_array)
+    return bool_array
+
 def parse_float_array(lookup, root):
     count = int(root.attrib["count"])
     id = root.attrib.get("id")
@@ -280,6 +308,20 @@ def parse_float_array(lookup, root):
     float_array = types.FloatArray(count, id, name, digits, magnitude, floats)
     lookup_add(lookup, id, float_array)
     return float_array
+
+def parse_int_array(lookup, root):
+    count = int(root.attrib["count"])
+    id = root.attrib.get("id")
+    name = root.attrib.get("name")
+    min_inclusive = int(root.attrib.get("minInclusive", -2147483648))
+    max_inclusive = int(root.attrib.get("maxInclusive", 2147483647))
+
+    assert len(root.getchildren()) == 0
+    ints = [int(s) for s in root.text.strip().split()]
+
+    int_array = types.IntArray(count, id, name, minInclusive, maxInclusive, ints)
+    lookup_add(lookup, id, int_array)
+    return int_array
 
 def parse_param(lookup, sid_lookup, root):
     name = root.attrib.get("name")
@@ -324,12 +366,26 @@ def parse_source_core(lookup, root):
     technique_common = None # 0 or 1
 
     for child in root.getchildren():
+        if child.tag == tag("IDREF_array"):
+            assert array_element is None
+            assert False, child.tag # not implemented
+        if child.tag == tag("Name_array"):
+            assert array_element is None
+            array_element = parse_name_array(lookup, child)
+        if child.tag == tag("bool_array"):
+            assert array_element is None
+            array_element = parse_bool_array(lookup, child)
         if child.tag == tag("float_array"):
             assert array_element is None
             array_element = parse_float_array(lookup, child)
+        if child.tag == tag("int_array"):
+            assert array_element is None
+            array_element = parse_int_array(lookup, child)
         if child.tag == tag("technique_common"):
             assert technique_common is None
             technique_common = parse_technique_common_source_core(lookup, child)
+        if child.tag == tag("technique"):
+            assert False, child.tag # not implemented
 
     source_core = types.SourceCore(id, name, array_element, technique_common)
     lookup_add(lookup, id, source_core)
@@ -739,6 +795,162 @@ def parse_scene(lookup, root):
     # instance_visual_scene may be none
     return types.Scene(instance_visual_scene, sid_lookup)
 
+def parse_sampler(lookup, root):
+    id = root.attrib.get("id")
+
+    inputs = []
+    for child in root.getchildren():
+        if child.tag == tag("input"):
+            inputs.append(parse_input_unshared(lookup, child))
+
+    sampler = types.Sampler(id, inputs)
+    lookup_add(lookup, id, sampler)
+    return sampler
+
+def parse_channel(lookup, root):
+    source = root.attrib["source"]
+    target = root.attrib["target"]
+
+    return types.Channel(source, target)
+
+def parse_animation(lookup, root):
+    id = root.attrib.get("id")
+    name = root.attrib.get("name")
+
+    animations = [] # nested animation
+    sources = []
+    samplers = []
+    channels = []
+    for child in root.getchildren():
+        if child.tag == tag("animation"):
+            animations.append(parse_animation(lookup, child))
+        if child.tag == tag("source"):
+            sources.append(parse_source_core(lookup, child))
+        if child.tag == tag("sampler"):
+            samplers.append(parse_sampler(lookup, child))
+        if child.tag == tag("channels"):
+            channels.append(parse_channel(lookup, child))
+
+    animation = types.Animation(id, name, animations, sources, samplers, channels)
+    lookup_add(lookup, id, animation)
+    return animation
+
+def parse_library_animations(lookup, root):
+    id = root.attrib.get("id")
+    name = root.attrib.get("name")
+
+    animations = []
+    for child in root.getchildren():
+        if child.tag == tag("animation"):
+            animations.append(parse_animation(lookup, child))
+
+    assert len(animations) >= 1
+
+    library_animations = types.LibraryAnimations(id, name, animations)
+    lookup_add(lookup, id, library_animations)
+    return library_animations
+
+def parse_bind_shape_matrix(lookup, root):
+    assert len(root.getchildren()) == 0
+    values = [float(i) for i in root.text.strip().split()]
+    assert len(values) == 16
+
+    r0 = tuple(values[0:4])
+    r1 = tuple(values[4:8])
+    r2 = tuple(values[8:12])
+    r3 = tuple(values[12:16])
+    values = tuple([r0, r1, r2, r3])
+    return types.BindShapeMatrix(values)
+
+def parse_joints(lookup, root):
+    inputs = []
+
+    for child in root.getchildren():
+        if child.tag == tag("input"):
+            inputs.append(parse_input_unshared(lookup, child))
+
+    assert len(inputs) >= 2
+
+    return types.Joints(inputs)
+
+def parse_vertex_weights(lookup, root):
+    inputs = []
+    vcount = None
+    v = None
+
+    for child in root.getchildren():
+        if child.tag == tag("input"):
+            inputs.append(parse_input_shared(lookup, child))
+        if child.tag == tag("vcount"):
+            assert vcount is None
+            vcount = parse_p(lookup, child)
+        if child.tag == tag("v"):
+            assert v is None
+            v = parse_p(lookup, child)
+
+    assert len(inputs) >= 2
+    assert vcount is not None
+    assert v is not None
+    return types.VertexWeights(inputs, vcount, v)
+
+def parse_skin(lookup, root):
+    source = root.attrib["source"]
+
+    bind_shape_matrix = None
+    sources = []
+    joints = None
+    vertex_weights = None
+
+    for child in root.getchildren():
+        if child.tag == tag("bind_shape_matrix"):
+            bind_shape_matrix = parse_bind_shape_matrix(lookup, child)
+        if child.tag == tag("source"):
+            sources.append(parse_source_core(lookup, child))
+        if child.tag == tag("joints"):
+            assert joints is None
+            joints = parse_joints(lookup, child)
+        if child.tag == tag("vertex_weights"):
+            assert vertex_weights is None
+            vertex_weights = parse_vertex_weights(lookup, child)
+
+    assert joints is not None
+    assert vertex_weights is not None
+
+    return types.Skin(source, bind_shape_matrix, sources, joints, vertex_weights)
+
+def parse_controller(lookup, root):
+    id = root.attrib.get("id")
+    name = root.attrib.get("name")
+
+    control_element = None
+    for child in root.getchildren():
+        if child.tag == tag("skin"):
+            assert control_element is None
+            control_element = parse_skin(lookup, child)
+        if child.tag == tag("morph"):
+            assert control_element is None
+            assert False, child.tag # not implemented
+
+    assert control_element is not None
+    controller = types.Controller(id, name, control_element)
+    lookup_add(lookup, id, controller)
+    return controller
+
+def parse_library_controllers(lookup, root):
+    id = root.attrib.get("id")
+    name = root.attrib.get("name")
+
+    controllers = []
+    for child in root.getchildren():
+        if child.tag == tag("controller"):
+            controllers.append(parse_controller(lookup, child))
+
+    assert len(controllers) >= 1
+
+    library_controllers = types.LibraryControllers(id, name, controllers)
+    lookup_add(lookup, id, library_controllers)
+    return library_controllers
+
 def parse_collada(tree):
     root = tree.getroot()
     assert root.tag == tag("COLLADA")
@@ -747,6 +959,10 @@ def parse_collada(tree):
     lookup = {}
 
     for child in root.getchildren():
+        if child.tag == tag("library_animations"):
+            collada.library_animations.append(parse_library_animations(lookup, child))
+        if child.tag == tag("library_controllers"):
+            collada.library_controllers.append(parse_library_controllers(lookup, child))
         if child.tag == tag("library_effects"):
             collada.library_effects.append(parse_library_effects(lookup, child))
         if child.tag == tag("library_materials"):
@@ -762,9 +978,18 @@ def parse_collada(tree):
         if child.tag == tag("scene"):
             collada.scenes.append(parse_scene(lookup, child))
 
+    collada._lookup = lookup
     return collada
 
-collada = parse_collada(tree)
-from prettyprinter import pprint, install_extras
-install_extras(include=["dataclasses"])
-pprint(collada, width=120)
+def parse_collada_file(filename):
+    with open(filename) as f:
+        tree = etree.parse(f)
+    collada = parse_collada(tree)
+    return collada
+
+if __name__ == "__main__":
+    import sys
+    from prettyprinter import pprint, install_extras
+    install_extras(include=["dataclasses"])
+    collada = parse_collada_file(sys.argv[1])
+    pprint(collada, width=120)

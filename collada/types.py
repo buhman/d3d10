@@ -278,14 +278,40 @@ class LibraryMaterials:
     materials: List[Material]
 
 @dataclass
+class NameArray:
+    count: int
+    id: Optional[ID]
+    name: Optional[str]
+
+    names: List[str]
+
+@dataclass
+class BoolArray:
+    count: int
+    id: Optional[ID]
+    name: Optional[str]
+
+    bools: List[bool]
+
+@dataclass
 class FloatArray:
     count: int
     id: Optional[ID]
     name: Optional[str]
-    digits: Optional[str]
-    magnitude: Optional[str]
+    digits: Optional[int]
+    magnitude: Optional[int]
 
     floats: List[float]
+
+@dataclass
+class IntArray:
+    count: int
+    id: Optional[ID]
+    name: Optional[str]
+    minInclusive: Optional[int]
+    maxInclusive: Optional[int]
+
+    ints: List[int]
 
 @dataclass
 class SourceCore:
@@ -320,7 +346,7 @@ class Vertices:
     id: ID
     name: Optional[str]
 
-    input: List[InputUnshared]
+    input: List[InputUnshared] # 1 or more
 
 @dataclass
 class Mesh:
@@ -416,7 +442,75 @@ class LibraryVisualScenes:
     visual_scenes: List[VisualScene]
 
 @dataclass
+class BindShapeMatrix:
+    # it is written in row-major order in the COLLADA document for
+    # human readability.
+    values: Tuple[Float4, Float4, Float4, Float4]
+
+@dataclass
+class Joints:
+    inputs: List[InputUnshared] # 2 or more
+
+@dataclass
+class VertexWeights:
+    inputs: List[InputShared] # 2 or more
+    vcount: List[int]
+    v: List[int]
+
+@dataclass
+class Skin:
+    source: URI # required
+
+    bind_shape_matrix: Optional[BindShapeMatrix]
+    sources: List[SourceCore] # 3 or more
+    joints: Joints # 1
+    vertex_weights: VertexWeights # 1
+
+@dataclass
+class Controller:
+    id: Optional[ID]
+    name: Optional[str]
+
+    control_element: Union[Skin]
+
+@dataclass
+class LibraryControllers:
+    id: Optional[ID]
+    name: Optional[str]
+
+    controllers: List[Controller]
+
+@dataclass
+class Sampler:
+    id: Optional[ID]
+    inputs: List[InputUnshared] # 1 or more
+
+@dataclass
+class Channel:
+    source: URI
+    target: URI
+
+@dataclass
+class Animation:
+    id: Optional[ID]
+    name: Optional[str]
+
+    animations: List['Animation']
+    sources: List[SourceCore]
+    samplers: List[Sampler]
+    channels: List[Channel]
+
+@dataclass
+class LibraryAnimations:
+    id: Optional[ID]
+    name: Optional[str]
+
+    animations: List[Animation] # 1 or more
+
+@dataclass
 class Collada:
+    library_animations: List[LibraryAnimations]
+    library_controllers: List[LibraryControllers]
     library_effects: List[LibraryEffects]
     library_materials: List[LibraryMaterials]
     library_geometries: List[LibraryGeometries]
@@ -424,8 +518,11 @@ class Collada:
     library_images: List[LibraryImages]
     library_visual_scenes: List[LibraryVisualScenes]
     scenes: List[Scene]
+    _lookup: dict = field(repr=False)
 
     def __init__(self):
+        self.library_animations = []
+        self.library_controllers = []
         self.library_effects = []
         self.library_materials = []
         self.library_geometries = []
@@ -433,3 +530,10 @@ class Collada:
         self.library_images = []
         self.library_visual_scenes = []
         self.scenes = []
+        self._lookup = None
+
+    def lookup(self, s):
+        assert '/' not in s
+        assert s.startswith("#")
+        id = s[1:]
+        return self._lookup[id]
