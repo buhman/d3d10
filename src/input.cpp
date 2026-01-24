@@ -48,12 +48,16 @@ HRESULT InitInput(HINSTANCE hInstance)
 void UpdateInput()
 {
   XINPUT_STATE state;
+  DWORD ret;
   for (DWORD i = 0; i < 4; i++) {
-    DWORD ret = g_XInputGetState(i, &state);
-    if (ret != ERROR_SUCCESS) {
-      continue;
+    ret = g_XInputGetState(i, &state);
+    if (ret == ERROR_SUCCESS) {
+      break;
     }
-    break;
+  }
+  if (ret != ERROR_SUCCESS) {
+    g_Joystate = {};
+    return;
   }
 
   const float trigger = 1.0f / 255.0f;
