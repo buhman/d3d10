@@ -6,8 +6,8 @@
       <authoring_tool>OpenCOLLADA for 3ds Max;  Version: 1.6;  Revision: 68</authoring_tool>
       <source_data>file:///C:/cygwin/home/bilbo/d3d10/models/skinned_cube/skinned_cube.max</source_data>
     </contributor>
-    <created>2026-01-23T23:56:13</created>
-    <modified>2026-01-23T23:56:13</modified>
+    <created>2026-01-24T13:01:29</created>
+    <modified>2026-01-24T13:01:29</modified>
     <unit name="inch" meter="0.0254"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -126,9 +126,9 @@
           </technique_common>
         </source>
         <source id="geom-Box001-skin1-weights">
-          <float_array id="geom-Box001-skin1-weights-array" count="41">1 0 0 0 0 0 0 0 0 0.2 0.8 0.2 0.8 0.2 0.8 0.2 0.8 0.4 0.6 0.4 0.6 0.4 0.6 0.4 0.6 0.6 0.4 0.6 0.4 0.6 0.4 0.6 0.4 0.8 0.2 0.8 0.2 0.8 0.2 0.8 0.2</float_array>
+          <float_array id="geom-Box001-skin1-weights-array" count="33">1 0.2 0.8 0.2 0.8 0.2 0.8 0.2 0.8 0.4 0.6 0.4 0.6 0.4 0.6 0.4 0.6 0.6 0.4 0.6 0.4 0.6 0.4 0.6 0.4 0.8 0.2 0.8 0.2 0.8 0.2 0.8 0.2</float_array>
           <technique_common>
-            <accessor source="#geom-Box001-skin1-weights-array" count="41" stride="1">
+            <accessor source="#geom-Box001-skin1-weights-array" count="33" stride="1">
               <param name="WEIGHT" type="float"/>
             </accessor>
           </technique_common>
@@ -140,8 +140,8 @@
         <vertex_weights count="24">
           <input semantic="JOINT" source="#geom-Box001-skin1-joints" offset="0"/>
           <input semantic="WEIGHT" source="#geom-Box001-skin1-weights" offset="1"/>
-          <vcount>2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2</vcount>
-          <v>1 1 0 0 1 2 0 0 1 3 0 0 1 4 0 0 1 0 0 5 1 0 0 6 1 0 0 7 1 0 0 8 1 9 0 10 1 11 0 12 1 13 0 14 1 15 0 16 1 17 0 18 1 19 0 20 1 21 0 22 1 23 0 24 1 25 0 26 1 27 0 28 1 29 0 30 1 31 0 32 1 33 0 34 1 35 0 36 1 37 0 38 1 39 0 40</v>
+          <vcount>1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2</vcount>
+          <v>0 0 0 0 0 0 0 0 1 0 1 0 1 0 1 0 1 1 0 2 1 3 0 4 1 5 0 6 1 7 0 8 1 9 0 10 1 11 0 12 1 13 0 14 1 15 0 16 1 17 0 18 1 19 0 20 1 21 0 22 1 23 0 24 1 25 0 26 1 27 0 28 1 29 0 30 1 31 0 32</v>
         </vertex_weights>
       </skin>
     </controller>

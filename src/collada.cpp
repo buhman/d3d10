@@ -117,12 +117,86 @@ namespace collada {
     54, 55, 53,
   };
 
+  static const float inverse_bind_matrices[] = {
+      0.0f,   0.0f,  -1.0f,   0.0f,
+      0.0f,   1.0f,   0.0f,   0.0f,
+      1.0f,   0.0f,   0.0f,   0.0f,
+      0.0f,   0.0f,   0.0f,   1.0f,
+
+      0.0f,   0.0f,  -1.0f,   0.0f,
+      0.0f,   1.0f,   0.0f,   0.0f,
+      1.0f,   0.0f,   0.0f,   0.0f,
+    -10.0f,   0.0f,   0.0f,   1.0f,
+  };
+
+  static const float joints_weights[] = {
+    0, 0, 0, 0, 1.0, 0, 0, 0,
+    0, 0, 0, 0, 1.0, 0, 0, 0,
+    0, 0, 0, 0, 1.0, 0, 0, 0,
+    0, 0, 0, 0, 1.0, 0, 0, 0,
+    1, 0, 0, 0, 1.0, 0, 0, 0,
+    1, 0, 0, 0, 1.0, 0, 0, 0,
+    1, 0, 0, 0, 1.0, 0, 0, 0,
+    1, 0, 0, 0, 1.0, 0, 0, 0,
+    0, 0, 0, 0, 1.0, 0, 0, 0,
+    0, 0, 0, 0, 1.0, 0, 0, 0,
+    1, 0, 0, 0, 0.2, 0.8, 0, 0,
+    1, 0, 0, 0, 0.2, 0.8, 0, 0,
+    1, 0, 0, 0, 0.4, 0.6, 0, 0,
+    1, 0, 0, 0, 0.4, 0.6, 0, 0,
+    1, 0, 0, 0, 0.6, 0.4, 0, 0,
+    1, 0, 0, 0, 0.6, 0.4, 0, 0,
+    1, 0, 0, 0, 0.8, 0.2, 0, 0,
+    1, 0, 0, 0, 0.8, 0.2, 0, 0,
+    1, 0, 0, 0, 1.0, 0, 0, 0,
+    1, 0, 0, 0, 1.0, 0, 0, 0,
+    0, 0, 0, 0, 1.0, 0, 0, 0,
+    0, 0, 0, 0, 1.0, 0, 0, 0,
+    1, 0, 0, 0, 0.2, 0.8, 0, 0,
+    1, 0, 0, 0, 0.2, 0.8, 0, 0,
+    1, 0, 0, 0, 0.4, 0.6, 0, 0,
+    1, 0, 0, 0, 0.4, 0.6, 0, 0,
+    1, 0, 0, 0, 0.6, 0.4, 0, 0,
+    1, 0, 0, 0, 0.6, 0.4, 0, 0,
+    1, 0, 0, 0, 0.8, 0.2, 0, 0,
+    1, 0, 0, 0, 0.8, 0.2, 0, 0,
+    1, 0, 0, 0, 1.0, 0, 0, 0,
+    1, 0, 0, 0, 1.0, 0, 0, 0,
+    0, 0, 0, 0, 1.0, 0, 0, 0,
+    0, 0, 0, 0, 1.0, 0, 0, 0,
+    1, 0, 0, 0, 0.2, 0.8, 0, 0,
+    1, 0, 0, 0, 0.2, 0.8, 0, 0,
+    1, 0, 0, 0, 0.4, 0.6, 0, 0,
+    1, 0, 0, 0, 0.4, 0.6, 0, 0,
+    1, 0, 0, 0, 0.6, 0.4, 0, 0,
+    1, 0, 0, 0, 0.6, 0.4, 0, 0,
+    1, 0, 0, 0, 0.8, 0.2, 0, 0,
+    1, 0, 0, 0, 0.8, 0.2, 0, 0,
+    1, 0, 0, 0, 1.0, 0, 0, 0,
+    1, 0, 0, 0, 1.0, 0, 0, 0,
+    0, 0, 0, 0, 1.0, 0, 0, 0,
+    0, 0, 0, 0, 1.0, 0, 0, 0,
+    1, 0, 0, 0, 0.2, 0.8, 0, 0,
+    1, 0, 0, 0, 0.2, 0.8, 0, 0,
+    1, 0, 0, 0, 0.4, 0.6, 0, 0,
+    1, 0, 0, 0, 0.4, 0.6, 0, 0,
+    1, 0, 0, 0, 0.6, 0.4, 0, 0,
+    1, 0, 0, 0, 0.6, 0.4, 0, 0,
+    1, 0, 0, 0, 0.8, 0.2, 0, 0,
+    1, 0, 0, 0, 0.8, 0.2, 0, 0,
+    1, 0, 0, 0, 1.0, 0, 0, 0,
+    1, 0, 0, 0, 1.0, 0, 0, 0,
+  };
+
   ID3D10Effect * g_pEffect = NULL;
   ID3D10EffectTechnique * g_pTechniqueRender = NULL;
   ID3D10InputLayout * g_pVertexLayout = NULL;
 
-  ID3D10Buffer * g_pVertexBuffer;
+  ID3D10Buffer * g_pVertexBufferPNT;
+  ID3D10Buffer * g_pVertexBufferJW;
   ID3D10Buffer * g_pIndexBuffer;
+
+  ID3D10EffectMatrixVariable * g_pJointVariable = NULL;
 
   ID3D10EffectMatrixVariable * g_pWorldVariable = NULL;
   ID3D10EffectMatrixVariable * g_pViewVariable = NULL;
@@ -154,6 +228,8 @@ namespace collada {
     g_pTechniqueRender = g_pEffect->GetTechniqueByName("Render");
 
     // variables
+    g_pJointVariable = g_pEffect->GetVariableByName("mJoint")->AsMatrix();
+
     g_pWorldVariable = g_pEffect->GetVariableByName("World")->AsMatrix();
     g_pViewVariable = g_pEffect->GetVariableByName("View")->AsMatrix();
     g_pProjectionVariable = g_pEffect->GetVariableByName("Projection")->AsMatrix();
@@ -163,6 +239,8 @@ namespace collada {
       {"POSITION"    , 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0 , D3D10_INPUT_PER_VERTEX_DATA, 0},
       {"NORMAL"      , 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
       {"TEXCOORD"    , 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0},
+      {"BLENDINDICES", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0,  D3D10_INPUT_PER_VERTEX_DATA, 0},
+      {"BLENDWEIGHT" , 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D10_INPUT_PER_VERTEX_DATA, 0},
     };
     UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
 
@@ -194,7 +272,19 @@ namespace collada {
     bd.CPUAccessFlags = 0;
     bd.MiscFlags = 0;
     initData.pSysMem = vertex_buffer;
-    hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffer);
+    hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBufferPNT);
+    if (FAILED(hr)) {
+      print("CreateBuffer: D3D10_BIND_VERTEX_BUFFER\n");
+      return hr;
+    }
+
+    bd.Usage = D3D10_USAGE_IMMUTABLE;
+    bd.ByteWidth = (sizeof (joints_weights));
+    bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
+    bd.CPUAccessFlags = 0;
+    bd.MiscFlags = 0;
+    initData.pSysMem = joints_weights;
+    hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBufferJW);
     if (FAILED(hr)) {
       print("CreateBuffer: D3D10_BIND_VERTEX_BUFFER\n");
       return hr;
@@ -215,20 +305,48 @@ namespace collada {
     return S_OK;
   }
 
-  void Render()
+  void Render(float t)
   {
-    XMMATRIX World = XMMatrixScaling(0.1, 0.1, 0.1);
+    XMMATRIX World = XMMatrixScaling(1, 1, 1);
+
+    // XMMATRIX    XM_CALLCONV     XMMatrixRotationNormal(FXMVECTOR NormalAxis, float Angle) noexcept;
+    //XMConvertToRadians
+    XMVECTOR axis = XMVectorSet(0, 1, 0, 0);
+    XMVECTOR axisZ = XMVectorSet(0, 0, 1, 0);
+    XMMATRIX joint0
+      = XMMatrixRotationNormal(axis, XMConvertToRadians(-90))
+      ;
+    XMMATRIX joint1
+      = XMMatrixRotationNormal(axisZ, sin(t))
+      * XMMatrixTranslation(10, 0, 0)
+      * joint0
+      ;
+
+    XMMATRIX joint0ibm = XMLoadFloat4x4((XMFLOAT4X4*)&inverse_bind_matrices[0 * 16]);
+    XMMATRIX joint1ibm = XMLoadFloat4x4((XMFLOAT4X4*)&inverse_bind_matrices[1 * 16]);
+    XMMATRIX mJoints[2] = {
+      joint0ibm * joint0,
+      joint1ibm * joint1,
+    };
+
+    g_pJointVariable->SetMatrixArray((float *)mJoints, 0, 2);
 
     g_pWorldVariable->SetMatrix((float *)&World);
     g_pViewVariable->SetMatrix((float *)&g_View);
     g_pProjectionVariable->SetMatrix((float *)&g_Projection);
 
     UINT stride[] = {
-      3 * 3 * 4,
+      3 * 3 * 4, // position normal texture
+      4 * 2 * 4, // joint weight
     };
-    UINT offset[] = { 0 };
+    UINT offset[] = { 0, 0 };
+    ID3D10Buffer * vertex_buffers[] = {
+      g_pVertexBufferPNT,
+      g_pVertexBufferJW,
+    };
+
     g_pd3dDevice->IASetInputLayout(g_pVertexLayout);
-    g_pd3dDevice->IASetVertexBuffers(0, 1, &g_pVertexBuffer, stride, offset);
+    g_pd3dDevice->IASetVertexBuffers(0, 2, vertex_buffers, stride, offset);
     g_pd3dDevice->IASetIndexBuffer(g_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
     g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

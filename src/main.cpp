@@ -126,8 +126,8 @@ XMFLOAT4 g_vLightColors[2] = {
 
 //
 
-XMVECTOR g_Eye = XMVectorSet(0.0f, 0.0f, -2.0f, 1.0f);
-XMVECTOR g_At = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+XMVECTOR g_Eye = XMVectorSet(0.0f, -30.0f, 15.0f, 1.0f);
+XMVECTOR g_At = XMVectorSet(0.0f, 0.0f, 15.0f, 1.0f);
 
 // forward declarations
 
@@ -1710,15 +1710,15 @@ void Update(float t, float dt)
 
   // view
   XMMATRIX mRotateView
-    = XMMatrixRotationY(deadzone(g_Joystate.thumbLX) * 3.0f * dt)
-    * XMMatrixRotationX(deadzone(g_Joystate.thumbLY) * 3.0f * dt);
+    = XMMatrixRotationX(deadzone(g_Joystate.thumbLY) * 3.0f * dt)
+    * XMMatrixRotationZ(deadzone(g_Joystate.thumbLX) * 3.0f * dt);
 
   XMMATRIX mTranslateView = XMMatrixTranslation(deadzone(g_Joystate.thumbRX) * 3.0f * dt,
-                                                0.0f,
-                                                deadzone(g_Joystate.thumbRY) * 3.0f * dt);
+                                                deadzone(g_Joystate.thumbRY) * 3.0f * dt,
+                                                0.0f);
 
   g_Eye = XMVector4Transform(g_Eye, mTranslateView * mRotateView);
-  XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+  XMVECTOR Up = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
   g_View = XMMatrixLookAtLH(g_Eye, g_At, Up);
 
@@ -1827,7 +1827,7 @@ void Render(float t, float dt)
 
   RenderFont(dt);
 
-  collada::Render();
+  collada::Render(t);
 
   // present
   g_pSwapChain->Present(0, 0);

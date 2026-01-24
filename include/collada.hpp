@@ -6,7 +6,7 @@
 namespace collada {
   HRESULT LoadEffect();
   HRESULT LoadMesh();
-  void Render();
+  void Render(float t);
 }
 
 #endif

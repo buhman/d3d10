@@ -2,11 +2,15 @@ matrix World;
 matrix View;
 matrix Projection;
 
+matrix mJoint[2];
+
 struct VS_INPUT
 {
   float4 Pos : POSITION;
   float3 Normal : NORMAL;
   float2 Tex : TEXCOORD0;
+  float4 Joint : BLENDINDICES0;
+  float4 Weight : BLENDWEIGHT0;
 };
 
 struct PS_INPUT
@@ -20,7 +24,15 @@ PS_INPUT VS(VS_INPUT input)
 {
   PS_INPUT output;
 
-  output.Pos = mul(input.Pos, World);
+  matrix mSkin
+    = input.Weight.x * mJoint[int(input.Joint.x)]
+    + input.Weight.y * mJoint[int(input.Joint.y)]
+    + input.Weight.z * mJoint[int(input.Joint.z)]
+    + input.Weight.w * mJoint[int(input.Joint.w)]
+    ;
+
+  output.Pos = mul(input.Pos, mSkin);
+  output.Pos = mul(output.Pos, World);
   output.Pos = mul(output.Pos, View);
   output.Pos = mul(output.Pos, Projection);
 
