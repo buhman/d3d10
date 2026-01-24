@@ -17,6 +17,8 @@
 #define ROOT_MESH_NODE robot_player::node_39
 #include "cube.hpp"
 
+#include "collada.hpp"
+
 HINSTANCE g_hInstance = NULL;
 HWND g_hWnd = NULL;
 ID3D10Device * g_pd3dDevice = NULL;
@@ -132,8 +134,8 @@ XMVECTOR g_At = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 HRESULT InitDirect3DDevice();
-void Render(float t);
-void Update(float t);
+void Render(float t, float dt);
+void Update(float t, float dt);
 BOOL Resize();
 void InitializeNodeInstances();
 
@@ -186,12 +188,27 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     return 0;
   }
 
+  if (FAILED(collada::LoadEffect())) {
+    print("collada::LoadEffect\n");
+    return 0;
+  }
+  if (FAILED(collada::LoadMesh())) {
+    print("collada::LoadMesh\n");
+    return 0;
+  }
+
   InitializeNodeInstances();
 
   if (FAILED(InitInput(hInstance))) {
     print("InitInput\n");
     return 0;
   }
+
+  LARGE_INTEGER frequency;
+  LARGE_INTEGER start;
+  LARGE_INTEGER end;
+  QueryPerformanceFrequency(&frequency);
+  QueryPerformanceCounter(&start);
 
   MSG msg = {};
   while (msg.message != WM_QUIT) {
@@ -214,11 +231,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     } else {
+      QueryPerformanceCounter(&end);
+      uint64_t elapsed = end.QuadPart - start.QuadPart;
+      float dt = (double)elapsed / (double)frequency.QuadPart;
+      elapsed *= 1000000;
+      elapsed /= frequency.QuadPart;
+      if (elapsed < 16667)
+	continue;
+      start.QuadPart = end.QuadPart;
+
       if (Resize()) {
         UpdateInput();
         float t = GetTime();
-        Update(t);
-        Render(t);
+        Update(t, dt);
+        Render(t, dt);
       }
     }
   }
@@ -1045,7 +1071,8 @@ HRESULT InitDirect3DDevice()
 
   D3D10_RASTERIZER_DESC RSDesc;
   RSDesc.FillMode = D3D10_FILL_SOLID;
-  RSDesc.CullMode = D3D10_CULL_BACK;
+  //RSDesc.CullMode = D3D10_CULL_BACK;
+  RSDesc.CullMode = D3D10_CULL_NONE;
   RSDesc.FrontCounterClockwise = FALSE;
   RSDesc.DepthBias = 0;
   RSDesc.SlopeScaledDepthBias = 0.0f;
@@ -1473,7 +1500,7 @@ static inline int sprint(LPCSTR fmt, ...)
   return length;
 }
 
-void RenderFont()
+void RenderFont(float dt)
 {
   HRESULT hr;
 
@@ -1496,7 +1523,8 @@ void RenderFont()
          " thumbLX: % 5.3f\n"
          " thumbLY: % 5.3f\n"
          " thumbRX: % 5.3f\n"
-         " thumbRY: % 5.3f",
+         " thumbRY: % 5.3f\n"
+	 " dt: % 8.5f\n",
          g_bloomPasses,
          g_exposure,
          g_Joystate.triggerL,
@@ -1504,7 +1532,8 @@ void RenderFont()
          g_Joystate.thumbLX,
          g_Joystate.thumbLY,
          g_Joystate.thumbRX,
-         g_Joystate.thumbRY);
+         g_Joystate.thumbRY,
+	 dt);
 
   const char start_advance = 10;
   int hadvance = start_advance;
@@ -1664,7 +1693,7 @@ float deadzone(float f)
   }
 }
 
-void Update(float t)
+void Update(float t, float dt)
 {
   XMVECTOR vLightDirs[2] = {
     {-0.577f, 0.577f, 0.0, 1.0},
@@ -1681,12 +1710,12 @@ void Update(float t)
 
   // view
   XMMATRIX mRotateView
-    = XMMatrixRotationY(deadzone(g_Joystate.thumbLX) * 0.002f)
-    * XMMatrixRotationX(deadzone(g_Joystate.thumbLY) * 0.002f);
+    = XMMatrixRotationY(deadzone(g_Joystate.thumbLX) * 3.0f * dt)
+    * XMMatrixRotationX(deadzone(g_Joystate.thumbLY) * 3.0f * dt);
 
-  XMMATRIX mTranslateView = XMMatrixTranslation(deadzone(g_Joystate.thumbRX) * 0.002f,
+  XMMATRIX mTranslateView = XMMatrixTranslation(deadzone(g_Joystate.thumbRX) * 3.0f * dt,
                                                 0.0f,
-                                                deadzone(g_Joystate.thumbRY) * 0.002f);
+                                                deadzone(g_Joystate.thumbRY) * 3.0f * dt);
 
   g_Eye = XMVector4Transform(g_Eye, mTranslateView * mRotateView);
   XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
@@ -1770,7 +1799,7 @@ void RenderVolumeMesh()
   }
 }
 
-void Render(float t)
+void Render(float t, float dt)
 {
   // clear
 
@@ -1794,9 +1823,11 @@ void Render(float t)
   //RenderBloom();
   //print("%f\n", t);
   //RenderVolume(t);
-  RenderVolumeMesh();
+  //RenderVolumeMesh();
 
-  RenderFont();
+  RenderFont(dt);
+
+  collada::Render();
 
   // present
   g_pSwapChain->Present(0, 0);

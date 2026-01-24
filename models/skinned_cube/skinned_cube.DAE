@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <asset>
+    <contributor>
+      <author>bilbo</author>
+      <authoring_tool>OpenCOLLADA for 3ds Max;  Version: 1.6;  Revision: 68</authoring_tool>
+      <source_data>file:///C:/cygwin/home/bilbo/d3d10/models/skinned_cube/skinned_cube.max</source_data>
+    </contributor>
+    <created>2026-01-23T23:56:13</created>
+    <modified>2026-01-23T23:56:13</modified>
+    <unit name="inch" meter="0.0254"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_effects>
+    <effect id="ColorEffectR26G177B26">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <ambient>
+              <color>0.1019608 0.6941176 0.1019608 1</color>
+            </ambient>
+            <diffuse>
+              <color>0.1019608 0.6941176 0.1019608 1</color>
+            </diffuse>
+            <specular>
+              <color>1 1 1 1</color>
+            </specular>
+            <shininess>
+              <float>10</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <transparent>
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_materials>
+    <material id="ColorEffectR26G177B26-material" name="ColorEffectR26G177B26-material">
+      <instance_effect url="#ColorEffectR26G177B26"/>
+    </material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="geom-Box001" name="Box001">
+      <mesh>
+        <source id="geom-Box001-positions">
+          <float_array id="geom-Box001-positions-array" count="72">-5 -5 0 5 -5 0 -5 5 0 5 5 0 -5 -5 20 5 -5 20 -5 5 20 5 5 20 -5 -5 4 5 -5 4 5 5 4 -5 5 4 -5 -5 8 5 -5 8 5 5 8 -5 5 8 -5 -5 12 5 -5 12 5 5 12 -5 5 12 -5 -5 16 5 -5 16 5 5 16 -5 5 16</float_array>
+          <technique_common>
+            <accessor source="#geom-Box001-positions-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Box001-normals">
+          <float_array id="geom-Box001-normals-array" count="168">0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 1 0 0 1 0 0 1 0 0 1 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Box001-normals-array" count="56" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Box001-map1">
+          <float_array id="geom-Box001-map1-array" count="84">0 0 0 1 0 0 0 0.2 0 1 0.2 0 0 0.4 0 1 0.4 0 0 0.6 0 1 0.6 0 0 0.8 0 1 0.8 0 0 1 0 1 1 0 0 0 0 1 0 0 0 0.2 0 1 0.2 0 0 0.4 0 1 0.4 0 0 0.6 0 1 0.6 0 0 0.8 0 1 0.8 0 0 1 0 1 1 0 0 0 0 1 0 0 0 1 0 1 1 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Box001-map1-array" count="28" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="geom-Box001-vertices">
+          <input semantic="POSITION" source="#geom-Box001-positions"/>
+        </vertices>
+        <triangles material="ColorMaterial" count="44">
+          <input semantic="VERTEX" source="#geom-Box001-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Box001-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Box001-map1" offset="2" set="0"/>
+          <p>0 0 25 2 1 27 3 2 26 3 2 26 1 3 24 0 0 25 4 4 24 5 5 25 7 6 27 7 6 27 6 7 26 4 4 24 0 8 12 1 9 13 9 10 15 9 10 15 8 11 14 0 8 12 8 11 14 9 10 15 13 12 17 13 12 17 12 13 16 8 11 14 12 13 16 13 12 17 17 14 19 17 14 19 16 15 18 12 13 16 16 15 18 17 14 19 21 16 21 21 16 21 20 17 20 16 15 18 20 17 20 21 16 21 5 18 23 5 18 23 4 19 22 20 17 20 1 20 0 3 21 1 10 22 3 10 22 3 9 23 2 1 20 0 9 23 2 10 22 3 14 24 5 14 24 5 13 25 4 9 23 2 13 25 4 14 24 5 18 26 7 18 26 7 17 27 6 13 25 4 17 27 6 18 26 7 22 28 9 22 28 9 21 29 8 17 27 6 21 29 8 22 28 9 7 30 11 7 30 11 5 31 10 21 29 8 3 32 12 2 33 13 11 34 15 11 34 15 10 35 14 3 32 12 10 35 14 11 34 15 15 36 17 15 36 17 14 37 16 10 35 14 14 37 16 15 36 17 19 38 19 19 38 19 18 39 18 14 37 16 18 39 18 19 38 19 23 40 21 23 40 21 22 41 20 18 39 18 22 41 20 23 40 21 6 42 23 6 42 23 7 43 22 22 41 20 2 44 0 0 45 1 8 46 3 8 46 3 11 47 2 2 44 0 11 47 2 8 46 3 12 48 5 12 48 5 15 49 4 11 47 2 15 49 4 12 48 5 16 50 7 16 50 7 19 51 6 15 49 4 19 51 6 16 50 7 20 52 9 20 52 9 23 53 8 19 51 6 23 53 8 20 52 9 4 54 11 4 54 11 6 55 10 23 53 8</p>
+        </triangles>
+      </mesh>
+      <extra>
+        <technique profile="OpenCOLLADA3dsMax">
+          <max_box>
+            <length sid="length" type="float">10</length>
+            <width sid="width" type="float">10</width>
+            <height sid="height" type="float">20</height>
+            <widthsegments sid="widthsegments" type="int">1</widthsegments>
+            <lengthsegments sid="lengthsegments" type="int">1</lengthsegments>
+            <heightsegments sid="heightsegments" type="int">5</heightsegments>
+            <generateuvs sid="generateuvs" type="int">1</generateuvs>
+          </max_box>
+        </technique>
+      </extra>
+    </geometry>
+  </library_geometries>
+  <library_controllers>
+    <controller id="geom-Box001-skin1">
+      <skin source="#geom-Box001">
+        <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
+        <source id="geom-Box001-skin1-joints">
+          <Name_array id="geom-Box001-skin1-joints-array" count="2">joint0 joint1</Name_array>
+          <technique_common>
+            <accessor source="#geom-Box001-skin1-joints-array" count="2" stride="1">
+              <param name="JOINT" type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Box001-skin1-bind_poses">
+          <float_array id="geom-Box001-skin1-bind_poses-array" count="32">-5.11435e-14 3.13916e-7 1 0 -1.74846e-7 1 -3.13916e-7 0 -1 -1.74846e-7 3.74342e-15 0 0 0 0 1 -8.74227e-8 -5.52335e-7 1 -10 -8.74228e-8 1 5.52335e-7 -9.85461e-6 -1 -8.74227e-8 -8.74227e-8 8.74227e-7 0 0 0 1</float_array>
+          <technique_common>
+            <accessor source="#geom-Box001-skin1-bind_poses-array" count="2" stride="16">
+              <param name="TRANSFORM" type="float4x4"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Box001-skin1-weights">
+          <float_array id="geom-Box001-skin1-weights-array" count="41">1 0 0 0 0 0 0 0 0 0.2 0.8 0.2 0.8 0.2 0.8 0.2 0.8 0.4 0.6 0.4 0.6 0.4 0.6 0.4 0.6 0.6 0.4 0.6 0.4 0.6 0.4 0.6 0.4 0.8 0.2 0.8 0.2 0.8 0.2 0.8 0.2</float_array>
+          <technique_common>
+            <accessor source="#geom-Box001-skin1-weights-array" count="41" stride="1">
+              <param name="WEIGHT" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <joints>
+          <input semantic="JOINT" source="#geom-Box001-skin1-joints"/>
+          <input semantic="INV_BIND_MATRIX" source="#geom-Box001-skin1-bind_poses"/>
+        </joints>
+        <vertex_weights count="24">
+          <input semantic="JOINT" source="#geom-Box001-skin1-joints" offset="0"/>
+          <input semantic="WEIGHT" source="#geom-Box001-skin1-weights" offset="1"/>
+          <vcount>2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2</vcount>
+          <v>1 1 0 0 1 2 0 0 1 3 0 0 1 4 0 0 1 0 0 5 1 0 0 6 1 0 0 7 1 0 0 8 1 9 0 10 1 11 0 12 1 13 0 14 1 15 0 16 1 17 0 18 1 19 0 20 1 21 0 22 1 23 0 24 1 25 0 26 1 27 0 28 1 29 0 30 1 31 0 32 1 33 0 34 1 35 0 36 1 37 0 38 1 39 0 40</v>
+        </vertex_weights>
+      </skin>
+    </controller>
+  </library_controllers>
+  <library_lights>
+    <light id="EnvironmentAmbientLight" name="EnvironmentAmbientLight">
+      <technique_common>
+        <ambient>
+          <color>0 0 0</color>
+        </ambient>
+      </technique_common>
+    </light>
+  </library_lights>
+  <library_visual_scenes>
+    <visual_scene id="MaxScene">
+      <node name="EnvironmentAmbientLight">
+        <instance_light url="#EnvironmentAmbientLight"/>
+      </node>
+      <node id="node-Box001" name="Box001">
+        <instance_controller url="#geom-Box001-skin1">
+          <skeleton>#node-Bone001</skeleton>
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="ColorMaterial" target="#ColorEffectR26G177B26-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_controller>
+        <extra>
+          <technique profile="OpenCOLLADA">
+            <cast_shadows sid="cast_shadows" type="bool">1</cast_shadows>
+            <receive_shadows sid="receive_shadows" type="bool">1</receive_shadows>
+            <primary_visibility sid="primary_visibility" type="int">1</primary_visibility>
+            <secondary_visibility sid="secondary_visibility" type="int">1</secondary_visibility>
+          </technique>
+        </extra>
+      </node>
+      <node id="node-Bone001" name="Bone001" sid="joint0" type="JOINT">
+        <rotate>1.32123e-6 1 -1.49608e-6 -90</rotate>
+        <node id="node-Bone002" name="Bone002" sid="joint1" type="JOINT">
+          <translate>10 1.19209e-6 5.69993e-14</translate>
+          <rotate sid="rotationZ">0 0 1 5.00896e-6</rotate>
+          <rotate sid="rotationY">0 1 0 -5.00896e-6</rotate>
+          <rotate sid="rotationX">1 0 0 -5.00896e-6</rotate>
+          <extra>
+            <technique profile="OpenCOLLADA">
+              <cast_shadows sid="cast_shadows" type="bool">1</cast_shadows>
+              <receive_shadows sid="receive_shadows" type="bool">1</receive_shadows>
+              <primary_visibility sid="primary_visibility" type="int">1</primary_visibility>
+              <secondary_visibility sid="secondary_visibility" type="int">1</secondary_visibility>
+            </technique>
+          </extra>
+        </node>
+        <extra>
+          <technique profile="OpenCOLLADA">
+            <cast_shadows sid="cast_shadows" type="bool">1</cast_shadows>
+            <receive_shadows sid="receive_shadows" type="bool">1</receive_shadows>
+            <primary_visibility sid="primary_visibility" type="int">1</primary_visibility>
+            <secondary_visibility sid="secondary_visibility" type="int">1</secondary_visibility>
+          </technique>
+        </extra>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <library_animations>
+    <animation>
+      <source id="node-Bone002_rotationZ.ANGLE-input">
+        <float_array id="node-Bone002_rotationZ.ANGLE-input-array" count="5">0 0.3333333 0.6666667 1 1.333333</float_array>
+        <technique_common>
+          <accessor source="#node-Bone002_rotationZ.ANGLE-input-array" count="5" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Bone002_rotationZ.ANGLE-output">
+        <float_array id="node-Bone002_rotationZ.ANGLE-output-array" count="5">180 230 180 130 180</float_array>
+        <technique_common>
+          <accessor source="#node-Bone002_rotationZ.ANGLE-output-array" count="5" stride="1">
+            <param name="ANGLE" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Bone002_rotationZ.ANGLE-intangent">
+        <float_array id="node-Bone002_rotationZ.ANGLE-intangent-array" count="10">-0.3332639 180 0.2222222 213.3333 0.5555556 196.6667 0.8888889 146.6667 1.222222 163.3333</float_array>
+        <technique_common>
+          <accessor source="#node-Bone002_rotationZ.ANGLE-intangent-array" count="5" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Bone002_rotationZ.ANGLE-outtangent">
+        <float_array id="node-Bone002_rotationZ.ANGLE-outtangent-array" count="10">0.1111111 196.6667 0.4444444 213.3333 0.7777778 163.3333 1.111111 146.6667 1.666597 180</float_array>
+        <technique_common>
+          <accessor source="#node-Bone002_rotationZ.ANGLE-outtangent-array" count="5" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Bone002_rotationZ.ANGLE-interpolation">
+        <Name_array id="node-Bone002_rotationZ.ANGLE-interpolation-array" count="5">LINEAR LINEAR LINEAR LINEAR LINEAR</Name_array>
+        <technique_common>
+          <accessor source="#node-Bone002_rotationZ.ANGLE-interpolation-array" count="5" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <sampler id="node-Bone002_rotationZ.ANGLE-sampler">
+        <input semantic="INPUT" source="#node-Bone002_rotationZ.ANGLE-input"/>
+        <input semantic="OUTPUT" source="#node-Bone002_rotationZ.ANGLE-output"/>
+        <input semantic="IN_TANGENT" source="#node-Bone002_rotationZ.ANGLE-intangent"/>
+        <input semantic="OUT_TANGENT" source="#node-Bone002_rotationZ.ANGLE-outtangent"/>
+        <input semantic="INTERPOLATION" source="#node-Bone002_rotationZ.ANGLE-interpolation"/>
+      </sampler>
+      <channel source="#node-Bone002_rotationZ.ANGLE-sampler" target="node-Bone002/rotationZ.ANGLE"/>
+    </animation>
+  </library_animations>
+  <scene>
+    <instance_visual_scene url="#MaxScene"/>
+  </scene>
+</COLLADA>

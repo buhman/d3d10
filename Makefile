@@ -46,7 +46,8 @@ SHADERS = \
 	$(BUILD_TYPE)/effect/font.fxo \
 	$(BUILD_TYPE)/effect/volume.fxo \
 	$(BUILD_TYPE)/effect/bloom.fxo \
-	$(BUILD_TYPE)/effect/static.fxo
+	$(BUILD_TYPE)/effect/static.fxo \
+	$(BUILD_TYPE)/effect/collada.fxo
 
 $(BUILD_TYPE)/%.res: %.rc $(SHADERS)
 	@mkdir -p $(@D)
@@ -57,13 +58,14 @@ $(BUILD_TYPE)/%.obj: src/%.cpp
 	$(CXX) $(CXXSTD) $(CFLAGS) $(CXXFLAGS) $(WOPT) $(OPT) -o $@ -c $<
 
 OBJS = \
+	$(BUILD_TYPE)/main.res \
 	$(BUILD_TYPE)/robot_player.obj \
 	$(BUILD_TYPE)/cube.obj \
 	$(BUILD_TYPE)/main.obj \
 	$(BUILD_TYPE)/print.obj \
 	$(BUILD_TYPE)/render_state.obj \
 	$(BUILD_TYPE)/input.obj \
-	$(BUILD_TYPE)/main.res
+	$(BUILD_TYPE)/collada.obj
 
 $(BUILD_TYPE)/d3d10.exe: $(OBJS)
 	@mkdir -p $(@D)

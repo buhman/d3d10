@@ -348,7 +348,7 @@ class Vertices:
     id: ID
     name: Optional[str]
 
-    input: List[InputUnshared] # 1 or more
+    inputs: List[InputUnshared] # 1 or more
 
 @dataclass
 class Mesh:
@@ -534,8 +534,10 @@ class Collada:
         self.scenes = []
         self._lookup = None
 
-    def lookup(self, s):
+    def lookup(self, s, t):
         assert '/' not in s
         assert s.startswith("#")
         id = s[1:]
-        return self._lookup[id]
+        value = self._lookup[id]
+        assert type(value) is t, type(value)
+        return value
