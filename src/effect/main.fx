@@ -17,19 +17,19 @@ SamplerState samLinear {
 struct VS_INPUT
 {
   float4 Pos : POSITION;
-  float4 Weight : TEXCOORD0;
-  float4 Joint : TEXCOORD1;
   float3 Normal : NORMAL;
-  float2 Tex : TEXCOORD2;
+  float2 Tex : TEXCOORD0;
+  float4 Weight : BLENDWEIGHT0;
+  float4 Joint : BLENDINDICES0;
 };
 
 struct PS_INPUT
 {
   float4 Pos : SV_POSITION;
-  float4 Weight : TEXCOORD0;
-  float4 Joint : TEXCOORD1;
-  float3 Normal : TEXCOORD2;
-  float2 Tex : TEXCOORD3;
+  float3 Normal : NORMAL;
+  float2 Tex : TEXCOORD0;
+  float4 Weight : BLENDWEIGHT0;
+  float4 Joint : BLENDINDICES0;
 };
 
 PS_INPUT VS(VS_INPUT input)

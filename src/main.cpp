@@ -389,32 +389,6 @@ HRESULT LoadMesh()
     return hr;
   }
 
-  // weights
-  bd.Usage = D3D10_USAGE_IMMUTABLE;
-  bd.ByteWidth = mesh->weights_0_size;
-  bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
-  bd.CPUAccessFlags = 0;
-  bd.MiscFlags = 0;
-  initData.pSysMem = mesh->weights_0;
-  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffers[1]);
-  if (FAILED(hr)) {
-    print("CreateBuffer\n");
-    return hr;
-  }
-
-  // joints
-  bd.Usage = D3D10_USAGE_IMMUTABLE;
-  bd.ByteWidth = mesh->joints_0_size;
-  bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
-  bd.CPUAccessFlags = 0;
-  bd.MiscFlags = 0;
-  initData.pSysMem = mesh->joints_0;
-  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffers[2]);
-  if (FAILED(hr)) {
-    print("CreateBuffer\n");
-    return hr;
-  }
-
   // normals
   bd.Usage = D3D10_USAGE_IMMUTABLE;
   bd.ByteWidth = mesh->normal_size;
@@ -422,7 +396,7 @@ HRESULT LoadMesh()
   bd.CPUAccessFlags = 0;
   bd.MiscFlags = 0;
   initData.pSysMem = mesh->normal;
-  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffers[3]);
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffers[1]);
   if (FAILED(hr)) {
     print("CreateBuffer\n");
     return hr;
@@ -435,6 +409,32 @@ HRESULT LoadMesh()
   bd.CPUAccessFlags = 0;
   bd.MiscFlags = 0;
   initData.pSysMem = mesh->texcoord_0;
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffers[2]);
+  if (FAILED(hr)) {
+    print("CreateBuffer\n");
+    return hr;
+  }
+
+  // weights
+  bd.Usage = D3D10_USAGE_IMMUTABLE;
+  bd.ByteWidth = mesh->weights_0_size;
+  bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
+  bd.CPUAccessFlags = 0;
+  bd.MiscFlags = 0;
+  initData.pSysMem = mesh->weights_0;
+  hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffers[3]);
+  if (FAILED(hr)) {
+    print("CreateBuffer\n");
+    return hr;
+  }
+
+  // joints
+  bd.Usage = D3D10_USAGE_IMMUTABLE;
+  bd.ByteWidth = mesh->joints_0_size;
+  bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
+  bd.CPUAccessFlags = 0;
+  bd.MiscFlags = 0;
+  initData.pSysMem = mesh->joints_0;
   hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &g_pVertexBuffers[4]);
   if (FAILED(hr)) {
     print("CreateBuffer\n");
@@ -1010,7 +1010,7 @@ HRESULT InitDirect3DDevice()
     D3D10_CREATE_DEVICE_DEBUG,
     (D3D10_CREATE_DEVICE_FLAG)0,
   };
-  UINT numFlags = (sizeof (flags)) / (sizeof (flags[0]));  
+  UINT numFlags = (sizeof (flags)) / (sizeof (flags[0]));
 
   HRESULT hr;
   D3D10_DRIVER_TYPE driverType = D3D10_DRIVER_TYPE_NULL;
@@ -1108,11 +1108,11 @@ HRESULT InitDirect3DDevice()
   //////////////////////////////////////////////////////////////////////
 
   D3D10_INPUT_ELEMENT_DESC layout[] = {
-    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 2, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"NORMAL"  , 0, DXGI_FORMAT_R32G32B32_FLOAT,    3, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 2, DXGI_FORMAT_R32G32_FLOAT,       4, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"POSITION"    , 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"NORMAL"      , 0, DXGI_FORMAT_R32G32B32_FLOAT,    1, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"TEXCOORD"    , 0, DXGI_FORMAT_R32G32_FLOAT,       2, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"BLENDWEIGHT" , 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 3, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
+    {"BLENDINDICES", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 4, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
   };
   UINT numElements = (sizeof (layout)) / (sizeof (layout[0]));
 
@@ -1388,10 +1388,10 @@ void RenderModel(float t)
 
   UINT stride[] = {
     (sizeof (mesh->position[0])),
-    (sizeof (mesh->weights_0[0])),
-    (sizeof (mesh->joints_0[0])),
     (sizeof (mesh->normal[0])),
     (sizeof (mesh->texcoord_0[0])),
+    (sizeof (mesh->weights_0[0])),
+    (sizeof (mesh->joints_0[0])),
   };
   UINT offset[] = { 0, 0, 0, 0, 0 };
   g_pd3dDevice->IASetInputLayout(g_pVertexLayout);
