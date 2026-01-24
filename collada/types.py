@@ -236,6 +236,8 @@ class TechniqueFX:
 
 @dataclass
 class ProfileCommon:
+    id: Optional[ID]
+
     newparam: List[Newparam]
     technique: TechniqueFX
 
@@ -318,7 +320,7 @@ class SourceCore:
     id: ID
     name: Optional[str]
 
-    array_element: Union[FloatArray]
+    array_element: Union[NameArray, BoolArray, FloatArray, IntArray]
     technique_common: TechniqueCommon_SourceCore
 
 @dataclass

@@ -38,9 +38,23 @@ def parse_surface(lookup, root):
 
     init_from = None
     for child in root.getchildren():
+        if child.tag == tag("format"):
+            assert False, child.tag
+        if child.tag == tag("format_hint"):
+            assert False, child.tag
+        if child.tag == tag("size"):
+            assert False, child.tag
+        if child.tag == tag("viewport_ratio"):
+            assert False, child.tag
+        if child.tag == tag("mip_levels"):
+            assert False, child.tag
+        if child.tag == tag("mipmap_generate"):
+            assert False, child.tag
         if child.tag == tag("init_from"):
             assert init_from is None
             init_from = parse_init_from(lookup, child)
+        if child.tag == tag("generator"):
+            assert False, child.tag
 
     surface = types.Surface(type, init_from)
     return surface
@@ -64,6 +78,14 @@ def parse_newparam(lookup, sid_lookup, root):
 
     parameter_type = None
     for child in root.getchildren():
+        if child.tag == tag("float"):
+            assert False, child.tag
+        if child.tag == tag("float2"):
+            assert False, child.tag
+        if child.tag == tag("float3"):
+            assert False, child.tag
+        if child.tag == tag("float4"):
+            assert False, child.tag
         if child.tag == tag("surface"):
             assert parameter_type is None
             parameter_type = parse_surface(lookup, child)
@@ -165,11 +187,15 @@ def parse_technique_fx(lookup, sid_lookup, root):
     return technique
 
 def parse_profile_common(lookup, root):
+    id = root.attrib.get("id")
+
     newparam = []
     technique_fx = None
     sid_lookup = {}
 
     for child in root.getchildren():
+        if child.tag == tag("image"):
+            assert False, child.tag
         if child.tag == tag("newparam"):
             newparam.append(parse_newparam(lookup, sid_lookup, child))
         if child.tag == tag("technique"):
@@ -177,7 +203,9 @@ def parse_profile_common(lookup, root):
             technique_fx = parse_technique_fx(lookup, sid_lookup, child)
 
     assert technique_fx is not None
-    return types.ProfileCommon(newparam, technique_fx, sid_lookup)
+    profile_common = types.ProfileCommon(id, newparam, technique_fx, sid_lookup)
+    lookup_add(lookup, id, profile_common)
+    return profile_common
 
 def parse_effect(lookup, root):
     id = root.attrib["id"]
@@ -430,8 +458,20 @@ def parse_mesh(lookup, root):
         if child.tag == tag("vertices"):
             assert vertices is None
             vertices = parse_vertices(lookup, child)
+        if child.tag == tag("lines"):
+            assert False, child.tag
+        if child.tag == tag("linestrips"):
+            assert False, child.tag
+        if child.tag == tag("polygons"):
+            assert False, child.tag
+        if child.tag == tag("polylist"):
+            assert False, child.tag
         if child.tag == tag("triangles"):
             primitive_elements.append(parse_triangles(lookup, child))
+        if child.tag == tag("trifans"):
+            assert False, child.tag
+        if child.tag == tag("tristrips"):
+            assert False, child.tag
     assert vertices is not None
     assert len(sources) >= 1
 
@@ -445,9 +485,13 @@ def parse_geometry(lookup, root):
     geometric_element = None
 
     for child in root.getchildren():
+        if child.tag == tag("convex_mesh"):
+            assert child.tag, False
         if child.tag == tag("mesh"):
             assert geometric_element is None
             geometric_element = parse_mesh(lookup, child)
+        if child.tag == tag("spline"):
+            assert child.tag, False
     assert geometric_element is not None
 
     geometry = types.Geometry(id, name, geometric_element)
@@ -549,6 +593,8 @@ def parse_image(lookup, root):
     image_source = None
 
     for child in root.getchildren():
+        if child.tag == tag("data"):
+            assert False, child.tag
         if child.tag == tag("init_from"):
             assert image_source is None
             image_source = parse_init_from(lookup, child)
