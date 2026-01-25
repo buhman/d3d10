@@ -53,6 +53,8 @@ class MeshVertexIndexBufferState:
         self.index_buffer = [] # a list of integers
         self.vertex_buffer = [] # a list of floats
 
+        self.index_buffer_offsets = []
+
         # vertex_index_table: input/collada vertex indices in the order written
         #                     to the index buffer
         #   indices: output vertex index (absolute)
@@ -73,6 +75,8 @@ def mesh_vertex_index_buffer(collada, mesh):
 
     for triangles in mesh.primitive_elements:
         assert type(triangles) is types.Triangles
+
+        state.index_buffer_offsets.append(len(state.index_buffer))
 
         max_offset = max(i.offset for i in triangles.inputs)
         p_stride = max_offset + 1
@@ -161,6 +165,9 @@ if __name__ == "__main__":
     assert type(mesh) is types.Mesh
     state = mesh_vertex_index_buffer(collada, mesh)
 
-    #skin = collada.library_controllers[0].controllers[0].control_element
-    #assert type(skin) is types.Skin
-    #vertex_buffer_jw = skin_vertex_buffer(collada, skin, vertex_index_table)
+    skin = collada.library_controllers[0].controllers[0].control_element
+    assert type(skin) is types.Skin
+    vertex_buffer_jw = skin_vertex_buffer(collada, skin, state.vertex_index_table)
+    #print(vertex_buffer_jw)
+    #print(state.vertex_buffer)
+    #print(state.index_buffer)
