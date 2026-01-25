@@ -9,14 +9,14 @@ Float3 = Tuple[float, float, float]
 Float4 = Tuple[float, float, float, float]
 Float7 = Tuple[float, float, float, float, float, float, float]
 
-@dataclass
+@dataclass(frozen=True)
 class Lookat:
     sid: Optional[str]
     eye: Float3
     at: Float3
     up: Float3
 
-@dataclass
+@dataclass(frozen=True)
 class Matrix:
     # collada is the transpose of a directx matrix
     # 1.0  0.0  0.0  0.0
@@ -26,35 +26,35 @@ class Matrix:
     sid: Optional[str]
     values: Tuple[Float4, Float4, Float4, Float4]
 
-@dataclass
+@dataclass(frozen=True)
 class Rotate:
     # x y z w ; quaternion
     sid: Optional[str]
     rotate: Float4
 
-@dataclass
+@dataclass(frozen=True)
 class Scale:
     sid: Optional[str]
     scale: Float3
 
-@dataclass
+@dataclass(frozen=True)
 class Skew:
     sid: Optional[str]
     skew: Float7
 
-@dataclass
+@dataclass(frozen=True)
 class Translate:
     sid: Optional[str]
     translate: Float3
 
-@dataclass
+@dataclass(frozen=True)
 class Param:
     name: Optional[str]
     sid: Optional[str]
     type: str
     semantic: Optional[str]
 
-@dataclass
+@dataclass(frozen=True)
 class Accessor:
     count: int
     offset: Optional[int]
@@ -65,33 +65,33 @@ class Accessor:
 
     sid_lookup: dict = field(repr=False)
 
-@dataclass
+@dataclass(frozen=True)
 class TechniqueCommon_SourceCore:
     accessor: Accessor
 
-@dataclass
+@dataclass(frozen=True)
 class Ambient:
     color: Float3
 
-@dataclass
+@dataclass(frozen=True)
 class Directional:
     color: Float3
 
-@dataclass
+@dataclass(frozen=True)
 class Point:
     color: Float3
 
-@dataclass
+@dataclass(frozen=True)
 class Spot:
     color: Float3
 
-@dataclass
+@dataclass(frozen=True)
 class BindVertexInput:
     semantic: str
     input_semantic: str
     input_set: int
 
-@dataclass
+@dataclass(frozen=True)
 class InstanceMaterial:
     sid: Optional[str]
     name: Optional[str]
@@ -100,17 +100,17 @@ class InstanceMaterial:
 
     bind_vertex_inputs: List[BindVertexInput]
 
-@dataclass
+@dataclass(frozen=True)
 class TechniqueCommon_BindMaterial:
     materials: List[InstanceMaterial] # one or more
 
     sid_lookup: dict = field(repr=False)
 
-@dataclass
+@dataclass(frozen=True)
 class BindMaterial:
     technique_common: TechniqueCommon_BindMaterial
 
-@dataclass
+@dataclass(frozen=True)
 class InstanceGeometry:
     sid: Optional[str]
     name: Optional[str]
@@ -119,19 +119,19 @@ class InstanceGeometry:
     # child element
     bind_material: Optional[BindMaterial]
 
-@dataclass
+@dataclass(frozen=True)
 class InstanceLight:
     sid: Optional[str]
     name: Optional[str]
     url: URI
 
-@dataclass
+@dataclass(frozen=True)
 class InstanceVisualScene:
     sid: Optional[str]
     name: Optional[str]
     url: URI
 
-@dataclass
+@dataclass(frozen=True)
 class Scene:
     instance_visual_scene: InstanceVisualScene
 
@@ -146,43 +146,43 @@ class FxSurfaceType(Enum):
     DEPTH = auto()
     RECT = auto()
 
-@dataclass
+@dataclass(frozen=True)
 class InitFrom:
     uri: str
 
-@dataclass
+@dataclass(frozen=True)
 class Surface:
     type: FxSurfaceType
 
     init_from: InitFrom
 
-@dataclass
+@dataclass(frozen=True)
 class SourceFX:
     sid: ID
 
-@dataclass
+@dataclass(frozen=True)
 class Sampler2D:
     source: SourceFX
 
-@dataclass
+@dataclass(frozen=True)
 class Newparam:
     sid: str # required
     parameter_type: Union[Surface, Sampler2D]
 
-@dataclass
+@dataclass(frozen=True)
 class Color:
     value: Float4
 
-@dataclass
+@dataclass(frozen=True)
 class Float:
     value: float
 
-@dataclass
+@dataclass(frozen=True)
 class Texture:
     texture: str
     texcoord:  str
 
-@dataclass
+@dataclass(frozen=True)
 class Blinn:
     emission: Optional[Union[Color, Texture]]
     ambient: Optional[Union[Color, Texture]]
@@ -195,7 +195,7 @@ class Blinn:
     transparency: Optional[Float]
     index_of_refraction: Optional[Float]
 
-@dataclass
+@dataclass(frozen=True)
 class Lambert:
     emission: Optional[Union[Color, Texture]]
     ambient: Optional[Union[Color, Texture]]
@@ -206,7 +206,7 @@ class Lambert:
     transparency: Optional[Float]
     index_of_refraction: Optional[Float]
 
-@dataclass
+@dataclass(frozen=True)
 class Phong:
     emission: Optional[Union[Color, Texture]]
     ambient: Optional[Union[Color, Texture]]
@@ -219,7 +219,7 @@ class Phong:
     transparency: Optional[Float]
     index_of_refraction: Optional[Float]
 
-@dataclass
+@dataclass(frozen=True)
 class Constant:
     emission: Optional[Color]
     reflective: Optional[Union[Color, Texture]]
@@ -228,13 +228,13 @@ class Constant:
     transparency: Optional[Float]
     index_of_refraction: Optional[Float]
 
-@dataclass
+@dataclass(frozen=True)
 class TechniqueFX:
     id: Optional[ID]
     sid: str # required
     shader: Union[Blinn, Lambert, Phong, Constant]
 
-@dataclass
+@dataclass(frozen=True)
 class ProfileCommon:
     id: Optional[ID]
 
@@ -243,27 +243,27 @@ class ProfileCommon:
 
     sid_lookup: dict = field(repr=False)
 
-@dataclass
+@dataclass(frozen=True)
 class Effect:
     id: str
     name: Optional[str]
 
     profile_common: List[ProfileCommon]
 
-@dataclass
+@dataclass(frozen=True)
 class LibraryEffects:
     id: Optional[ID]
     name: Optional[str]
 
     effects: List[Effect]
 
-@dataclass
+@dataclass(frozen=True)
 class InstanceEffect:
     sid: Optional[str]
     name: Optional[str]
     url: URI
 
-@dataclass
+@dataclass(frozen=True)
 class Material:
     id: Optional[ID]
     name: Optional[str]
@@ -272,14 +272,14 @@ class Material:
 
     sid_lookup: dict = field(repr=False)
 
-@dataclass
+@dataclass(frozen=True)
 class LibraryMaterials:
     id: Optional[ID]
     name: Optional[str]
 
     materials: List[Material]
 
-@dataclass
+@dataclass(frozen=True)
 class NameArray:
     count: int
     id: Optional[ID]
@@ -287,7 +287,7 @@ class NameArray:
 
     names: List[str]
 
-@dataclass
+@dataclass(frozen=True)
 class BoolArray:
     count: int
     id: Optional[ID]
@@ -295,7 +295,7 @@ class BoolArray:
 
     bools: List[bool]
 
-@dataclass
+@dataclass(frozen=True)
 class FloatArray:
     count: int
     id: Optional[ID]
@@ -305,7 +305,7 @@ class FloatArray:
 
     floats: List[float]
 
-@dataclass
+@dataclass(frozen=True)
 class IntArray:
     count: int
     id: Optional[ID]
@@ -315,7 +315,7 @@ class IntArray:
 
     ints: List[int]
 
-@dataclass
+@dataclass(frozen=True)
 class SourceCore:
     id: ID
     name: Optional[str]
@@ -323,14 +323,14 @@ class SourceCore:
     array_element: Union[NameArray, BoolArray, FloatArray, IntArray]
     technique_common: TechniqueCommon_SourceCore
 
-@dataclass
+@dataclass(frozen=True)
 class InputShared:
     offset: int
     semantic: str
     source: URI
     set: Optional[int]
 
-@dataclass
+@dataclass(frozen=True)
 class Triangles:
     name: Optional[str]
     count: int
@@ -338,57 +338,57 @@ class Triangles:
     inputs: List[InputShared]
     p: List[int]
 
-@dataclass
+@dataclass(frozen=True)
 class InputUnshared:
     semantic: str
     source: URI
 
-@dataclass
+@dataclass(frozen=True)
 class Vertices:
     id: ID
     name: Optional[str]
 
     inputs: List[InputUnshared] # 1 or more
 
-@dataclass
+@dataclass(frozen=True)
 class Mesh:
     sources: List[SourceCore]
     vertices: Vertices
     primitive_elements: List[Union[Triangles]]
 
-@dataclass
+@dataclass(frozen=True)
 class Geometry:
     id: Optional[ID]
     name: Optional[str]
 
     geometric_element: Union[Mesh]
 
-@dataclass
+@dataclass(frozen=True)
 class LibraryGeometries:
     id: Optional[ID]
     name: Optional[str]
 
     geometries: List[Geometry]
 
-@dataclass
+@dataclass(frozen=True)
 class TechniqueCommon_Light:
     light: Union[Ambient, Directional, Point, Spot]
 
-@dataclass
+@dataclass(frozen=True)
 class Light:
     id: Optional[ID]
     name: Optional[str]
 
     technique_common: TechniqueCommon_Light
 
-@dataclass
+@dataclass(frozen=True)
 class LibraryLights:
     id: Optional[ID]
     name: Optional[str]
 
     lights: List[Light]
 
-@dataclass
+@dataclass(frozen=True)
 class Image:
     id: Optional[ID]
     name: Optional[str]
@@ -399,7 +399,7 @@ class Image:
 
     image_source: Union[InitFrom]
 
-@dataclass
+@dataclass(frozen=True)
 class LibraryImages:
     id: Optional[ID]
     name: Optional[str]
@@ -412,7 +412,7 @@ class NodeType(Enum):
 
 TransformationElements = Union[Lookat, Matrix, Rotate, Scale, Skew, Translate]
 
-@dataclass
+@dataclass(frozen=True)
 class Node:
     id: Optional[ID]
     name: Optional[str]
@@ -427,7 +427,7 @@ class Node:
 
     sid_lookup: dict = field(repr=False)
 
-@dataclass
+@dataclass(frozen=True)
 class VisualScene:
     id: Optional[ID]
     name: Optional[str]
@@ -436,30 +436,30 @@ class VisualScene:
 
     sid_lookup: dict = field(repr=False)
 
-@dataclass
+@dataclass(frozen=True)
 class LibraryVisualScenes:
     id: Optional[ID]
     name: Optional[str]
 
     visual_scenes: List[VisualScene]
 
-@dataclass
+@dataclass(frozen=True)
 class BindShapeMatrix:
     # it is written in row-major order in the COLLADA document for
     # human readability.
     values: Tuple[Float4, Float4, Float4, Float4]
 
-@dataclass
+@dataclass(frozen=True)
 class Joints:
     inputs: List[InputUnshared] # 2 or more
 
-@dataclass
+@dataclass(frozen=True)
 class VertexWeights:
     inputs: List[InputShared] # 2 or more
     vcount: List[int]
     v: List[int]
 
-@dataclass
+@dataclass(frozen=True)
 class Skin:
     source: URI # required
 
@@ -468,31 +468,31 @@ class Skin:
     joints: Joints # 1
     vertex_weights: VertexWeights # 1
 
-@dataclass
+@dataclass(frozen=True)
 class Controller:
     id: Optional[ID]
     name: Optional[str]
 
     control_element: Union[Skin]
 
-@dataclass
+@dataclass(frozen=True)
 class LibraryControllers:
     id: Optional[ID]
     name: Optional[str]
 
     controllers: List[Controller]
 
-@dataclass
+@dataclass(frozen=True)
 class Sampler:
     id: Optional[ID]
     inputs: List[InputUnshared] # 1 or more
 
-@dataclass
+@dataclass(frozen=True)
 class Channel:
     source: URI
     target: URI
 
-@dataclass
+@dataclass(frozen=True)
 class Animation:
     id: Optional[ID]
     name: Optional[str]
@@ -502,7 +502,7 @@ class Animation:
     samplers: List[Sampler]
     channels: List[Channel]
 
-@dataclass
+@dataclass(frozen=True)
 class LibraryAnimations:
     id: Optional[ID]
     name: Optional[str]
