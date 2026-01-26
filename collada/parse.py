@@ -747,7 +747,7 @@ def parse_node(lookup, sid_lookup, root):
     id = root.attrib.get("id")
     name = root.attrib.get("name")
     sid = root.attrib.get("sid")
-    type = root.attrib["type"] if "type" in root.attrib else types.NodeType.NODE
+    type = parse_node_type(root.attrib["type"]) if "type" in root.attrib else types.NodeType.NODE
     layer = root.attrib.get("layer", "").strip().split()
 
     transformation_elements = []

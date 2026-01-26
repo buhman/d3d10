@@ -15,6 +15,16 @@ namespace collada {
     float const w;
   };
 
+  struct float7 {
+    float const a;
+    float const b;
+    float const c;
+    float const d;
+    float const e;
+    float const f;
+    float const g;
+  };
+
   //////////////////////////////////////////////////////////////////////
   // animation
   //////////////////////////////////////////////////////////////////////
@@ -57,9 +67,23 @@ namespace collada {
     enum input_format const format;
   };
 
+  // inputs uniqueness is by evaluted pointer
+  struct inputs {
+    input_element const * const elements;
+    int const elements_count;
+  };
+
+  struct triangles {
+    int const count;
+    int const index_offset;
+    inputs const inputs;
+  };
+
   struct mesh {
-    input_element const * const input_elements;
-    int const input_elements_count;
+    // `triangles` must become a union if non-triangles are implemented.
+    // instance_geometry is an index into this array.
+    triangles const * triangles;
+    int const triangles_count;
 
     int const vertex_buffer_offset;
     int const vertex_buffer_size;
@@ -104,6 +128,7 @@ namespace collada {
       matrix const matrix;
       float4 const rotate;
       float3 const scale;
+      float7 const skew;
       float3 const translate;
     };
   };
@@ -113,14 +138,100 @@ namespace collada {
     NODE,
   };
 
+
+  struct color_or_texture {
+    union {
+      float4 color;
+    };
+  };
+
+  struct blinn {
+    color_or_texture const emission;
+    color_or_texture const ambient;
+    color_or_texture const diffuse;
+    color_or_texture const specular;
+    float const shininess;
+    color_or_texture const reflective;
+    float const reflectivity;
+    color_or_texture const transparent;
+    float const transparency;
+    float const index_of_refraction;
+  };
+
+  struct lambert {
+    color_or_texture const emission;
+    color_or_texture const ambient;
+    color_or_texture const diffuse;
+    color_or_texture const reflective;
+    float const reflectivity;
+    color_or_texture const transparent;
+    float const transparency;
+    float const index_of_refraction;
+  };
+
+  struct phong {
+    color_or_texture const emission;
+    color_or_texture const ambient;
+    color_or_texture const diffuse;
+    color_or_texture const specular;
+    float const shininess;
+    color_or_texture const reflective;
+    float const reflectivity;
+    color_or_texture const transparent;
+    float const transparency;
+    float const index_of_refraction;
+  };
+
+  struct constant {
+    float4 const color;
+    color_or_texture const reflective;
+    float const reflectivity;
+    color_or_texture const transparent;
+    float const transparency;
+    float const index_of_refraction;
+  };
+
+  enum class effect_type {
+    BLINN,
+    LAMBERT,
+    PHONG,
+    CONSTANT,
+  };
+
+  struct effect {
+    effect_type const type;
+    union {
+      blinn const blinn;
+      lambert const lambert;
+      phong const phong;
+      constant const constant;
+    };
+  };
+
+  struct material {
+    effect const * const effect;
+  };
+
+  struct instance_material {
+    int element_index;
+    material const * const material;
+  };
+
+  struct instance_geometry {
+    geometry const * const geometry;
+
+    instance_material const * const instance_materials;
+    int const instance_materials_count;
+  };
+
   struct node {
     node_type const type;
 
     transform const * const transforms;
     int const transforms_count;
 
-    geometry const * const geometries;
-    int const geometries_count;
+    instance_geometry const * const instance_geometries;
+    int const instance_geometries_count;
 
     node const * const nodes;
     int const nodes_count;

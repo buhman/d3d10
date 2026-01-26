@@ -1,7 +1,7 @@
-from typing import Dict, List
+from typing import Dict, List, Any
 
 from dataclasses import dataclass
-from itertools import islice
+from itertools import islice, chain
 from io import BytesIO
 import struct
 
@@ -30,10 +30,34 @@ class State:
     #   values: vertex_index_table (see buffer.py)
     geometry__vertex_index_tables: Dict[str, List[int]]
 
+    # symbol_names: C++ symbols/names already emitted
+    symbol_names: Dict[str, Any]
+
+    # joint_sids
+    joint_sids: Dict[str, types.Node]
+
+    # emitted_input_elements_arrays
+    emitted_input_elements_arrays: Dict[str, tuple]
+
     def __init__(self):
         self.buf = BytesIO()
         self.geometry__indices = {}
         self.geometry__vertex_index_tables = {}
+        self.node_names = {}
+        self.symbol_names = {}
+        self.joint_sids = {}
+        self.emitted_input_elements_arrays = {}
+
+def sanitize_name(state, name, value):
+    assert name is not None
+    assert type(name) is str
+    assert '/' not in name, name
+    c_id = name.lower().replace('-', '_').replace('.', '_')
+
+    assert c_id not in state.node_names or state.node_names[c_id] is value
+    state.symbol_names[c_id] = value
+
+    return c_id
 
 def render_matrix(fs):
     fsi = iter(fs)
@@ -68,39 +92,80 @@ def renderbin(f, elems, t):
         assert type(e) is t, (e, elems)
         f.write(struct.pack(fmt, e))
 
-def render_input_elements(input_source_table):
-    for input, source in input_source_table:
-        semantic = input.semantic if input.semantic != "VERTEX" else "POSITION"
+def offset_table_key(offset_table):
+    for input, source in offset_table:
         semantic_index = 0 if input.set is None else input.set
         assert all(param.type == 'float' for param in source.technique_common.accessor.params)
         assert type(source.technique_common.accessor.stride) is int
         stride = source.technique_common.accessor.stride
+        semantic = "POSITION" if input.semantic == "VERTEX" else input.semantic
+        yield semantic, semantic_index, stride
+
+def input_elements_key_name(key):
+    return "_".join(map(str, chain.from_iterable(key))).lower()
+
+def render_input_elements(state, collada, geometry_name, offset_tables):
+    for i, offset_table in enumerate(offset_tables):
+        key = tuple(offset_table_key(offset_table))
+        key_name = input_elements_key_name(key)
+        if key_name in state.emitted_input_elements_arrays:
+            assert state.emitted_input_elements_arrays[key_name] == key
+            continue
+        state.emitted_input_elements_arrays[key_name] = key
+
+        yield f"input_element const input_elements_{key_name}[] = {{"
+        for semantic, semantic_index, stride in key:
+            yield "{"
+            yield f'.semantic = "{semantic}",'
+            yield f".semantic_index = {semantic_index},"
+            yield f".format = input_format::FLOAT{stride},"
+            yield "},"
+        yield "};"
+
+def render_triangles(state, collada, geometry_name, primitive_elements, mesh_buffer_state):
+    yield from render_input_elements(state, collada, geometry_name, mesh_buffer_state.offset_tables)
+
+    yield f"triangles const triangles_{geometry_name}[] = {{"
+    for i, triangles in enumerate(primitive_elements):
+        assert type(triangles) is types.Triangles, type(triangles)
+
+        key = tuple(offset_table_key(mesh_buffer_state.offset_tables[i]))
+        key_name = input_elements_key_name(key)
 
         yield "{"
-        yield f'.semantic = "{semantic}",'
-        yield f".semantic_index = {semantic_index},"
-        yield f".format = input_format::FLOAT{stride},"
+        yield f".count = {triangles.count}, // triangles"
+        yield f".index_offset = {mesh_buffer_state.index_buffer_offsets[i]}, // indices"
+        yield ".inputs = {"
+        yield f".elements = input_elements_{key_name},"
+        yield f".elements_count = {len(key)},"
+        yield "}"
         yield "},"
+    yield "};"
 
 def render_geometry(state, collada, geometry):
+    geometry_name = sanitize_name(state, geometry.id, geometry)
+
     mesh = geometry.geometric_element
     assert type(mesh) is types.Mesh
-    vertex_buffer, index_buffer, vertex_index_table, input_source_table = buffer.mesh_vertex_index_buffer(collada, mesh)
+    mesh_buffer_state = buffer.mesh_vertex_index_buffer(collada, mesh)
+
     vertex_buffer_offset = state.buf.tell()
-    renderbin(state.buf, vertex_buffer, float)
+    renderbin(state.buf, mesh_buffer_state.vertex_buffer, float)
     vertex_buffer_size = state.buf.tell() - vertex_buffer_offset
+
     index_buffer_offset = state.buf.tell()
-    renderbin(state.buf, index_buffer, int)
+    renderbin(state.buf, mesh_buffer_state.index_buffer, int)
     index_buffer_size = state.buf.tell() - index_buffer_offset
 
-    state.geometry__vertex_index_tables[geometry.id] = vertex_index_table
+    yield from render_triangles(state, collada, geometry_name, mesh.primitive_elements, mesh_buffer_state)
 
-    yield "{"
+    # used by skin_vertex_buffer
+    state.geometry__vertex_index_tables[geometry.id] = mesh_buffer_state.vertex_index_table
+
+    yield f"geometry const geometry_{geometry_name} = {{"
     yield ".mesh = {"
-    yield f".input_elements = {{"
-    yield from render_input_elements(input_source_table)
-    yield "},"
-    yield f".input_elements_count = {len(input_source_table)},"
+    yield f".triangles = triangles_{geometry_name},"
+    yield f".triangles_count = {len(mesh.primitive_elements)},"
     yield ""
     yield f".vertex_buffer_offset = {vertex_buffer_offset},"
     yield f".vertex_buffer_size = {vertex_buffer_size},"
@@ -108,10 +173,9 @@ def render_geometry(state, collada, geometry):
     yield f".index_buffer_offset = {index_buffer_offset},"
     yield f".index_buffer_size = {index_buffer_size},"
     yield "}"
-    yield "},"
+    yield "};"
 
 def render_library_geometries(state, collada):
-    yield "geometry const geometries[] = {"
     next_index = 0
     for library_geometries in collada.library_geometries:
         for geometry in library_geometries.geometries:
@@ -119,7 +183,246 @@ def render_library_geometries(state, collada):
             state.geometry__indices[geometry.id] = next_index
             next_index += 1
             yield from render_geometry(state, collada, geometry)
+
+    yield "geometry const * const geometries[] = {"
+    for library_geometries in collada.library_geometries:
+        for geometry in library_geometries.geometries:
+            geometry_name = sanitize_name(state, geometry.id, geometry)
+            yield f"&geometry_{geometry_name},"
     yield "};"
+
+def render_float_tuple(t):
+    s = ", ".join((f"{float(f)}f" for f in t))
+    return f"{{{s}}}"
+
+def render_node_transforms(state, collada, node_name, transformation_elements):
+    yield f"transform const transforms_{node_name}[] = {{"
+    for transform in transformation_elements:
+        yield "{"
+        if type(transform) is types.Lookat:
+            yield ".type = transform_type::LOOKAT,"
+            yield ".lookat = {"
+            yield f".eye = {render_float_tuple(transform.eye)}",
+            yield f".at = {render_float_tuple(transform.at)}",
+            yield f".up = {render_float_tuple(transform.up)}",
+            yield "},"
+        elif type(transform) is types.Matrix:
+            yield ".type = transform_type::MATRIX,"
+            yield f".matrix = {render_float_tuple(matrix_transpose(transform.matrix))},"
+        elif type(transform) is types.Rotate:
+            yield ".type = transform_type::ROTATE,"
+            yield f".rotate = {render_float_tuple(transform.rotate)},"
+        elif type(transform) is types.Scale:
+            yield ".type = transform_type::SCALE,"
+            yield f".scale = {render_float_tuple(transform.scale)},"
+        elif type(transform) is types.Skew:
+            yield ".type = transform_type::SKEW,"
+            yield f".skew = {render_float_tuple(transform.skew)},"
+        elif type(transform) is types.Translate:
+            yield ".type = transform_type::TRANSLATE,"
+            yield f".translate = {render_float_tuple(transform.translate)},"
+        else:
+            assert False, type(transform)
+        yield "},"
+    yield "};"
+
+def find_material_symbol(geometry, material_symbol):
+    assert material_symbol is not None
+    mesh = geometry.geometric_element
+    assert type(mesh) is types.Mesh
+    for i, element in enumerate(mesh.primitive_elements):
+        if element.material == material_symbol:
+            return i # element index
+    assert False, material_symbol
+
+def render_node_instance_geometry_instance_materials(state, collada, node_name, i, geometry, instance_materials):
+    yield f"instance_material const instance_materials_{node_name}_{i}[] = {{"
+    for instance_material in instance_materials:
+        # bind <triangles> with `symbol` to <effect> with `target`
+
+        # symbol is not an XML id
+        # symbol is the `.material` attribute of <triangles> in geometry.mesh
+        element_index = find_material_symbol(geometry, instance_material.symbol)
+
+        # target is an XML id
+        material = collada.lookup(instance_material.target, types.Material)
+        material_name = sanitize_name(state, material.id, material)
+
+        yield "{"
+        yield f".element_index = {element_index}, // an index into mesh.triangles"
+        yield f".material = &material_{material_name},"
+        yield "},"
+    yield "};"
+
+def get_instance_materials(instance_geometry):
+    return instance_geometry.bind_material.technique_common.materials if instance_geometry.bind_material is not None else []
+
+def render_node_instance_geometries(state, collada, node_name, instance_geometries):
+    for i, instance_geometry in enumerate(instance_geometries):
+        geometry = collada.lookup(instance_geometry.url, types.Geometry)
+        instance_materials = get_instance_materials(instance_geometry)
+        yield from render_node_instance_geometry_instance_materials(state, collada, node_name, i, geometry, instance_materials)
+
+    yield f"instance_geometry const instance_geometries_{node_name}[] = {{"
+    for i, instance_geometry in enumerate(instance_geometries):
+        geometry = collada.lookup(instance_geometry.url, types.Geometry)
+        geometry_name = sanitize_name(state, geometry.id, geometry)
+
+        instance_materials = get_instance_materials(instance_geometry)
+
+        yield "{"
+        yield f".geometry = &geometry_{geometry_name},"
+        yield f".instance_materials = instance_materials_{node_name}_{i},"
+        yield f".instance_materials_count = {len(instance_materials)},"
+        yield "},"
+    yield "};"
+
+def get_node_name_id(node):
+    name = node.id if node.id is not None else f"node-{node.name}"
+    assert name is not None, node
+    return name
+
+def render_node(state, collada, node):
+    if node.type is types.NodeType.JOINT:
+        assert node.sid is not None, node.sid
+        assert node.sid not in state.joint_sids, node.sid
+        state.joint_sids[node.sid] = node
+
+    # render children first
+    for node in node.nodes:
+        yield from render_node(state, collada, node)
+
+    node_name_id = get_node_name_id(node)
+    node_name = sanitize_name(state, node_name_id, node)
+    yield from render_node_transforms(state, collada, node_name, node.transformation_elements)
+    yield from render_node_instance_geometries(state, collada, node_name, node.instance_geometries)
+
+    type = {
+        types.NodeType.JOINT: "JOINT",
+        types.NodeType.NODE: "NODE",
+    }[node.type]
+
+    yield f"node const node_{node_name} = {{"
+    yield f".type = node_type::{type},"
+    yield ""
+    yield f".transforms = transforms_{node_name},"
+    yield f".transforms_count = {len(node.transformation_elements)},"
+    yield ""
+    yield f".instance_geometries = instance_geometries_{node_name},"
+    yield f".instance_geometries_count = {len(node.instance_geometries)},"
+    yield "};"
+
+def linear_nodes(collada):
+    for library_visual_scenes in collada.library_visual_scenes:
+        for visual_scene in library_visual_scenes.visual_scenes:
+            for node in visual_scene.nodes:
+                yield node
+
+def render_library_visual_scenes(state, collada):
+    for node in linear_nodes(collada):
+        yield from render_node(state, collada, node)
+    yield "node const * const nodes[] = {"
+    for node in linear_nodes(collada):
+        node_name_id = get_node_name_id(node)
+        node_name = sanitize_name(state, node_name_id, node)
+        yield f"&node_{node_name},"
+    yield "};"
+
+def render_header():
+    yield '#include "collada_types.hpp"'
+    yield ''
+    yield 'using namespace collada;'
+
+
+def render_opt_color(field_name, color):
+    yield f".color = {render_float_tuple(color.value)},"
+
+def render_opt_color_or_texture(field_name, color_or_texture):
+    if color_or_texture is None:
+        color_or_texture = types.Color(value=(0.0, 0.0, 0.0, 0.0))
+    assert type(color_or_texture) is types.Color, color_or_texture
+    yield f".{field_name} = {{"
+    yield from render_opt_color("color", color_or_texture)
+    yield "},"
+
+def render_opt_float(field_name, f):
+    if f is None:
+        f = types.Float(value=0.0)
+    yield f".{field_name} = {float(f.value)}f,"
+
+def render_library_effects(state, collada):
+    for library_effects in collada.library_effects:
+        for effect in library_effects.effects:
+            profile_common, = effect.profile_common
+            assert profile_common.newparam == []
+            shader = profile_common.technique.shader
+            effect_name = sanitize_name(state, effect.id, effect)
+            yield f"effect const effect_{effect_name} = {{"
+
+            if type(shader) is types.Blinn:
+                yield ".type = effect_type::BLINN,"
+                yield ".blinn = {"
+                yield from render_opt_color_or_texture("emission", shader.emission)
+                yield from render_opt_color_or_texture("ambient", shader.ambient)
+                yield from render_opt_color_or_texture("diffuse", shader.diffuse)
+                yield from render_opt_color_or_texture("specular", shader.specular)
+                yield from render_opt_float("shininess", shader.shininess)
+                yield from render_opt_color_or_texture("reflective", shader.reflective)
+                yield from render_opt_float("reflectivity", shader.reflectivity)
+                yield from render_opt_color_or_texture("transparent", shader.transparent)
+                yield from render_opt_float("transparency", shader.transparency)
+                yield from render_opt_float("index_of_refraction", shader.index_of_refraction)
+                yield "}"
+            elif type(shader) is types.Lambert:
+                yield ".type = effect_type::LAMBERT,"
+                yield ".lambert = {"
+                yield from render_opt_color_or_texture("emission", shader.emission)
+                yield from render_opt_color_or_texture("ambient", shader.ambient)
+                yield from render_opt_color_or_texture("diffuse", shader.diffuse)
+                yield from render_opt_color_or_texture("reflective", shader.reflective)
+                yield from render_opt_float("reflectivity", shader.reflectivity)
+                yield from render_opt_color_or_texture("transparent", shader.transparent)
+                yield from render_opt_float("transparency", shader.transparency)
+                yield from render_opt_float("index_of_refraction", shader.index_of_refraction)
+                yield "}"
+            elif type(shader) is types.Phong:
+                yield ".type = effect_type::PHONG,"
+                yield ".phong = {"
+                yield from render_opt_color_or_texture("emission", shader.emission)
+                yield from render_opt_color_or_texture("ambient", shader.ambient)
+                yield from render_opt_color_or_texture("diffuse", shader.diffuse)
+                yield from render_opt_color_or_texture("specular", shader.specular)
+                yield from render_opt_float("shininess", shader.shininess)
+                yield from render_opt_color_or_texture("reflective", shader.reflective)
+                yield from render_opt_float("reflectivity", shader.reflectivity)
+                yield from render_opt_color_or_texture("transparent", shader.transparent)
+                yield from render_opt_float("transparency", shader.transparency)
+                yield from render_opt_float("index_of_refraction", shader.index_of_refraction)
+                yield "}"
+            elif type(shader) is types.Constant:
+                yield ".type = effect_type::CONSTANT,"
+                yield ".constant = {"
+                yield from render_opt_color("color", shader.color)
+                yield from render_opt_color_or_texture("reflective", shader.reflective)
+                yield from render_opt_float("reflectivity", shader.reflectivity)
+                yield from render_opt_color_or_texture("transparent", shader.transparent)
+                yield from render_opt_float("transparency", shader.transparency)
+                yield from render_opt_float("index_of_refraction", shader.index_of_refraction)
+                yield "}"
+            else:
+                assert False, type(shader)
+
+            yield "};"
+
+def render_library_materials(state, collada):
+    for library_materials in collada.library_materials:
+        for material in library_materials.materials:
+            effect = collada.lookup(material.instance_effect.url, types.Effect)
+            material_name = sanitize_name(state, material.id, material)
+            effect_name = sanitize_name(state, effect.id, effect)
+            yield f"material const material_{material_name} = {{"
+            yield f".effect = &effect_{effect_name},"
+            yield "};"
 
 if __name__ == "__main__":
     import sys
@@ -131,5 +434,9 @@ if __name__ == "__main__":
 
     state = State()
     render, out = renderer()
+    render(render_header())
+    render(render_library_effects(state, collada))
+    render(render_library_materials(state, collada))
     render(render_library_geometries(state, collada))
+    render(render_library_visual_scenes(state, collada))
     print(out.getvalue())

@@ -539,5 +539,5 @@ class Collada:
         assert s.startswith("#")
         id = s[1:]
         value = self._lookup[id]
-        assert type(value) is t, type(value)
+        assert type(value) is t, (s, type(value))
         return value
