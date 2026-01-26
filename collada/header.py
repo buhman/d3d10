@@ -424,6 +424,16 @@ def render_library_materials(state, collada):
             yield f".effect = &effect_{effect_name},"
             yield "};"
 
+def render_all(collada):
+    state = State()
+    render, out = renderer()
+    render(render_header())
+    render(render_library_effects(state, collada))
+    render(render_library_materials(state, collada))
+    render(render_library_geometries(state, collada))
+    render(render_library_visual_scenes(state, collada))
+    return state, out
+
 if __name__ == "__main__":
     import sys
     collada = parse.parse_collada_file(sys.argv[1])
@@ -432,11 +442,5 @@ if __name__ == "__main__":
     #assert type(skin) is types.Skin
     #foo = render_inverse_bind_matrix(collada, skin)
 
-    state = State()
-    render, out = renderer()
-    render(render_header())
-    render(render_library_effects(state, collada))
-    render(render_library_materials(state, collada))
-    render(render_library_geometries(state, collada))
-    render(render_library_visual_scenes(state, collada))
+    state, out = render_all(collada)
     print(out.getvalue())

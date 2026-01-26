@@ -1,5 +1,7 @@
 import io
 
+line_ending = "\r\n"
+
 def should_autonewline(line):
     return (
         "static_assert" not in line
@@ -20,9 +22,9 @@ def _render(out, lines):
                 level = 0
 
         if len(l) == 0:
-            out.write("\n")
+            out.write(line_ending)
         else:
-            out.write(indent * level + l + "\n")
+            out.write(indent * level + l + line_ending)
 
         if l and (l[-1] == "{" or l[-1] == "("):
             if l.startswith("namespace"):
@@ -32,7 +34,7 @@ def _render(out, lines):
 
         if level == 0 and l and l[-1] == ";":
             if should_autonewline(l):
-                out.write("\n")
+                out.write(line_ending)
     return out
 
 def renderer():
