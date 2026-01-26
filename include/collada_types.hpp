@@ -56,8 +56,13 @@ namespace collada {
   //////////////////////////////////////////////////////////////////////
 
   enum class input_format {
+    FLOAT1,
+    FLOAT2,
     FLOAT3,
     FLOAT4,
+    INT1,
+    INT2,
+    INT3,
     INT4,
   };
 
@@ -76,7 +81,7 @@ namespace collada {
   struct triangles {
     int const count;
     int const index_offset;
-    inputs const inputs;
+    int const inputs_index;
   };
 
   struct mesh {
@@ -137,7 +142,6 @@ namespace collada {
     JOINT,
     NODE,
   };
-
 
   struct color_or_texture {
     union {
@@ -235,5 +239,13 @@ namespace collada {
 
     node const * const nodes;
     int const nodes_count;
+  };
+
+  struct descriptor {
+    node const * const * const nodes;
+    int const nodes_count;
+
+    inputs const * inputs_list;
+    int const inputs_list_count;
   };
 }

@@ -313,14 +313,25 @@ namespace collada {
     //XMConvertToRadians
     XMVECTOR axis = XMVectorSet(0, 1, 0, 0);
     XMVECTOR axisZ = XMVectorSet(0, 0, 1, 0);
-    XMMATRIX joint0
-      = XMMatrixRotationNormal(axis, XMConvertToRadians(-90))
+    XMMATRIX joint0 = XMMatrixScaling(1, 1, 1);
+    joint0 = XMMatrixTranslation(10, 0, 0) * joint0;
+    joint0 = XMMatrixRotationNormal(axis, XMConvertToRadians(-90)) * joint0;
+
+    XMMATRIX joint1 = XMMatrixScaling(1, 1, 1);
+
+    /*
+    joint1 = joint1 * XMMatrixRotationNormal(axisZ, sin(t));
+    joint1 = joint1 * XMMatrixTranslation(10, 0, 0);
+    joint1 = joint1 * joint0;
+    */
+
+    joint1 = joint0 * joint1;
+    joint1 = XMMatrixTranslation(10, 0, 0) * joint1;
+    joint1 = XMMatrixRotationNormal(axisZ, sin(t)) * joint1;
+    /*
+      = XMMatrixRotationNormal(axisZ, sin(t)) * XMMatrixTranslation(10, 0, 0) * joint0
       ;
-    XMMATRIX joint1
-      = XMMatrixRotationNormal(axisZ, sin(t))
-      * XMMatrixTranslation(10, 0, 0)
-      * joint0
-      ;
+    */
 
     XMMATRIX joint0ibm = XMLoadFloat4x4((XMFLOAT4X4*)&inverse_bind_matrices[0 * 16]);
     XMMATRIX joint1ibm = XMLoadFloat4x4((XMFLOAT4X4*)&inverse_bind_matrices[1 * 16]);

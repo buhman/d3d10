@@ -18,7 +18,8 @@ install_extras(include=["dataclasses"])
 class State:
     # arbitrary binary data, including vertex buffers and index
     # buffers
-    buf: BytesIO
+    vertex_buffer: BytesIO
+    index_buffer: BytesIO
 
     # geometry__indices:
     #   keys: collada <geometry> id
@@ -40,7 +41,8 @@ class State:
     emitted_input_elements_arrays: Dict[str, tuple]
 
     def __init__(self):
-        self.buf = BytesIO()
+        self.vertex_buffer = BytesIO()
+        self.index_buffer = BytesIO()
         self.geometry__indices = {}
         self.geometry__vertex_index_tables = {}
         self.node_names = {}
@@ -109,9 +111,9 @@ def render_input_elements(state, collada, geometry_name, offset_tables):
         key = tuple(offset_table_key(offset_table))
         key_name = input_elements_key_name(key)
         if key_name in state.emitted_input_elements_arrays:
-            assert state.emitted_input_elements_arrays[key_name] == key
+            assert state.emitted_input_elements_arrays[key_name][1] == key
             continue
-        state.emitted_input_elements_arrays[key_name] = key
+        state.emitted_input_elements_arrays[key_name] = (i, key)
 
         yield f"input_element const input_elements_{key_name}[] = {{"
         for semantic, semantic_index, stride in key:
@@ -131,14 +133,12 @@ def render_triangles(state, collada, geometry_name, primitive_elements, mesh_buf
 
         key = tuple(offset_table_key(mesh_buffer_state.offset_tables[i]))
         key_name = input_elements_key_name(key)
+        index, _ = state.emitted_input_elements_arrays[key_name]
 
         yield "{"
         yield f".count = {triangles.count}, // triangles"
         yield f".index_offset = {mesh_buffer_state.index_buffer_offsets[i]}, // indices"
-        yield ".inputs = {"
-        yield f".elements = input_elements_{key_name},"
-        yield f".elements_count = {len(key)},"
-        yield "}"
+        yield f".inputs_index = {index}, // index into inputs_list"
         yield "},"
     yield "};"
 
@@ -149,13 +149,13 @@ def render_geometry(state, collada, geometry):
     assert type(mesh) is types.Mesh
     mesh_buffer_state = buffer.mesh_vertex_index_buffer(collada, mesh)
 
-    vertex_buffer_offset = state.buf.tell()
-    renderbin(state.buf, mesh_buffer_state.vertex_buffer, float)
-    vertex_buffer_size = state.buf.tell() - vertex_buffer_offset
+    vertex_buffer_offset = state.vertex_buffer.tell()
+    renderbin(state.vertex_buffer, mesh_buffer_state.vertex_buffer, float)
+    vertex_buffer_size = state.vertex_buffer.tell() - vertex_buffer_offset
 
-    index_buffer_offset = state.buf.tell()
-    renderbin(state.buf, mesh_buffer_state.index_buffer, int)
-    index_buffer_size = state.buf.tell() - index_buffer_offset
+    index_buffer_offset = state.index_buffer.tell()
+    renderbin(state.index_buffer, mesh_buffer_state.index_buffer, int)
+    index_buffer_size = state.index_buffer.tell() - index_buffer_offset
 
     yield from render_triangles(state, collada, geometry_name, mesh.primitive_elements, mesh_buffer_state)
 
@@ -328,11 +328,12 @@ def render_library_visual_scenes(state, collada):
         yield f"&node_{node_name},"
     yield "};"
 
-def render_header():
+def render_header(namespace):
     yield '#include "collada_types.hpp"'
     yield ''
+    yield f'namespace {namespace} {{'
+    yield ''
     yield 'using namespace collada;'
-
 
 def render_opt_color(field_name, color):
     yield f".color = {render_float_tuple(color.value)},"
@@ -424,14 +425,38 @@ def render_library_materials(state, collada):
             yield f".effect = &effect_{effect_name},"
             yield "};"
 
-def render_all(collada):
+def render_input_elements_list(state):
+    yield "inputs const inputs_list[] = {"
+    for key_name, (index, key) in state.emitted_input_elements_arrays.items():
+        yield "{"
+        yield f".elements = input_elements_{key_name},"
+        yield f".elements_count = {len(key)},"
+        yield "},"
+    yield "};"
+
+def render_descriptor():
+    yield "descriptor const descriptor = {"
+    yield ".nodes = nodes,"
+    yield ".nodes_count = (sizeof (nodes)) / (sizeof (nodes[0])),"
+    yield ""
+    yield ".inputs_list = inputs_list,"
+    yield ".inputs_list_count = (sizeof (inputs_list)) / (sizeof (inputs_list[0])),"
+    yield "};"
+
+def render_end_of_namespace():
+    yield "}"
+
+def render_all(collada, namespace):
     state = State()
     render, out = renderer()
-    render(render_header())
+    render(render_header(namespace))
     render(render_library_effects(state, collada))
     render(render_library_materials(state, collada))
     render(render_library_geometries(state, collada))
     render(render_library_visual_scenes(state, collada))
+    render(render_input_elements_list(state))
+    render(render_descriptor())
+    render(render_end_of_namespace())
     return state, out
 
 if __name__ == "__main__":
@@ -442,5 +467,5 @@ if __name__ == "__main__":
     #assert type(skin) is types.Skin
     #foo = render_inverse_bind_matrix(collada, skin)
 
-    state, out = render_all(collada)
+    state, out = render_all(collada, "test")
     print(out.getvalue())

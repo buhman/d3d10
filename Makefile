@@ -47,7 +47,8 @@ SHADERS = \
 	$(BUILD_TYPE)/effect/volume.fxo \
 	$(BUILD_TYPE)/effect/bloom.fxo \
 	$(BUILD_TYPE)/effect/static.fxo \
-	$(BUILD_TYPE)/effect/collada.fxo
+	$(BUILD_TYPE)/effect/collada.fxo \
+	$(BUILD_TYPE)/effect/collada_scene.fxo
 
 $(BUILD_TYPE)/%.res: %.rc $(SHADERS)
 	@mkdir -p $(@D)
@@ -65,7 +66,8 @@ OBJS = \
 	$(BUILD_TYPE)/print.obj \
 	$(BUILD_TYPE)/render_state.obj \
 	$(BUILD_TYPE)/input.obj \
-	$(BUILD_TYPE)/collada.obj
+	$(BUILD_TYPE)/collada.obj \
+	$(BUILD_TYPE)/collada_scene.obj
 
 $(BUILD_TYPE)/d3d10.exe: $(OBJS)
 	@mkdir -p $(@D)

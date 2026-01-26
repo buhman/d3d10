@@ -8,3 +8,7 @@ RES_ROBOT_PLAYER RCDATA "models/robot_player/robot_player.data"
 RES_FONT_TERMINUS_6X12 RCDATA "font/terminus_128x64_6x12.data"
 
 RES_COLLADA_FXO RCDATA "collada.fxo"
+
+RES_COLLADA_SCENE_FXO RCDATA "collada_scene.fxo"
+RES_MODELS_CURVE_INTERPOLATION_VTX RCDATA "models/curve_interpolation/curve_interpolation.vtx"
+RES_MODELS_CURVE_INTERPOLATION_IDX RCDATA "models/curve_interpolation/curve_interpolation.idx"

@@ -42,13 +42,7 @@ def mesh_vertex_index_buffer_triangles(collada, mesh, triangles):
     p_stride = max_offset + 1
     offset_table, used_offsets = build_offset_table(collada, triangles, p_stride)
 
-from prettyprinter import pprint, install_extras
-install_extras(include=["dataclasses"])
-
-@dataclass
 class MeshVertexIndexBufferState:
-    index_buffer: List[int]
-
     def __init__(self):
         self.index_buffer = [] # a list of integers
         self.vertex_buffer = [] # a list of floats

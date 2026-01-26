@@ -18,6 +18,9 @@
 #include "cube.hpp"
 
 #include "collada.hpp"
+#include "collada_scene.hpp"
+
+#include "scenes/curve_interpolation.hpp"
 
 HINSTANCE g_hInstance = NULL;
 HWND g_hWnd = NULL;
@@ -129,6 +132,10 @@ XMFLOAT4 g_vLightColors[2] = {
 XMVECTOR g_Eye = XMVectorSet(0.0f, -30.0f, 15.0f, 1.0f);
 XMVECTOR g_At = XMVectorSet(0.0f, 0.0f, 15.0f, 1.0f);
 
+// collada scene state
+
+collada_scene::scene_state g_SceneState;
+
 // forward declarations
 
 HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);
@@ -194,6 +201,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
   }
   if (FAILED(collada::LoadMesh())) {
     print("collada::LoadMesh\n");
+    return 0;
+  }
+
+  if (FAILED(collada_scene::LoadScene(curve_interpolation::descriptor, g_SceneState))) {
+    print("collada::LoadScene\n");
     return 0;
   }
 
@@ -1827,7 +1839,9 @@ void Render(float t, float dt)
 
   RenderFont(dt);
 
-  collada::Render(t);
+  //collada::Render(t);
+
+  collada_scene::Render(curve_interpolation::descriptor, g_SceneState);
 
   // present
   g_pSwapChain->Present(0, 0);
