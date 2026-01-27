@@ -1,9 +1,7 @@
 #pragma once
 
-#include <stdlib.h>
-
 template <typename T>
 T * New(int elements)
 {
-  return (T *)malloc((sizeof (T)) * elements);
+  return (T *)_aligned_malloc((sizeof (T)) * elements, 16);
 }

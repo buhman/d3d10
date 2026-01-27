@@ -71,7 +71,7 @@ namespace collada_scene {
   {
     int count = 1;
     for (int i = 0; i < node->nodes_count; i++) {
-      count += count_nodes(&node->nodes[i]);
+      count += count_nodes(node->nodes[i]);
     }
     return count;
   }
@@ -98,7 +98,7 @@ namespace collada_scene {
         transform.scale = XMLoadFloat3((XMFLOAT3 *)&node->transforms[i].scale);
         break;
       case transform_type::TRANSLATE:
-        transform.translate = XMLoadFloat3((XMFLOAT3 *)&node->transforms[i].translate);
+        transform.translate = XMLoadFloat3((XMFLOAT3*)&node->transforms[i].translate);
         break;
       default:
         assert(false);
@@ -106,8 +106,8 @@ namespace collada_scene {
     }
   }
 
-  static void allocate_node_instance(node const * const node,
-                                     node_instance * node_instance)
+  void scene_state::allocate_node_instance(node const * const node,
+                                           node_instance * node_instance)
   {
     node_instance->transforms = New<transform>(node->transforms_count);
     initialize_node_transforms(node, node_instance);
@@ -117,11 +117,11 @@ namespace collada_scene {
                                                      node_instance * node_instance,
                                                      apply_node_func_t func)
   {
-    func(node, node_instance);
+    (this->*func)(node, node_instance);
     node_instance = &node_instance[1];
 
     for (int i = 0; i < node->nodes_count; i++) {
-      node_instance = apply_node_instances1(&node->nodes[i], node_instance, func);
+      node_instance = apply_node_instances1(node->nodes[i], node_instance, func);
     }
 
     return node_instance;
@@ -144,7 +144,7 @@ namespace collada_scene {
 
     m_nodeInstances = New<node_instance>(count);
 
-    apply_node_instances(allocate_node_instance);
+    apply_node_instances(&scene_state::allocate_node_instance);
   }
 
   HRESULT scene_state::load_scene(collada::descriptor const * const descriptor)

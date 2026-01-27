@@ -5,14 +5,13 @@
 
 namespace collada_scene {
 
-  struct lookat {
+  struct __attribute__((aligned(16))) lookat {
     XMVECTOR eye;
     XMVECTOR at;
     XMVECTOR up;
   };
 
-  struct transform {
-    collada::transform_type type;
+  struct __attribute__((aligned(16))) transform {
     union {
       lookat lookat;
       XMMATRIX matrix;
@@ -20,6 +19,7 @@ namespace collada_scene {
       XMVECTOR scale;
       XMVECTOR translate;
     };
+    collada::transform_type type;
   };
 
   struct node_instance {
@@ -43,8 +43,8 @@ namespace collada_scene {
     HRESULT load_scene(collada::descriptor const * const descriptor);
     void render();
 
-    typedef void (* const apply_node_func_t)(collada::node const * const node,
-                                             node_instance * node_instance);
+    typedef void (collada_scene::scene_state::* const apply_node_func_t)(collada::node const * const node,
+                                                                         node_instance * node_instance);
 
   private:
     HRESULT load_layouts();
@@ -53,6 +53,9 @@ namespace collada_scene {
                                           node_instance * node_instance,
                                           apply_node_func_t func);
     void apply_node_instances(apply_node_func_t func);
+
+    void allocate_node_instance(collada::node const * const node,
+                                node_instance * node_instance);
 
     void render_geometries(collada::instance_geometry const * const instance_geometries,
                            int const instance_geometries_count);
