@@ -67,15 +67,6 @@ namespace collada_scene {
     return S_OK;
   }
 
-  static int count_nodes(node const * const node)
-  {
-    int count = 1;
-    for (int i = 0; i < node->nodes_count; i++) {
-      count += count_nodes(node->nodes[i]);
-    }
-    return count;
-  }
-
   static void initialize_node_transforms(node const * const node,
                                          node_instance * node_instance)
   {
@@ -113,38 +104,13 @@ namespace collada_scene {
     initialize_node_transforms(node, node_instance);
   }
 
-  node_instance * scene_state::apply_node_instances1(node const * const node,
-                                                     node_instance * node_instance,
-                                                     apply_node_func_t func)
-  {
-    (this->*func)(node, node_instance);
-    node_instance = &node_instance[1];
-
-    for (int i = 0; i < node->nodes_count; i++) {
-      node_instance = apply_node_instances1(node->nodes[i], node_instance, func);
-    }
-
-    return node_instance;
-  }
-
-  void scene_state::apply_node_instances(apply_node_func_t func)
-  {
-    node_instance * node_instance = m_nodeInstances;
-    for (int i = 0; i < m_descriptor->nodes_count; i++) {
-      node_instance = apply_node_instances1(m_descriptor->nodes[i], node_instance, func);
-    }
-  }
-
   void scene_state::allocate_node_instances()
   {
-    int count = 0;
+    m_nodeInstances = New<node_instance>(m_descriptor->nodes_count);
+
     for (int i = 0; i < m_descriptor->nodes_count; i++) {
-      count += count_nodes(m_descriptor->nodes[i]);
+      allocate_node_instance(m_descriptor->nodes[i], &m_nodeInstances[i]);
     }
-
-    m_nodeInstances = New<node_instance>(count);
-
-    apply_node_instances(&scene_state::allocate_node_instance);
   }
 
   HRESULT scene_state::load_scene(collada::descriptor const * const descriptor)
@@ -383,7 +349,6 @@ namespace collada_scene {
 
     for (int i = 0; i < m_descriptor->nodes_count; i++) {
       node const& node = *m_descriptor->nodes[i];
-      assert(node.nodes_count == 0);
       if (node.type != node_type::NODE)
         continue;
 

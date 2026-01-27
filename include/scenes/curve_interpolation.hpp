@@ -510,9 +510,6 @@ geometry const * const geometries[] = {
   &geometry_geom_plane001,
 };
 
-node const * const node_children_node_environmentambientlight[] = {
-};
-
 transform const transforms_node_environmentambientlight[] = {
 };
 
@@ -532,12 +529,6 @@ node const node_node_environmentambientlight = {
 
   .channels = node_channels_node_environmentambientlight,
   .channels_count = 0,
-
-  .nodes = node_children_node_environmentambientlight,
-  .nodes_count = 0,
-};
-
-node const * const node_children_node_cube[] = {
 };
 
 transform const transforms_node_cube[] = {
@@ -583,8 +574,8 @@ instance_geometry const instance_geometries_node_cube[] = {
 };
 
 channel const * const node_channels_node_cube[] = {
-  &node_channel_node_cube_translation_y,
   &node_channel_node_cube_translation_x,
+  &node_channel_node_cube_translation_y,
 };
 
 node const node_node_cube = {
@@ -598,12 +589,6 @@ node const node_node_cube = {
 
   .channels = node_channels_node_cube,
   .channels_count = 2,
-
-  .nodes = node_children_node_cube,
-  .nodes_count = 0,
-};
-
-node const * const node_children_node_cylinder001[] = {
 };
 
 transform const transforms_node_cylinder001[] = {
@@ -638,12 +623,6 @@ node const node_node_cylinder001 = {
 
   .channels = node_channels_node_cylinder001,
   .channels_count = 0,
-
-  .nodes = node_children_node_cylinder001,
-  .nodes_count = 0,
-};
-
-node const * const node_children_node_plane001[] = {
 };
 
 transform const transforms_node_plane001[] = {
@@ -686,9 +665,6 @@ node const node_node_plane001 = {
 
   .channels = node_channels_node_plane001,
   .channels_count = 0,
-
-  .nodes = node_children_node_plane001,
-  .nodes_count = 0,
 };
 
 node const * const nodes[] = {

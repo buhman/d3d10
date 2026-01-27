@@ -43,17 +43,9 @@ namespace collada_scene {
     HRESULT load_scene(collada::descriptor const * const descriptor);
     void render();
 
-    typedef void (collada_scene::scene_state::* const apply_node_func_t)(collada::node const * const node,
-                                                                         node_instance * node_instance);
-
   private:
     HRESULT load_layouts();
     void allocate_node_instances();
-    node_instance * apply_node_instances1(collada::node const * const node,
-                                          node_instance * node_instance,
-                                          apply_node_func_t func);
-    void apply_node_instances(apply_node_func_t func);
-
     void allocate_node_instance(collada::node const * const node,
                                 node_instance * node_instance);
 

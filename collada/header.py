@@ -41,6 +41,10 @@ class State:
     # channel nodes: node_id to list of sanitized target names
     node_animation_channels: Dict[str, set]
 
+    # linearized_nodes
+    linearized_nodes: List[types.Node]
+    node_parents: Dict[int, int]
+
     def __init__(self):
         self.vertex_buffer = BytesIO()
         self.index_buffer = BytesIO()
@@ -50,6 +54,8 @@ class State:
         self.symbol_names = {}
         self.emitted_input_elements_arrays = {}
         self.node_animation_channels = defaultdict(set)
+        self.linearized_nodes = []
+        self.node_parents = {}
 
 def sanitize_name(state, name, value, *, allow_slash=False):
     assert name is not None, value
@@ -284,13 +290,13 @@ def get_node_name_id(node):
     assert name is not None, node
     return name
 
-def render_node_children(state, collada, node_name, nodes):
-    yield f"node const * const node_children_{node_name}[] = {{"
-    for node in nodes:
-        node_name_id = get_node_name_id(node)
-        node_name = sanitize_name(state, node_name_id, node)
-        yield "&node_{node_name},"
-    yield "};"
+#def render_node_children(state, collada, node_name, nodes):
+#    yield f"node const * const node_children_{node_name}[] = {{"
+#    for node in nodes:
+#        node_name_id = get_node_name_id(node)
+#        node_name = sanitize_name(state, node_name_id, node)
+#        yield "&node_{node_name},"
+#    yield "};"
 
 def render_node_channels(state, collada, node, node_name):
     if node.id is None:
@@ -304,14 +310,10 @@ def render_node_channels(state, collada, node, node_name):
         yield f"&node_channel_{target_name},"
     yield "};"
 
-def render_node(state, collada, node):
-    # render children first
-    for child_node in node.nodes:
-        yield from render_node(state, collada, child_node)
-
+def render_node(state, collada, node, node_index):
     node_name_id = get_node_name_id(node)
     node_name = sanitize_name(state, node_name_id, node)
-    yield from render_node_children(state, collada, node_name, node.nodes)
+    #yield from render_node_children(state, collada, node_name, node.nodes)
     yield from render_node_transforms(state, collada, node_name, node.transformation_elements)
     yield from render_node_instance_geometries(state, collada, node_name, node.instance_geometries)
     yield from render_node_channels(state, collada, node, node_name)
@@ -322,6 +324,8 @@ def render_node(state, collada, node):
     }[node.type]
 
     yield f"node const node_{node_name} = {{"
+    yield f".parent_index = {state.node_parents[node_index]},"
+    yield ""
     yield f".type = node_type::{type},"
     yield ""
     yield f".transforms = transforms_{node_name},"
@@ -332,22 +336,34 @@ def render_node(state, collada, node):
     yield ""
     yield f".channels = node_channels_{node_name},"
     yield f".channels_count = {len(state.node_animation_channels[node.id])},"
-    yield ""
-    yield f".nodes = node_children_{node_name},"
-    yield f".nodes_count = {len(node.nodes)},"
+    #yield ""
+    #yield f".nodes = node_children_{node_name},"
+    #yield f".nodes_count = {len(node.nodes)},"
     yield "};"
 
-def linear_nodes(collada):
+def traverse_node(state, parent_node_index, node):
+    assert parent_node_index < len(state.linearized_nodes)
+    node_index = len(state.linearized_nodes)
+    state.linearized_nodes.append(node)
+    assert node_index not in state.node_parents
+    state.node_parents[node_index] = parent_node_index
+    for child_node in node.nodes:
+        traverse_node(state, node_index, child_node)
+
+def linearize_nodes(state, collada):
     for library_visual_scenes in collada.library_visual_scenes:
         for visual_scene in library_visual_scenes.visual_scenes:
             for node in visual_scene.nodes:
-                yield node
+                traverse_node(state, -1, node)
 
 def render_library_visual_scenes(state, collada):
-    for node in linear_nodes(collada):
-        yield from render_node(state, collada, node)
+    linearize_nodes(state, collada)
+
+    for node_index, node in enumerate(state.linearized_nodes):
+        yield from render_node(state, collada, node, node_index)
+
     yield "node const * const nodes[] = {"
-    for node in linear_nodes(collada):
+    for node_index, node in enumerate(state.linearized_nodes):
         node_name_id = get_node_name_id(node)
         node_name = sanitize_name(state, node_name_id, node)
         yield f"&node_{node_name},"

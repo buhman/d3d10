@@ -277,6 +277,8 @@ namespace collada {
   //////////////////////////////////////////////////////////////////////
 
   struct node {
+    int const parent_index;
+
     node_type const type;
 
     transform const * const transforms;
@@ -288,8 +290,8 @@ namespace collada {
     channel const * const * const channels;
     int const channels_count;
 
-    node const * const * const nodes;
-    int const nodes_count;
+    //node const * const * const nodes;
+    //int const nodes_count;
   };
 
   struct descriptor {
