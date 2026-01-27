@@ -2,6 +2,11 @@
 
 namespace collada {
 
+  struct float2 {
+    float const x;
+    float const y;
+  };
+
   struct float3 {
     float const x;
     float const y;
@@ -23,32 +28,6 @@ namespace collada {
     float const e;
     float const f;
     float const g;
-  };
-
-  //////////////////////////////////////////////////////////////////////
-  // animation
-  //////////////////////////////////////////////////////////////////////
-
-  enum class interpolation {
-    LINEAR,
-    BEZIER,
-  };
-
-  struct source {
-    union {
-      float const * const float_array;
-      enum interpolation const name_array;
-    };
-    int const count;
-    int const stride;
-  };
-
-  struct sampler {
-    source const input;
-    source const output;
-    source const intangent;
-    source const outangent;
-    source const interpolation;
   };
 
   //////////////////////////////////////////////////////////////////////
@@ -228,6 +207,74 @@ namespace collada {
     int const instance_materials_count;
   };
 
+  //////////////////////////////////////////////////////////////////////
+  // animation
+  //////////////////////////////////////////////////////////////////////
+
+  enum class interpolation {
+    LINEAR,
+    BEZIER,
+  };
+
+  struct source {
+    union {
+      float const * const float_array;
+      float2 const * const float2_array;
+      float3 const * const float3_array;
+      float4 const * const float4_array;
+      enum interpolation const * const interpolation_array;
+    };
+    int const count;
+  };
+
+  struct sampler {
+    source const input;
+    source const output;
+    source const in_tangent;
+    source const out_tangent;
+    source const interpolation;
+  };
+
+  enum class target_attribute {
+    A, // alpha color component
+    ANGLE, // euler angle
+    B, // blue color component
+    G, // green color component
+    P, // third texture component
+    Q, // fourth texture component
+    R, // red color component
+    S, // first texture coordinate
+    T, // second texture coordinate
+    TIME, // time in seconds
+    U, // first generic parameter
+    V, // second generic parameter
+    W, // fourth cartesian coordinate
+    X, // first cartesian coordinate
+    Y, // second cartesian coordinate
+    Z, // third cartesian coordinate
+  };
+
+  struct channel {
+    sampler const * const source_sampler;
+    int const target_node_index; // an index into the nodes array
+    transform_type const target_transform_type;
+    target_attribute const target_attribute;
+  };
+
+  /*
+  struct animation {
+    animation const * const animations; // nested animations
+    int const animations_count;
+
+    channels const * const channels;
+    int const channels_count;
+  };
+  */
+
+  //////////////////////////////////////////////////////////////////////
+  // scene
+  //////////////////////////////////////////////////////////////////////
+
   struct node {
     node_type const type;
 
@@ -237,6 +284,9 @@ namespace collada {
     instance_geometry const * const instance_geometries;
     int const instance_geometries_count;
 
+    channel const * const * const channels;
+    int const channels_count;
+
     node const * const nodes;
     int const nodes_count;
   };
@@ -245,7 +295,10 @@ namespace collada {
     node const * const * const nodes;
     int const nodes_count;
 
-    inputs const * inputs_list;
+    inputs const * const inputs_list;
     int const inputs_list_count;
+
+    //animation const * const animations;
+    //int const animations_count;
   };
 }

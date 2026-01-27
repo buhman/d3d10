@@ -4,6 +4,144 @@ namespace curve_interpolation {
 
 using namespace collada;
 
+float const array_node_cube_translation_x_input_array[] = {
+  { 0.0f },
+  { 1.666667f },
+  { 3.333333f },
+  { 5.0f },
+};
+
+float const array_node_cube_translation_x_output_array[] = {
+  { 10.0f },
+  { -10.0f },
+  { 10.0f },
+  { -10.0f },
+};
+
+float2 const array_node_cube_translation_x_intangent_array[] = {
+  { -0.3332306f, 10.0f },
+  { 1.111167f, -10.0f },
+  { 2.778333f, 10.0f },
+  { 4.4445f, -9.219337f },
+};
+
+float2 const array_node_cube_translation_x_outtangent_array[] = {
+  { 0.5555f, 10.0f },
+  { 2.222167f, -10.0f },
+  { 3.888333f, 10.0f },
+  { 4.000208f, -8.594958f },
+};
+
+enum interpolation const array_node_cube_translation_x_interpolation_array[] = {
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+};
+
+sampler const sampler_node_cube_translation_x_sampler = {
+  // node_cube_translation_x_input
+  .input = {
+    .float_array = array_node_cube_translation_x_input_array,
+    .count = 4,
+  },
+  // node_cube_translation_x_output
+  .output = {
+    .float_array = array_node_cube_translation_x_output_array,
+    .count = 4,
+  },
+  // node_cube_translation_x_intangent
+  .in_tangent = {
+    .float2_array = array_node_cube_translation_x_intangent_array,
+    .count = 4,
+  },
+  // node_cube_translation_x_outtangent
+  .out_tangent = {
+    .float2_array = array_node_cube_translation_x_outtangent_array,
+    .count = 4,
+  },
+  // node_cube_translation_x_interpolation
+  .interpolation = {
+    .interpolation_array = array_node_cube_translation_x_interpolation_array,
+    .count = 4,
+  },
+};
+
+float const array_node_cube_translation_y_input_array[] = {
+  { -0.8333334f },
+  { 0.8333334f },
+  { 2.5f },
+  { 4.166667f },
+};
+
+float const array_node_cube_translation_y_output_array[] = {
+  { -10.05776f },
+  { 10.05852f },
+  { -9.941484f },
+  { 10.05852f },
+};
+
+float2 const array_node_cube_translation_y_intangent_array[] = {
+  { -1.166264f, -10.05776f },
+  { 0.2778334f, 10.05852f },
+  { 1.9445f, -9.941484f },
+  { 3.611667f, 10.05852f },
+};
+
+float2 const array_node_cube_translation_y_outtangent_array[] = {
+  { -0.2783333f, -10.05776f },
+  { 1.388833f, 10.05852f },
+  { 3.0555f, -9.941484f },
+  { 4.499598f, 10.05852f },
+};
+
+enum interpolation const array_node_cube_translation_y_interpolation_array[] = {
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+};
+
+sampler const sampler_node_cube_translation_y_sampler = {
+  // node_cube_translation_y_input
+  .input = {
+    .float_array = array_node_cube_translation_y_input_array,
+    .count = 4,
+  },
+  // node_cube_translation_y_output
+  .output = {
+    .float_array = array_node_cube_translation_y_output_array,
+    .count = 4,
+  },
+  // node_cube_translation_y_intangent
+  .in_tangent = {
+    .float2_array = array_node_cube_translation_y_intangent_array,
+    .count = 4,
+  },
+  // node_cube_translation_y_outtangent
+  .out_tangent = {
+    .float2_array = array_node_cube_translation_y_outtangent_array,
+    .count = 4,
+  },
+  // node_cube_translation_y_interpolation
+  .interpolation = {
+    .interpolation_array = array_node_cube_translation_y_interpolation_array,
+    .count = 4,
+  },
+};
+
+channel const node_channel_node_cube_translation_x = {
+  .source_sampler = &sampler_node_cube_translation_x_sampler,
+  .target_transform_type = transform_type::TRANSLATE,
+  .target_attribute = target_attribute::X,
+};
+
+channel const node_channel_node_cube_translation_y = {
+  .source_sampler = &sampler_node_cube_translation_y_sampler,
+  .target_transform_type = transform_type::TRANSLATE,
+  .target_attribute = target_attribute::Y,
+};
+
 effect const effect_material__15 = {
   .type = effect_type::BLINN,
   .blinn = {
@@ -372,11 +510,16 @@ geometry const * const geometries[] = {
   &geometry_geom_plane001,
 };
 
+node const * const node_children_node_environmentambientlight = {
+};
+
 transform const transforms_node_environmentambientlight[] = {
 };
 
 instance_geometry const instance_geometries_node_environmentambientlight[] = {
 };
+
+channel const * const node_channels_node_environmentambientlight[] = {};
 
 node const node_node_environmentambientlight = {
   .type = node_type::NODE,
@@ -386,6 +529,15 @@ node const node_node_environmentambientlight = {
 
   .instance_geometries = instance_geometries_node_environmentambientlight,
   .instance_geometries_count = 0,
+
+  .channels = node_channels_node_environmentambientlight,
+  .channels_count = 0,
+
+  .nodes = node_children_node_environmentambientlight,
+  .nodes_count = 0,
+};
+
+node const * const node_children_node_cube = {
 };
 
 transform const transforms_node_cube[] = {
@@ -430,6 +582,11 @@ instance_geometry const instance_geometries_node_cube[] = {
   },
 };
 
+channel const * const node_channels_node_cube[] = {
+  &node_channel_node_cube_translation_x,
+  &node_channel_node_cube_translation_y,
+};
+
 node const node_node_cube = {
   .type = node_type::NODE,
 
@@ -438,6 +595,15 @@ node const node_node_cube = {
 
   .instance_geometries = instance_geometries_node_cube,
   .instance_geometries_count = 1,
+
+  .channels = node_channels_node_cube,
+  .channels_count = 2,
+
+  .nodes = node_children_node_cube,
+  .nodes_count = 0,
+};
+
+node const * const node_children_node_cylinder001 = {
 };
 
 transform const transforms_node_cylinder001[] = {
@@ -458,6 +624,9 @@ instance_geometry const instance_geometries_node_cylinder001[] = {
   },
 };
 
+channel const * const node_channels_node_cylinder001[] = {
+};
+
 node const node_node_cylinder001 = {
   .type = node_type::NODE,
 
@@ -466,6 +635,15 @@ node const node_node_cylinder001 = {
 
   .instance_geometries = instance_geometries_node_cylinder001,
   .instance_geometries_count = 1,
+
+  .channels = node_channels_node_cylinder001,
+  .channels_count = 0,
+
+  .nodes = node_children_node_cylinder001,
+  .nodes_count = 0,
+};
+
+node const * const node_children_node_plane001 = {
 };
 
 transform const transforms_node_plane001[] = {
@@ -494,6 +672,9 @@ instance_geometry const instance_geometries_node_plane001[] = {
   },
 };
 
+channel const * const node_channels_node_plane001[] = {
+};
+
 node const node_node_plane001 = {
   .type = node_type::NODE,
 
@@ -502,6 +683,12 @@ node const node_node_plane001 = {
 
   .instance_geometries = instance_geometries_node_plane001,
   .instance_geometries_count = 1,
+
+  .channels = node_channels_node_plane001,
+  .channels_count = 0,
+
+  .nodes = node_children_node_plane001,
+  .nodes_count = 0,
 };
 
 node const * const nodes[] = {

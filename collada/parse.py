@@ -874,7 +874,7 @@ def parse_animation(lookup, root):
             sources.append(parse_source_core(lookup, child))
         if child.tag == tag("sampler"):
             samplers.append(parse_sampler(lookup, child))
-        if child.tag == tag("channels"):
+        if child.tag == tag("channel"):
             channels.append(parse_channel(lookup, child))
 
     animation = types.Animation(id, name, animations, sources, samplers, channels)

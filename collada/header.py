@@ -1,5 +1,6 @@
 from typing import Dict, List, Any
 
+from collections import defaultdict
 from dataclasses import dataclass
 from itertools import islice, chain
 from io import BytesIO
@@ -34,11 +35,11 @@ class State:
     # symbol_names: C++ symbols/names already emitted
     symbol_names: Dict[str, Any]
 
-    # joint_sids
-    joint_sids: Dict[str, types.Node]
-
     # emitted_input_elements_arrays
     emitted_input_elements_arrays: Dict[str, tuple]
+
+    # channel nodes: node_id to list of sanitized target names
+    node_animation_channels: Dict[str, set]
 
     def __init__(self):
         self.vertex_buffer = BytesIO()
@@ -47,14 +48,15 @@ class State:
         self.geometry__vertex_index_tables = {}
         self.node_names = {}
         self.symbol_names = {}
-        self.joint_sids = {}
         self.emitted_input_elements_arrays = {}
+        self.node_animation_channels = defaultdict(set)
 
-def sanitize_name(state, name, value):
-    assert name is not None
+def sanitize_name(state, name, value, *, allow_slash=False):
+    assert name is not None, value
     assert type(name) is str
-    assert '/' not in name, name
-    c_id = name.lower().replace('-', '_').replace('.', '_')
+    if not allow_slash:
+        assert '/' not in name, name
+    c_id = name.lower().replace('-', '_').replace('.', '_').replace('/', '_')
 
     assert c_id not in state.node_names or state.node_names[c_id] is value
     state.symbol_names[c_id] = value
@@ -282,20 +284,37 @@ def get_node_name_id(node):
     assert name is not None, node
     return name
 
-def render_node(state, collada, node):
-    if node.type is types.NodeType.JOINT:
-        assert node.sid is not None, node.sid
-        assert node.sid not in state.joint_sids, node.sid
-        state.joint_sids[node.sid] = node
+def render_node_children(state, collada, node_name, nodes):
+    yield f"node const * const node_children_{node_name} = {{"
+    for node in nodes:
+        node_name_id = get_node_name_id(node)
+        node_name = sanitize_name(state, node_name_id, node)
+        yield "&node_{node_name},"
+    yield "};"
 
+def render_node_channels(state, collada, node, node_name):
+    if node.id is None:
+        # nodes with no ID can't have channels
+        yield f"channel const * const node_channels_{node_name}[] = {{}};"
+        return
+
+    target_names = state.node_animation_channels[node.id]
+    yield f"channel const * const node_channels_{node_name}[] = {{"
+    for target_name in target_names:
+        yield f"&node_channel_{target_name},"
+    yield "};"
+
+def render_node(state, collada, node):
     # render children first
-    for node in node.nodes:
-        yield from render_node(state, collada, node)
+    for child_node in node.nodes:
+        yield from render_node(state, collada, child_node)
 
     node_name_id = get_node_name_id(node)
     node_name = sanitize_name(state, node_name_id, node)
+    yield from render_node_children(state, collada, node_name, node.nodes)
     yield from render_node_transforms(state, collada, node_name, node.transformation_elements)
     yield from render_node_instance_geometries(state, collada, node_name, node.instance_geometries)
+    yield from render_node_channels(state, collada, node, node_name)
 
     type = {
         types.NodeType.JOINT: "JOINT",
@@ -310,6 +329,12 @@ def render_node(state, collada, node):
     yield ""
     yield f".instance_geometries = instance_geometries_{node_name},"
     yield f".instance_geometries_count = {len(node.instance_geometries)},"
+    yield ""
+    yield f".channels = node_channels_{node_name},"
+    yield f".channels_count = {len(state.node_animation_channels[node.id])},"
+    yield ""
+    yield f".nodes = node_children_{node_name},"
+    yield f".nodes_count = {len(node.nodes)},"
     yield "};"
 
 def linear_nodes(collada):
@@ -446,13 +471,166 @@ def render_descriptor():
 def render_end_of_namespace():
     yield "}"
 
+def render_animation_children(state, collada, animation_name, animations):
+    yield f"node const * const animation_children_{animation_name} = {{"
+    for animation in animations:
+        animation_name = sanitize_name(state, animation.id, animation)
+        yield "&animation_{animation_name},"
+    yield "};"
+
+def array_c_type(accessor):
+    if accessor.params[0].name == "INTERPOLATION":
+        return "interpolation"
+    assert all(param.type == "float" for param in accessor.params)
+    if accessor.stride == 1:
+        return "float"
+    elif accessor.stride in {2, 3, 4}:
+        assert list(param.name for param in accessor.params) == ["X", "Y", "Z", "W"][:accessor.stride], accessor.params
+        return f"float{accessor.stride}"
+    else:
+        assert False, accessor.stride
+
+def render_array(state, collada, accessor, array):
+    array_name = sanitize_name(state, array.id, array)
+    # render the array
+    if type(array) is types.NameArray:
+        assert accessor.stride == 1
+        assert accessor.params[0].name == "INTERPOLATION"
+        assert len(array.names) == accessor.count
+        yield f"enum interpolation const array_{array_name}[] = {{"
+        for name in array.names:
+            assert name in {"BEZIER", "LINEAR"}, name
+            yield f"interpolation::{name},"
+        yield "};"
+        return "interpolation"
+    elif type(array) is types.FloatArray:
+        c_type = array_c_type(accessor)
+        yield f"{c_type} const array_{array_name}[] = {{"
+        it = iter(array.floats)
+        for i in range(accessor.count):
+            vector = ", ".join(f"{float(f)}f" for f in islice(it, accessor.stride))
+            yield f"{{ {vector} }},"
+        yield "};"
+    else:
+        assert False, type(array)
+
+def render_source(state, collada, field_name, source):
+    array_name = sanitize_name(state, source.array_element.id, source.array_element)
+    c_type = array_c_type(source.technique_common.accessor)
+    source_name = sanitize_name(state, source.id, source)
+    #yield f"source const source_{source_name} = {{"
+    yield f"// {source_name}"
+    yield f".{field_name} = {{"
+    yield f".{c_type}_array = array_{array_name},"
+    yield f".count = {source.technique_common.accessor.count},"
+    yield "},"
+
+def render_sampler(state, collada, sampler):
+    order = dict((s, i) for i, s in
+                 enumerate(["INPUT", "OUTPUT", "IN_TANGENT", "OUT_TANGENT", "INTERPOLATION"]))
+    inputs = sorted((input for input in sampler.inputs if input.semantic in order),
+                    key=lambda input: order[input.semantic])
+
+    # render the source arrays first
+    for input in inputs:
+        assert type(input) is types.InputUnshared
+        source = collada.lookup(input.source, types.SourceCore)
+        yield from render_array(state, collada, source.technique_common.accessor, source.array_element)
+
+    sampler_name = sanitize_name(state, sampler.id, sampler)
+    yield f"sampler const sampler_{sampler_name} = {{"
+    for input in inputs:
+        source = collada.lookup(input.source, types.SourceCore)
+        field_name = input.semantic.lower()
+        yield from render_source(state, collada, field_name, source)
+    yield "};"
+
+target_attributes = {
+    "A", "ANGLE", "B", "G", "P", "Q", "R", "S", "T", "TIME", "U", "V", "W", "X", "Y", "Z"
+}
+
+def render_transform_type(transformation_element):
+    return {
+        types.Lookat: "LOOKAT",
+        types.Matrix: "MATRIX",
+        types.Rotate: "ROTATE",
+        types.Scale: "SCALE",
+        types.Skew: "SKEW",
+        types.Translate: "TRANSLATE",
+    }[type(transformation_element)]
+
+def render_channel(state, collada, channel):
+    sampler = collada.lookup(channel.source, types.Sampler)
+    sampler_name = sanitize_name(state, sampler.id, sampler)
+
+    assert '/' in channel.target, channel.target
+    assert '.' in channel.target, channel.target
+    assert "(" not in channel.target, channel.target
+
+    node_id, rest = channel.target.split("/")
+    node_transform_sid, target_attribute = rest.split(".")
+    assert target_attribute in target_attributes
+
+    node = collada.lookup(f"#{node_id}", types.Node)
+    node_name_id = get_node_name_id(node)
+    node_name = sanitize_name(state, node_name_id, node)
+    transformation_element = node.sid_lookup[node_transform_sid]
+
+    target_name = sanitize_name(state, channel.target, channel, allow_slash=True)
+    assert target_name not in state.node_animation_channels[node.id]
+    state.node_animation_channels[node.id].add(target_name)
+
+    yield f"channel const node_channel_{target_name} = {{"
+    yield f".source_sampler = &sampler_{sampler_name},"
+    yield f".target_transform_type = transform_type::{render_transform_type(transformation_element)},"
+    yield f".target_attribute = target_attribute::{target_attribute},"
+    yield "};"
+
+def render_animation(state, collada, animation_name, animation):
+    # render children first
+    for i, child_animation in enumerate(animation.animations):
+        child_animation_name = f"{animation_name}_{i}"
+        yield from render_animation(state, collada, child_animation_name, child_animation)
+
+    # samplers (includes sources)
+    for sampler in animation.samplers:
+        yield from render_sampler(state, collada, sampler)
+
+    for channel in animation.channels:
+        yield from render_channel(state, collada, channel)
+
+    # all animations channels are referenced from the node (inverse
+    # the relationship in collada)
+    #
+    # I haven't considered how nested or layered animations are
+    # affected by this inversion.
+
+    #yield f"animation const animation_{animation_name} = {{"
+    #yield f".animations = animation_children_{animation_name},"
+    #yield f".animations_count = {len(animation.animations)},"
+    #yield ""
+    #yield f".channels = animation_channels_{animation_name}"
+    #yield f".channels_count = {len(animation.channels)}"
+    #yield "};"
+
+def render_library_animations(state, collada):
+    animation_ix = 0
+    for library_animations in collada.library_animations:
+        for animation in library_animations.animations:
+            animation_name = f"{animation_ix}"
+            yield from render_animation(state, collada, animation_name, animation)
+            animation_ix += 1
+
 def render_all(collada, namespace):
     state = State()
     render, out = renderer()
     render(render_header(namespace))
+    render(render_library_animations(state, collada))
     render(render_library_effects(state, collada))
     render(render_library_materials(state, collada))
     render(render_library_geometries(state, collada))
+
+    # root elements
     render(render_library_visual_scenes(state, collada))
     render(render_input_elements_list(state))
     render(render_descriptor())

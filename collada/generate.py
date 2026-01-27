@@ -17,7 +17,7 @@ def _render(out, lines):
         if l and (l[0] == "}" or l[0] == ")"):
             level -= 2
             if level < 0:
-                assert namespace >= 0
+                assert namespace >= 0, l
                 namespace -= 1
                 level = 0
 
