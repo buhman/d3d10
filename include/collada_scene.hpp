@@ -1,25 +1,65 @@
 #pragma once
 
 #include "collada_types.hpp"
+#include "directxmath/directxmath.h"
 
 namespace collada_scene {
 
-  struct scene_state {
-    const UINT numBuffers = 1; // FIXME
-    const UINT strides[1] = {3 * 3 * 4}; // FIXME
-    const UINT offsets[1] = {0}; // FIXME
-
-    ID3D10Buffer * pVertexBuffers[1] = {}; // FIXME
-    ID3D10Buffer * pIndexBuffer = NULL;
-
-    ID3D10InputLayout ** pVertexLayouts = NULL;
-
-    HRESULT load_vertex_buffer(LPCWSTR name);
-    HRESULT load_index_buffer(LPCWSTR name);
-    HRESULT load_layout(int inputs_index, collada::inputs const& inputs);
-    HRESULT load_layouts(collada::descriptor const& descriptor);
+  struct lookat {
+    XMVECTOR eye;
+    XMVECTOR at;
+    XMVECTOR up;
   };
 
-  HRESULT LoadScene(collada::descriptor const& descriptor, scene_state& state);
-  void Render(collada::descriptor const& descriptor, scene_state const& state);
+  struct transform {
+    collada::transform_type type;
+    union {
+      lookat lookat;
+      XMMATRIX matrix;
+      XMVECTOR rotate;
+      XMVECTOR scale;
+      XMVECTOR translate;
+    };
+  };
+
+  struct node_instance {
+    transform * transforms = NULL;
+  };
+
+  struct scene_state {
+    const UINT m_numBuffers = 1; // FIXME
+    const UINT m_strides[1] = {3 * 3 * 4}; // FIXME
+    const UINT m_offsets[1] = {0}; // FIXME
+
+    ID3D10Buffer * m_pVertexBuffers[1] = {}; // FIXME
+    ID3D10Buffer * m_pIndexBuffer = NULL;
+
+    ID3D10InputLayout ** m_pVertexLayouts = NULL;
+
+    node_instance * m_nodeInstances = NULL;
+
+    collada::descriptor const * m_descriptor;
+
+    HRESULT load_scene(collada::descriptor const * const descriptor);
+    void render();
+
+    typedef void (* const apply_node_func_t)(collada::node const * const node,
+                                             node_instance * node_instance);
+
+  private:
+    HRESULT load_layouts();
+    void allocate_node_instances();
+    node_instance * apply_node_instances1(collada::node const * const node,
+                                          node_instance * node_instance,
+                                          apply_node_func_t func);
+    void apply_node_instances(apply_node_func_t func);
+
+    void render_geometries(collada::instance_geometry const * const instance_geometries,
+                           int const instance_geometries_count);
+  };
+
+  HRESULT LoadEffect();
+  HRESULT LoadLayout(collada::inputs const& inputs, ID3D10InputLayout ** ppVertexLayout);
+  HRESULT LoadVertexBuffer(LPCWSTR name, ID3D10Buffer ** ppVertexBuffer);
+  HRESULT LoadIndexBuffer(LPCWSTR name, ID3D10Buffer ** ppIndexBuffer);
 }

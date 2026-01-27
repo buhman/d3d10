@@ -510,7 +510,7 @@ geometry const * const geometries[] = {
   &geometry_geom_plane001,
 };
 
-node const * const node_children_node_environmentambientlight = {
+node const * const node_children_node_environmentambientlight[] = {
 };
 
 transform const transforms_node_environmentambientlight[] = {
@@ -537,7 +537,7 @@ node const node_node_environmentambientlight = {
   .nodes_count = 0,
 };
 
-node const * const node_children_node_cube = {
+node const * const node_children_node_cube[] = {
 };
 
 transform const transforms_node_cube[] = {
@@ -603,7 +603,7 @@ node const node_node_cube = {
   .nodes_count = 0,
 };
 
-node const * const node_children_node_cylinder001 = {
+node const * const node_children_node_cylinder001[] = {
 };
 
 transform const transforms_node_cylinder001[] = {
@@ -643,7 +643,7 @@ node const node_node_cylinder001 = {
   .nodes_count = 0,
 };
 
-node const * const node_children_node_plane001 = {
+node const * const node_children_node_plane001[] = {
 };
 
 transform const transforms_node_plane001[] = {

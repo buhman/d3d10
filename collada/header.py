@@ -285,7 +285,7 @@ def get_node_name_id(node):
     return name
 
 def render_node_children(state, collada, node_name, nodes):
-    yield f"node const * const node_children_{node_name} = {{"
+    yield f"node const * const node_children_{node_name}[] = {{"
     for node in nodes:
         node_name_id = get_node_name_id(node)
         node_name = sanitize_name(state, node_name_id, node)

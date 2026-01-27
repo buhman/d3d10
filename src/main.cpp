@@ -204,8 +204,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     return 0;
   }
 
-  if (FAILED(collada_scene::LoadScene(curve_interpolation::descriptor, g_SceneState))) {
-    print("collada::LoadScene\n");
+  if (FAILED(collada_scene::LoadEffect())) {
+    print("collada_scene::LoadEffect\n");
+  }
+
+  if (FAILED(g_SceneState.load_scene(&curve_interpolation::descriptor))) {
+    print("g_SceneState::load_scene\n");
     return 0;
   }
 
@@ -1839,7 +1843,7 @@ void Render(float t, float dt)
 
   //collada::Render(t);
 
-  collada_scene::Render(curve_interpolation::descriptor, g_SceneState);
+  g_SceneState.render();
 
   RenderFont(dt);
 

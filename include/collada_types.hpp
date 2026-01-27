@@ -102,6 +102,7 @@ namespace collada {
     MATRIX,
     ROTATE,
     SCALE,
+    SKEW,
     TRANSLATE,
   };
 
@@ -287,11 +288,12 @@ namespace collada {
     channel const * const * const channels;
     int const channels_count;
 
-    node const * const nodes;
+    node const * const * const nodes;
     int const nodes_count;
   };
 
   struct descriptor {
+    // these are only the top-level nodes; nodes may have children
     node const * const * const nodes;
     int const nodes_count;
 

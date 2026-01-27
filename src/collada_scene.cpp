@@ -6,6 +6,7 @@
 
 #include "print.hpp"
 #include "collada_scene.hpp"
+#include "new.hpp"
 
 extern ID3D10Device * g_pd3dDevice;
 extern XMMATRIX g_View;
@@ -51,65 +52,126 @@ namespace collada_scene {
     }
   }
 
-  HRESULT scene_state::load_vertex_buffer(LPCWSTR name)
+  HRESULT scene_state::load_layouts()
   {
     HRESULT hr;
-    HRSRC hRes = FindResource(NULL, name, RT_RCDATA);
-    if (hRes == NULL) {
-      printW(L"FindResource %s\n", name);
-      return E_FAIL;
-    }
-    DWORD dwResSize = SizeofResource(NULL, hRes);
-    void * pData = LockResource(LoadResource(NULL, hRes));
 
-    D3D10_BUFFER_DESC bd;
-    D3D10_SUBRESOURCE_DATA initData;
+    m_pVertexLayouts = New<ID3D10InputLayout *>(m_descriptor->inputs_list_count);
 
-    bd.Usage = D3D10_USAGE_IMMUTABLE;
-    bd.ByteWidth = dwResSize;
-    bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
-    bd.CPUAccessFlags = 0;
-    bd.MiscFlags = 0;
-    initData.pSysMem = pData;
-    hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &pVertexBuffers[0]);
-    if (FAILED(hr)) {
-      print("CreateBuffer: D3D10_BIND_VERTEX_BUFFER\n");
-      return hr;
+    for (int i = 0; i < m_descriptor->inputs_list_count; i++) {
+      hr = LoadLayout(m_descriptor->inputs_list[i], &m_pVertexLayouts[i]);
+      if (FAILED(hr))
+        return hr;
     }
 
     return S_OK;
   }
 
-  HRESULT scene_state::load_index_buffer(LPCWSTR name)
+  static int count_nodes(node const * const node)
+  {
+    int count = 1;
+    for (int i = 0; i < node->nodes_count; i++) {
+      count += count_nodes(&node->nodes[i]);
+    }
+    return count;
+  }
+
+  static void initialize_node_transforms(node const * const node,
+                                         node_instance * node_instance)
+  {
+    for (int i = 0; i < node->transforms_count; i++) {
+      transform& transform = node_instance->transforms[i];
+      transform.type = node->transforms[i].type;
+      switch (transform.type) {
+      case transform_type::LOOKAT:
+        transform.lookat.eye = XMLoadFloat3((XMFLOAT3 *)&node->transforms[i].lookat.eye);
+        transform.lookat.at = XMLoadFloat3((XMFLOAT3 *)&node->transforms[i].lookat.at);
+        transform.lookat.up = XMLoadFloat3((XMFLOAT3 *)&node->transforms[i].lookat.up);
+        break;
+      case transform_type::MATRIX:
+        transform.matrix = XMLoadFloat4x4((XMFLOAT4X4 *)&node->transforms[i].matrix);
+        break;
+      case transform_type::ROTATE:
+        transform.rotate = XMLoadFloat4((XMFLOAT4 *)&node->transforms[i].rotate);
+        break;
+      case transform_type::SCALE:
+        transform.scale = XMLoadFloat3((XMFLOAT3 *)&node->transforms[i].scale);
+        break;
+      case transform_type::TRANSLATE:
+        transform.translate = XMLoadFloat3((XMFLOAT3 *)&node->transforms[i].translate);
+        break;
+      default:
+        assert(false);
+      }
+    }
+  }
+
+  static void allocate_node_instance(node const * const node,
+                                     node_instance * node_instance)
+  {
+    node_instance->transforms = New<transform>(node->transforms_count);
+    initialize_node_transforms(node, node_instance);
+  }
+
+  node_instance * scene_state::apply_node_instances1(node const * const node,
+                                                     node_instance * node_instance,
+                                                     apply_node_func_t func)
+  {
+    func(node, node_instance);
+    node_instance = &node_instance[1];
+
+    for (int i = 0; i < node->nodes_count; i++) {
+      node_instance = apply_node_instances1(&node->nodes[i], node_instance, func);
+    }
+
+    return node_instance;
+  }
+
+  void scene_state::apply_node_instances(apply_node_func_t func)
+  {
+    node_instance * node_instance = m_nodeInstances;
+    for (int i = 0; i < m_descriptor->nodes_count; i++) {
+      node_instance = apply_node_instances1(m_descriptor->nodes[i], node_instance, func);
+    }
+  }
+
+  void scene_state::allocate_node_instances()
+  {
+    int count = 0;
+    for (int i = 0; i < m_descriptor->nodes_count; i++) {
+      count += count_nodes(m_descriptor->nodes[i]);
+    }
+
+    m_nodeInstances = New<node_instance>(count);
+
+    apply_node_instances(allocate_node_instance);
+  }
+
+  HRESULT scene_state::load_scene(collada::descriptor const * const descriptor)
   {
     HRESULT hr;
-    HRSRC hRes = FindResource(NULL, name, RT_RCDATA);
-    if (hRes == NULL) {
-      printW(L"FindResource %s\n", name);
+
+    m_descriptor = descriptor;
+
+    // layouts
+    hr = load_layouts();
+    if (FAILED(hr))
       return E_FAIL;
-    }
-    DWORD dwResSize = SizeofResource(NULL, hRes);
-    void * pData = LockResource(LoadResource(NULL, hRes));
 
-    D3D10_BUFFER_DESC bd;
-    D3D10_SUBRESOURCE_DATA initData;
+    hr = LoadVertexBuffer(L"RES_MODELS_CURVE_INTERPOLATION_VTX", &m_pVertexBuffers[0]);
+    if (FAILED(hr))
+      return E_FAIL;
 
-    bd.Usage = D3D10_USAGE_IMMUTABLE;
-    bd.ByteWidth = dwResSize;
-    bd.BindFlags = D3D10_BIND_INDEX_BUFFER;
-    bd.CPUAccessFlags = 0;
-    bd.MiscFlags = 0;
-    initData.pSysMem = pData;
-    hr = g_pd3dDevice->CreateBuffer(&bd, &initData, &pIndexBuffer);
-    if (FAILED(hr)) {
-      print("CreateBuffer: D3D10_BIND_VERTEX_BUFFER\n");
-      return hr;
-    }
+    hr = LoadIndexBuffer(L"RES_MODELS_CURVE_INTERPOLATION_IDX", &m_pIndexBuffer);
+    if (FAILED(hr))
+      return E_FAIL;
+
+    allocate_node_instances();
 
     return S_OK;
   }
 
-  HRESULT scene_state::load_layout(int inputs_index, inputs const& inputs)
+  HRESULT LoadLayout(inputs const& inputs, ID3D10InputLayout ** ppVertexLayout)
   {
     HRESULT hr;
 
@@ -134,32 +196,10 @@ namespace collada_scene {
     hr = g_pd3dDevice->CreateInputLayout(layout, inputs.elements_count,
                                          passDesc.pIAInputSignature,
                                          passDesc.IAInputSignatureSize,
-                                         &pVertexLayouts[inputs_index]);
+                                         ppVertexLayout);
     if (FAILED(hr)) {
       print("CreateInputLayout\n");
       return hr;
-    }
-
-    return S_OK;
-  }
-
-  template <typename T>
-  T New(int elements)
-  {
-    return (T)malloc((sizeof (T)) * elements);
-  }
-
-  HRESULT scene_state::load_layouts(descriptor const& descriptor)
-  {
-    HRESULT hr;
-
-    //this->pVertexLayouts = new ID3D10InputLayout *[descriptor.inputs_list_count];
-    this->pVertexLayouts = New<ID3D10InputLayout **>(descriptor.inputs_list_count);
-
-    for (int i = 0; i < descriptor.inputs_list_count; i++) {
-      hr = load_layout(i, descriptor.inputs_list[i]);
-      if (FAILED(hr))
-        return hr;
     }
 
     return S_OK;
@@ -203,41 +243,74 @@ namespace collada_scene {
     return S_OK;
   }
 
-  HRESULT LoadScene(descriptor const& descriptor, scene_state& state)
+  HRESULT LoadVertexBuffer(LPCWSTR name, ID3D10Buffer ** ppVertexBuffer)
   {
     HRESULT hr;
-
-    // effects/techniques
-    hr = LoadEffect();
-    if (FAILED(hr))
+    HRSRC hRes = FindResource(NULL, name, RT_RCDATA);
+    if (hRes == NULL) {
+      printW(L"FindResource %s\n", name);
       return E_FAIL;
+    }
+    DWORD dwResSize = SizeofResource(NULL, hRes);
+    void * pData = LockResource(LoadResource(NULL, hRes));
 
-    // layouts
-    hr = state.load_layouts(descriptor);
-    if (FAILED(hr))
-      return E_FAIL;
+    D3D10_BUFFER_DESC bd;
+    D3D10_SUBRESOURCE_DATA initData;
 
-    hr = state.load_vertex_buffer(L"RES_MODELS_CURVE_INTERPOLATION_VTX");
-    if (FAILED(hr))
-      return E_FAIL;
-
-    hr = state.load_index_buffer(L"RES_MODELS_CURVE_INTERPOLATION_IDX");
-    if (FAILED(hr))
-      return E_FAIL;
+    bd.Usage = D3D10_USAGE_IMMUTABLE;
+    bd.ByteWidth = dwResSize;
+    bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
+    bd.CPUAccessFlags = 0;
+    bd.MiscFlags = 0;
+    initData.pSysMem = pData;
+    hr = g_pd3dDevice->CreateBuffer(&bd, &initData, ppVertexBuffer);
+    if (FAILED(hr)) {
+      print("CreateBuffer: D3D10_BIND_VERTEX_BUFFER\n");
+      return hr;
+    }
 
     return S_OK;
   }
 
-  static inline XMMATRIX transform_matrix(transform const& transform)
+  HRESULT LoadIndexBuffer(LPCWSTR name, ID3D10Buffer ** ppIndexBuffer)
+  {
+    HRESULT hr;
+    HRSRC hRes = FindResource(NULL, name, RT_RCDATA);
+    if (hRes == NULL) {
+      printW(L"FindResource %s\n", name);
+      return E_FAIL;
+    }
+    DWORD dwResSize = SizeofResource(NULL, hRes);
+    void * pData = LockResource(LoadResource(NULL, hRes));
+
+    D3D10_BUFFER_DESC bd;
+    D3D10_SUBRESOURCE_DATA initData;
+
+    bd.Usage = D3D10_USAGE_IMMUTABLE;
+    bd.ByteWidth = dwResSize;
+    bd.BindFlags = D3D10_BIND_INDEX_BUFFER;
+    bd.CPUAccessFlags = 0;
+    bd.MiscFlags = 0;
+    initData.pSysMem = pData;
+    hr = g_pd3dDevice->CreateBuffer(&bd, &initData, ppIndexBuffer);
+    if (FAILED(hr)) {
+      print("CreateBuffer: D3D10_BIND_VERTEX_BUFFER\n");
+      return hr;
+    }
+
+    return S_OK;
+  }
+
+  static inline XMMATRIX TransformMatrix(transform const& transform)
   {
     switch (transform.type) {
     case transform_type::TRANSLATE:
-      return XMMatrixTranslationFromVector(XMLoadFloat3((XMFLOAT3 *)&transform.translate.x));
+      return XMMatrixTranslationFromVector(transform.translate);
     case transform_type::ROTATE:
-      return XMMatrixRotationNormal(XMLoadFloat3((XMFLOAT3 *)&transform.rotate.x),
-                                    XMConvertToRadians(transform.rotate.w));
+      return XMMatrixRotationNormal(transform.rotate,
+                                    XMConvertToRadians(XMVectorGetW(transform.rotate)));
     case transform_type::SCALE:
-      return XMMatrixScalingFromVector(XMLoadFloat3((XMFLOAT3 *)&transform.scale.x));
+      return XMMatrixScalingFromVector(transform.scale);
     default:
       assert(false);
       break;
@@ -274,9 +347,8 @@ namespace collada_scene {
     }
   }
 
-  void RenderGeometries(scene_state const& state,
-                        instance_geometry const * const instance_geometries,
-                        int const instance_geometries_count)
+  void scene_state::render_geometries(instance_geometry const * const instance_geometries,
+                                      int const instance_geometries_count)
   {
     for (int i = 0; i < instance_geometries_count; i++) {
       instance_geometry const &instance_geometry = instance_geometries[i];
@@ -284,8 +356,8 @@ namespace collada_scene {
 
       UINT strides[1] = { 3 * 3 * 4 };
       UINT offsets[1] = { (UINT)mesh.vertex_buffer_offset };
-      g_pd3dDevice->IASetVertexBuffers(0, state.numBuffers, state.pVertexBuffers, strides, offsets);
-      g_pd3dDevice->IASetIndexBuffer(state.pIndexBuffer, DXGI_FORMAT_R32_UINT, mesh.index_buffer_offset);
+      g_pd3dDevice->IASetVertexBuffers(0, m_numBuffers, m_pVertexBuffers, strides, offsets);
+      g_pd3dDevice->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, mesh.index_buffer_offset);
 
       D3D10_TECHNIQUE_DESC techDesc;
       g_pTechniqueBlinn->GetDesc(&techDesc);
@@ -296,33 +368,34 @@ namespace collada_scene {
         SetMaterial(*instance_material.material->effect);
 
         g_pTechniqueBlinn->GetPassByIndex(0)->Apply(0);
-        g_pd3dDevice->IASetInputLayout(state.pVertexLayouts[triangles.inputs_index]);
+        g_pd3dDevice->IASetInputLayout(m_pVertexLayouts[triangles.inputs_index]);
         g_pd3dDevice->DrawIndexed(triangles.count * 3, triangles.index_offset, 0);
       }
     }
   }
 
-  void Render(descriptor const& descriptor, scene_state const& state)
+  void scene_state::render()
   {
     g_pViewVariable->SetMatrix((float *)&g_View);
     g_pProjectionVariable->SetMatrix((float *)&g_Projection);
 
     g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    for (int i = 0; i < descriptor.nodes_count; i++) {
-      node const& node = *descriptor.nodes[i];
+    for (int i = 0; i < m_descriptor->nodes_count; i++) {
+      node const& node = *m_descriptor->nodes[i];
+      assert(node.nodes_count == 0);
       if (node.type != node_type::NODE)
         continue;
 
+      node_instance const& node_instance = m_nodeInstances[i];
       XMMATRIX World = XMMatrixIdentity();
       // build the world transform
       for (int j = 0; j < node.transforms_count; j++) {
-        transform const& transform = node.transforms[j];
-        World = transform_matrix(transform) * World;
+        World = TransformMatrix(node_instance.transforms[j]) * World;
       }
       g_pWorldVariable->SetMatrix((float *)&World);
 
-      RenderGeometries(state, node.instance_geometries, node.instance_geometries_count);
+      render_geometries(node.instance_geometries, node.instance_geometries_count);
     }
   }
 }
