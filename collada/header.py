@@ -525,7 +525,10 @@ def render_array(state, collada, accessor, array):
         it = iter(array.floats)
         for i in range(accessor.count):
             vector = ", ".join(f"{float(f)}f" for f in islice(it, accessor.stride))
-            yield f"{{ {vector} }},"
+            if accessor.stride == 1:
+                yield f"{vector},"
+            else:
+                yield f"{{ {vector} }},"
         yield "};"
     else:
         assert False, type(array)

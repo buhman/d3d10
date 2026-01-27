@@ -24,6 +24,7 @@ namespace collada_scene {
 
   struct node_instance {
     transform * transforms = NULL;
+    XMMATRIX world;
   };
 
   struct scene_state {
@@ -41,7 +42,7 @@ namespace collada_scene {
     collada::descriptor const * m_descriptor;
 
     HRESULT load_scene(collada::descriptor const * const descriptor);
-    void render();
+    void render(float t);
 
   private:
     HRESULT load_layouts();
@@ -51,6 +52,7 @@ namespace collada_scene {
 
     void render_geometries(collada::instance_geometry const * const instance_geometries,
                            int const instance_geometries_count);
+    void node_world_transform(collada::node const& node, node_instance& node_instance);
   };
 
   HRESULT LoadEffect();

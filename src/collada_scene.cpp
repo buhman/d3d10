@@ -287,26 +287,26 @@ namespace collada_scene {
   {
     switch (effect.type) {
     case effect_type::BLINN:
-      g_pEmissionVariable->SetFloatVector((float *)&effect.blinn.emission.color.x);
-      g_pAmbientVariable->SetFloatVector((float *)&effect.blinn.ambient.color.x);
-      g_pDiffuseVariable->SetFloatVector((float *)&effect.blinn.diffuse.color.x);
-      g_pSpecularVariable->SetFloatVector((float *)&effect.blinn.specular.color.x);
+      g_pEmissionVariable->SetFloatVector((float *)&effect.blinn.emission.color);
+      g_pAmbientVariable->SetFloatVector((float *)&effect.blinn.ambient.color);
+      g_pDiffuseVariable->SetFloatVector((float *)&effect.blinn.diffuse.color);
+      g_pSpecularVariable->SetFloatVector((float *)&effect.blinn.specular.color);
       g_pShininessVariable->SetFloat(effect.blinn.shininess);
       break;
     case effect_type::LAMBERT:
-      g_pEmissionVariable->SetFloatVector((float *)&effect.lambert.emission.color.x);
-      g_pAmbientVariable->SetFloatVector((float *)&effect.lambert.ambient.color.x);
-      g_pDiffuseVariable->SetFloatVector((float *)&effect.lambert.diffuse.color.x);
+      g_pEmissionVariable->SetFloatVector((float *)&effect.lambert.emission.color);
+      g_pAmbientVariable->SetFloatVector((float *)&effect.lambert.ambient.color);
+      g_pDiffuseVariable->SetFloatVector((float *)&effect.lambert.diffuse.color);
       break;
     case effect_type::PHONG:
-      g_pEmissionVariable->SetFloatVector((float *)&effect.phong.emission.color.x);
-      g_pAmbientVariable->SetFloatVector((float *)&effect.phong.ambient.color.x);
-      g_pDiffuseVariable->SetFloatVector((float *)&effect.phong.diffuse.color.x);
-      g_pSpecularVariable->SetFloatVector((float *)&effect.phong.specular.color.x);
+      g_pEmissionVariable->SetFloatVector((float *)&effect.phong.emission.color);
+      g_pAmbientVariable->SetFloatVector((float *)&effect.phong.ambient.color);
+      g_pDiffuseVariable->SetFloatVector((float *)&effect.phong.diffuse.color);
+      g_pSpecularVariable->SetFloatVector((float *)&effect.phong.specular.color);
       g_pShininessVariable->SetFloat(effect.phong.shininess);
       break;
     case effect_type::CONSTANT:
-      g_pEmissionVariable->SetFloatVector((float *)&effect.constant.color.x);
+      g_pEmissionVariable->SetFloatVector((float *)&effect.constant.color);
       break;
     default:
       break;
@@ -340,25 +340,101 @@ namespace collada_scene {
     }
   }
 
-  void scene_state::render()
+  static inline float fract(float f)
+  {
+    return f - floorf(f);
+  }
+
+  static inline float loop(float f, float n)
+  {
+    return fract(f / n) * n;
+  }
+
+  static inline int find_frame_ix(source const& source, float t)
+  {
+    for (int i = 0; i < source.count - 1; i++) {
+      if (source.float_array[i] <= t && source.float_array[i+1] > t) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  static inline float interpolation_value(source const& source, int ix, float t)
+  {
+    float prev = source.float_array[ix];
+    float next = source.float_array[ix+1];
+    return (t - prev) / (next - prev);
+  }
+
+  static inline float linear_interpolate(source const& source, int ix, float iv)
+  {
+    float prev = source.float_array[ix];
+    float next = source.float_array[ix+1];
+    return prev + iv * (next - prev);
+  }
+
+  static void animate_node(node const& node, node_instance& node_instance, float t)
+  {
+    for (int i = 0; i < node.channels_count; i++) {
+      channel const& channel = *node.channels[i];
+      transform& transform = node_instance.transforms[channel.target_transform_index];
+
+      int frame_ix = find_frame_ix(channel.source_sampler->input, t);
+      if (frame_ix < 0)
+        continue; // animation is missing a key frame
+
+      float iv = interpolation_value(channel.source_sampler->input, frame_ix, t);
+      float value = linear_interpolate(channel.source_sampler->output, frame_ix, iv);
+      switch (transform.type) {
+      case transform_type::TRANSLATE:
+        switch (channel.target_attribute) {
+        case target_attribute::X: transform.translate = XMVectorSetX(transform.translate, value); break;
+        case target_attribute::Y: transform.translate = XMVectorSetY(transform.translate, value); break;
+        case target_attribute::Z: transform.translate = XMVectorSetZ(transform.translate, value); break;
+        default: break;
+        }
+        break;
+      default:
+        break;
+      }
+    }
+  }
+
+  void scene_state::node_world_transform(node const& node, node_instance& node_instance)
+  {
+    // build the node's world transform matrix
+    if (node.parent_index >= 0)
+      node_instance.world = m_nodeInstances[node.parent_index].world;
+    else
+      node_instance.world = XMMatrixIdentity();
+
+    for (int j = 0; j < node.transforms_count; j++) {
+      node_instance.world = TransformMatrix(node_instance.transforms[j]) * node_instance.world;
+    }
+  }
+
+  void scene_state::render(float t)
   {
     g_pViewVariable->SetMatrix((float *)&g_View);
     g_pProjectionVariable->SetMatrix((float *)&g_Projection);
 
     g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+    t = loop(t / 2.0f, 3.333333f);
+
     for (int i = 0; i < m_descriptor->nodes_count; i++) {
       node const& node = *m_descriptor->nodes[i];
+      node_instance& node_instance = m_nodeInstances[i];
+
+      animate_node(node, node_instance, t);
+      node_world_transform(node, node_instance);
+
+      g_pWorldVariable->SetMatrix((float *)&node_instance.world);
+
+      // joints aren't rendered
       if (node.type != node_type::NODE)
         continue;
-
-      node_instance const& node_instance = m_nodeInstances[i];
-      XMMATRIX World = XMMatrixIdentity();
-      // build the world transform
-      for (int j = 0; j < node.transforms_count; j++) {
-        World = TransformMatrix(node_instance.transforms[j]) * World;
-      }
-      g_pWorldVariable->SetMatrix((float *)&World);
 
       render_geometries(node.instance_geometries, node.instance_geometries_count);
     }

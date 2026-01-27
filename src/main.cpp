@@ -1843,7 +1843,7 @@ void Render(float t, float dt)
 
   //collada::Render(t);
 
-  g_SceneState.render();
+  g_SceneState.render(t);
 
   RenderFont(dt);
 

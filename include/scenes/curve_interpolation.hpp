@@ -5,17 +5,17 @@ namespace curve_interpolation {
 using namespace collada;
 
 float const array_node_cube_translation_x_input_array[] = {
-  { 0.0f },
-  { 1.666667f },
-  { 3.333333f },
-  { 5.0f },
+  0.0f,
+  1.666667f,
+  3.333333f,
+  5.0f,
 };
 
 float const array_node_cube_translation_x_output_array[] = {
-  { 10.0f },
-  { -10.0f },
-  { 10.0f },
-  { -10.0f },
+  10.0f,
+  -10.0f,
+  10.0f,
+  -10.0f,
 };
 
 float2 const array_node_cube_translation_x_intangent_array[] = {
@@ -68,17 +68,17 @@ sampler const sampler_node_cube_translation_x_sampler = {
 };
 
 float const array_node_cube_translation_y_input_array[] = {
-  { -0.8333334f },
-  { 0.8333334f },
-  { 2.5f },
-  { 4.166667f },
+  -0.8333334f,
+  0.8333334f,
+  2.5f,
+  4.166667f,
 };
 
 float const array_node_cube_translation_y_output_array[] = {
-  { -10.05776f },
-  { 10.05852f },
-  { -9.941484f },
-  { 10.05852f },
+  -10.05776f,
+  10.05852f,
+  -9.941484f,
+  10.05852f,
 };
 
 float2 const array_node_cube_translation_y_intangent_array[] = {
@@ -519,6 +519,8 @@ instance_geometry const instance_geometries_node_environmentambientlight[] = {
 channel const * const node_channels_node_environmentambientlight[] = {};
 
 node const node_node_environmentambientlight = {
+  .parent_index = -1,
+
   .type = node_type::NODE,
 
   .transforms = transforms_node_environmentambientlight,
@@ -574,11 +576,13 @@ instance_geometry const instance_geometries_node_cube[] = {
 };
 
 channel const * const node_channels_node_cube[] = {
-  &node_channel_node_cube_translation_x,
   &node_channel_node_cube_translation_y,
+  &node_channel_node_cube_translation_x,
 };
 
 node const node_node_cube = {
+  .parent_index = -1,
+
   .type = node_type::NODE,
 
   .transforms = transforms_node_cube,
@@ -613,6 +617,8 @@ channel const * const node_channels_node_cylinder001[] = {
 };
 
 node const node_node_cylinder001 = {
+  .parent_index = -1,
+
   .type = node_type::NODE,
 
   .transforms = transforms_node_cylinder001,
@@ -655,6 +661,8 @@ channel const * const node_channels_node_plane001[] = {
 };
 
 node const node_node_plane001 = {
+  .parent_index = -1,
+
   .type = node_type::NODE,
 
   .transforms = transforms_node_plane001,
