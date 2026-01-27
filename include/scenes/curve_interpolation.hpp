@@ -132,13 +132,13 @@ sampler const sampler_node_cube_translation_y_sampler = {
 
 channel const node_channel_node_cube_translation_x = {
   .source_sampler = &sampler_node_cube_translation_x_sampler,
-  .target_transform_type = transform_type::TRANSLATE,
+  .target_transform_index = 0,
   .target_attribute = target_attribute::X,
 };
 
 channel const node_channel_node_cube_translation_y = {
   .source_sampler = &sampler_node_cube_translation_y_sampler,
-  .target_transform_type = transform_type::TRANSLATE,
+  .target_transform_index = 0,
   .target_attribute = target_attribute::Y,
 };
 
@@ -543,7 +543,7 @@ node const * const node_children_node_cube = {
 transform const transforms_node_cube[] = {
   {
     .type = transform_type::TRANSLATE,
-    .translate = {10.0f, 0.0f, 0.0f},
+    .translate = {10.0f, -1.14258e-07f, 0.0f},
   },
 };
 
@@ -551,6 +551,10 @@ instance_material const instance_materials_node_cube_0[] = {
   {
     .element_index = 1, // an index into mesh.triangles
     .material = &material_material__15_material,
+  },
+  {
+    .element_index = 0, // an index into mesh.triangles
+    .material = &material_material__16_material,
   },
   {
     .element_index = 5, // an index into mesh.triangles
@@ -563,10 +567,6 @@ instance_material const instance_materials_node_cube_0[] = {
   {
     .element_index = 2, // an index into mesh.triangles
     .material = &material_material__19_material,
-  },
-  {
-    .element_index = 0, // an index into mesh.triangles
-    .material = &material_material__16_material,
   },
   {
     .element_index = 4, // an index into mesh.triangles
@@ -583,8 +583,8 @@ instance_geometry const instance_geometries_node_cube[] = {
 };
 
 channel const * const node_channels_node_cube[] = {
-  &node_channel_node_cube_translation_x,
   &node_channel_node_cube_translation_y,
+  &node_channel_node_cube_translation_x,
 };
 
 node const node_node_cube = {

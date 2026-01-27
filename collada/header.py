@@ -549,15 +549,20 @@ target_attributes = {
     "A", "ANGLE", "B", "G", "P", "Q", "R", "S", "T", "TIME", "U", "V", "W", "X", "Y", "Z"
 }
 
-def render_transform_type(transformation_element):
-    return {
-        types.Lookat: "LOOKAT",
-        types.Matrix: "MATRIX",
-        types.Rotate: "ROTATE",
-        types.Scale: "SCALE",
-        types.Skew: "SKEW",
-        types.Translate: "TRANSLATE",
-    }[type(transformation_element)]
+def find_transform_index_in_node(node, transform):
+    for i, node_transform in enumerate(node.transformation_elements):
+        if node_transform is transform:
+            return i
+    assert False, (node, transform)
+
+def transform_sid_lookup(node, sid):
+    transform_types = {
+        types.Lookat, types.Matrix, types.Rotate,
+        types.Scale, types.Skew, types.Translate
+    }
+    transform = node.sid_lookup[sid]
+    assert type(transform) in transform_types, transform
+    return transform
 
 def render_channel(state, collada, channel):
     sampler = collada.lookup(channel.source, types.Sampler)
@@ -574,7 +579,9 @@ def render_channel(state, collada, channel):
     node = collada.lookup(f"#{node_id}", types.Node)
     node_name_id = get_node_name_id(node)
     node_name = sanitize_name(state, node_name_id, node)
-    transformation_element = node.sid_lookup[node_transform_sid]
+
+    transform = transform_sid_lookup(node, node_transform_sid)
+    transform_index = find_transform_index_in_node(node, transform)
 
     target_name = sanitize_name(state, channel.target, channel, allow_slash=True)
     assert target_name not in state.node_animation_channels[node.id]
@@ -582,7 +589,7 @@ def render_channel(state, collada, channel):
 
     yield f"channel const node_channel_{target_name} = {{"
     yield f".source_sampler = &sampler_{sampler_name},"
-    yield f".target_transform_type = transform_type::{render_transform_type(transformation_element)},"
+    yield f".target_transform_index = {transform_index},"
     yield f".target_attribute = target_attribute::{target_attribute},"
     yield "};"
 

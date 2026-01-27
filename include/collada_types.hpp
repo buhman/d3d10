@@ -257,7 +257,7 @@ namespace collada {
   struct channel {
     sampler const * const source_sampler;
     int const target_node_index; // an index into the nodes array
-    transform_type const target_transform_type;
+    int const target_transform_index;
     target_attribute const target_attribute;
   };
 
