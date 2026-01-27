@@ -9,6 +9,15 @@ cbuffer cbMultiplePerFrame
   matrix World;
 };
 
+cbuffer cbPerMaterial
+{
+  float4 Emission;
+  float4 Ambient;
+  float4 Diffuse;
+  float4 Specular;
+  float Shininess;
+};
+
 struct VS_INPUT
 {
   float3 Pos : POSITION;
@@ -39,8 +48,12 @@ PS_INPUT VS(VS_INPUT input)
 
 float4 PS(PS_INPUT input) : SV_Target
 {
+  float4 color = Emission + Diffuse * 1.0 + Specular * 0.0;
+
+  return float4(color.xyz, 1);
+
   //return float4(input.Normal * 0.5 + 0.5, 1);
-  return float4(input.Tex.xy, 0, 1);
+  //return float4(input.Tex.xy, 0, 1);
 }
 
 BlendState DisableBlending

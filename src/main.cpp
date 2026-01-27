@@ -1821,7 +1821,7 @@ void Render(float t, float dt)
   g_pd3dDevice->ClearDepthStencilView(g_pDepthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
 
   // render
-  RenderModel(t);
+  //RenderModel(t);
 
   const float ClearColorZero[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
   ID3D10RenderTargetView * RenderTargets[] = {
@@ -1830,18 +1830,18 @@ void Render(float t, float dt)
   };
   g_pd3dDevice->OMSetRenderTargets(2, RenderTargets, g_pDepthStencilView);
   g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetViewTexture[0], ClearColorZero);
-  RenderMeshStatic(cube::node_0.mesh, t);
+  //RenderMeshStatic(cube::node_0.mesh, t);
 
   //RenderBloom();
   //print("%f\n", t);
   //RenderVolume(t);
   //RenderVolumeMesh();
 
-  RenderFont(dt);
-
   //collada::Render(t);
 
   collada_scene::Render(curve_interpolation::descriptor, g_SceneState);
+
+  RenderFont(dt);
 
   // present
   g_pSwapChain->Present(0, 0);

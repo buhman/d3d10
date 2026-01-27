@@ -21,6 +21,12 @@ namespace collada_scene {
   ID3D10EffectMatrixVariable * g_pViewVariable = NULL;
   ID3D10EffectMatrixVariable * g_pProjectionVariable = NULL;
 
+  ID3D10EffectVectorVariable * g_pEmissionVariable = NULL;
+  ID3D10EffectVectorVariable * g_pAmbientVariable = NULL;
+  ID3D10EffectVectorVariable * g_pDiffuseVariable = NULL;
+  ID3D10EffectVectorVariable * g_pSpecularVariable = NULL;
+  ID3D10EffectScalarVariable * g_pShininessVariable = NULL;
+
   static inline DXGI_FORMAT dxgi_format(input_format format)
   {
     switch (format) {
@@ -90,7 +96,7 @@ namespace collada_scene {
 
     bd.Usage = D3D10_USAGE_IMMUTABLE;
     bd.ByteWidth = dwResSize;
-    bd.BindFlags = D3D10_BIND_VERTEX_BUFFER;
+    bd.BindFlags = D3D10_BIND_INDEX_BUFFER;
     bd.CPUAccessFlags = 0;
     bd.MiscFlags = 0;
     initData.pSysMem = pData;
@@ -188,6 +194,12 @@ namespace collada_scene {
     g_pViewVariable = g_pEffect->GetVariableByName("View")->AsMatrix();
     g_pProjectionVariable = g_pEffect->GetVariableByName("Projection")->AsMatrix();
 
+    g_pEmissionVariable = g_pEffect->GetVariableByName("Emission")->AsVector();
+    g_pAmbientVariable = g_pEffect->GetVariableByName("Ambient")->AsVector();
+    g_pDiffuseVariable = g_pEffect->GetVariableByName("Diffuse")->AsVector();
+    g_pSpecularVariable = g_pEffect->GetVariableByName("Specular")->AsVector();
+    g_pShininessVariable = g_pEffect->GetVariableByName("Shininess")->AsScalar();
+
     return S_OK;
   }
 
@@ -232,13 +244,42 @@ namespace collada_scene {
     }
   }
 
+  static inline void SetMaterial(effect const& effect)
+  {
+    switch (effect.type) {
+    case effect_type::BLINN:
+      g_pEmissionVariable->SetFloatVector((float *)&effect.blinn.emission.color.x);
+      g_pAmbientVariable->SetFloatVector((float *)&effect.blinn.ambient.color.x);
+      g_pDiffuseVariable->SetFloatVector((float *)&effect.blinn.diffuse.color.x);
+      g_pSpecularVariable->SetFloatVector((float *)&effect.blinn.specular.color.x);
+      g_pShininessVariable->SetFloat(effect.blinn.shininess);
+      break;
+    case effect_type::LAMBERT:
+      g_pEmissionVariable->SetFloatVector((float *)&effect.lambert.emission.color.x);
+      g_pAmbientVariable->SetFloatVector((float *)&effect.lambert.ambient.color.x);
+      g_pDiffuseVariable->SetFloatVector((float *)&effect.lambert.diffuse.color.x);
+      break;
+    case effect_type::PHONG:
+      g_pEmissionVariable->SetFloatVector((float *)&effect.phong.emission.color.x);
+      g_pAmbientVariable->SetFloatVector((float *)&effect.phong.ambient.color.x);
+      g_pDiffuseVariable->SetFloatVector((float *)&effect.phong.diffuse.color.x);
+      g_pSpecularVariable->SetFloatVector((float *)&effect.phong.specular.color.x);
+      g_pShininessVariable->SetFloat(effect.phong.shininess);
+      break;
+    case effect_type::CONSTANT:
+      g_pEmissionVariable->SetFloatVector((float *)&effect.constant.color.x);
+      break;
+    default:
+      break;
+    }
+  }
+
   void RenderGeometries(scene_state const& state,
                         instance_geometry const * const instance_geometries,
                         int const instance_geometries_count)
   {
     for (int i = 0; i < instance_geometries_count; i++) {
       instance_geometry const &instance_geometry = instance_geometries[i];
-
       mesh const& mesh = instance_geometry.geometry->mesh;
 
       UINT strides[1] = { 3 * 3 * 4 };
@@ -249,8 +290,10 @@ namespace collada_scene {
       D3D10_TECHNIQUE_DESC techDesc;
       g_pTechniqueBlinn->GetDesc(&techDesc);
 
-      for (int j = 0; j < mesh.triangles_count; j++) {
-        triangles const& triangles = mesh.triangles[j];
+      for (int j = 0; j < instance_geometry.instance_materials_count; j++) {
+        instance_material const& instance_material = instance_geometry.instance_materials[j];
+        triangles const& triangles = mesh.triangles[instance_material.element_index];
+        SetMaterial(*instance_material.material->effect);
 
         g_pTechniqueBlinn->GetPassByIndex(0)->Apply(0);
         g_pd3dDevice->IASetInputLayout(state.pVertexLayouts[triangles.inputs_index]);

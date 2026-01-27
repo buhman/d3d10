@@ -6,8 +6,8 @@
       <authoring_tool>OpenCOLLADA for 3ds Max;  Version: 1.6;  Revision: 68</authoring_tool>
       <source_data>file:///C:/cygwin/home/bilbo/d3d10/models/curve_interpolation/curve_interpolation.max</source_data>
     </contributor>
-    <created>2026-01-25T13:40:01</created>
-    <modified>2026-01-25T13:40:01</modified>
+    <created>2026-01-26T20:45:12</created>
+    <modified>2026-01-26T20:45:12</modified>
     <unit name="inch" meter="0.0254"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -622,15 +622,15 @@
         <instance_light url="#EnvironmentAmbientLight"/>
       </node>
       <node id="node-Cube" name="Cube">
-        <translate sid="translation">10 0 0</translate>
+        <translate sid="translation">10 -1.14258e-7 0</translate>
         <instance_geometry url="#geom-Cube">
           <bind_material>
             <technique_common>
               <instance_material symbol="Material__15_1" target="#Material__15-material"/>
+              <instance_material symbol="Material__16_1" target="#Material__16-material"/>
               <instance_material symbol="Material__17_1" target="#Material__17-material"/>
               <instance_material symbol="Material__18_1" target="#Material__18-material"/>
               <instance_material symbol="Material__19_1" target="#Material__19-material"/>
-              <instance_material symbol="Material__16_1" target="#Material__16-material"/>
               <instance_material symbol="Material__20_1" target="#Material__20-material"/>
             </technique_common>
           </bind_material>
