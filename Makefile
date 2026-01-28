@@ -50,7 +50,11 @@ SHADERS = \
 	$(BUILD_TYPE)/effect/collada.fxo \
 	$(BUILD_TYPE)/effect/collada_scene.fxo
 
-$(BUILD_TYPE)/%.res: %.rc $(SHADERS)
+BUFFERS = \
+	models/curve_interpolation/curve_interpolation.vtx \
+	models/curve_interpolation/curve_interpolation.idx
+
+$(BUILD_TYPE)/%.res: %.rc $(SHADERS) $(BUFFERS)
 	@mkdir -p $(@D)
 	$(WINDRES) -O coff -I$(BUILD_TYPE)/effect -o $@ $<
 
@@ -67,7 +71,8 @@ OBJS = \
 	$(BUILD_TYPE)/render_state.obj \
 	$(BUILD_TYPE)/input.obj \
 	$(BUILD_TYPE)/collada.obj \
-	$(BUILD_TYPE)/collada_scene.obj
+	$(BUILD_TYPE)/collada_scene.obj \
+	$(BUILD_TYPE)/scenes/curve_interpolation.obj
 
 $(BUILD_TYPE)/d3d10.exe: $(OBJS)
 	@mkdir -p $(@D)

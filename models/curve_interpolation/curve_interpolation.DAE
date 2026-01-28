@@ -6,8 +6,8 @@
       <authoring_tool>OpenCOLLADA for 3ds Max;  Version: 1.6;  Revision: 68</authoring_tool>
       <source_data>file:///C:/cygwin/home/bilbo/d3d10/models/curve_interpolation/curve_interpolation.max</source_data>
     </contributor>
-    <created>2026-01-26T20:45:12</created>
-    <modified>2026-01-26T20:45:12</modified>
+    <created>2026-01-27T22:01:59</created>
+    <modified>2026-01-27T22:01:59</modified>
     <unit name="inch" meter="0.0254"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -348,6 +348,35 @@
         </technique>
       </extra>
     </effect>
+    <effect id="ColorEffectR26G177B26">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <ambient>
+              <color>0.1019608 0.6941176 0.1019608 1</color>
+            </ambient>
+            <diffuse>
+              <color>0.1019608 0.6941176 0.1019608 1</color>
+            </diffuse>
+            <specular>
+              <color>1 1 1 1</color>
+            </specular>
+            <shininess>
+              <float>10</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <transparent>
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
     <effect id="ColorEffectR229G154B215">
       <profile_COMMON>
         <technique sid="common">
@@ -406,13 +435,48 @@
         </technique>
       </profile_COMMON>
     </effect>
+    <effect id="ColorEffectR198G224B87">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <ambient>
+              <color>0.7764706 0.8784314 0.3411765 1</color>
+            </ambient>
+            <diffuse>
+              <color>0.7764706 0.8784314 0.3411765 1</color>
+            </diffuse>
+            <specular>
+              <color>1 1 1 1</color>
+            </specular>
+            <shininess>
+              <float>10</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <transparent>
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
   </library_effects>
   <library_materials>
+    <material id="ColorEffectR26G177B26-material" name="ColorEffectR26G177B26-material">
+      <instance_effect url="#ColorEffectR26G177B26"/>
+    </material>
     <material id="ColorEffectR229G154B215-material" name="ColorEffectR229G154B215-material">
       <instance_effect url="#ColorEffectR229G154B215"/>
     </material>
     <material id="ColorEffectR28G149B177-material" name="ColorEffectR28G149B177-material">
       <instance_effect url="#ColorEffectR28G149B177"/>
+    </material>
+    <material id="ColorEffectR198G224B87-material" name="ColorEffectR198G224B87-material">
+      <instance_effect url="#ColorEffectR198G224B87"/>
     </material>
     <material id="Material__15-material" name="Material__15">
       <instance_effect url="#Material__15"/>
@@ -506,6 +570,66 @@
           <p>2 20 20 0 21 21 4 22 23 4 22 23 6 23 22 2 20 20</p>
         </triangles>
       </mesh>
+    </geometry>
+    <geometry id="geom-Torus001" name="Torus001">
+      <mesh>
+        <source id="geom-Torus001-positions">
+          <float_array id="geom-Torus001-positions-array" count="360">-1.09278e-7 2.5 0 -1.0635e-7 2.433013 0.25 -9.83506e-8 2.25 0.4330127 -8.74228e-8 2 0.5 -7.64949e-8 1.75 0.4330127 -6.84952e-8 1.566987 0.25 -6.55671e-8 1.5 7.54979e-8 -6.84952e-8 1.566987 -0.2499999 -7.64949e-8 1.75 -0.4330126 -8.74228e-8 2 -0.5 -9.83506e-8 2.25 -0.4330128 -1.0635e-7 2.433012 -0.2500003 1.469463 2.022542 0 1.430089 1.968349 0.25 1.322517 1.820288 0.4330127 1.17557 1.618034 0.5 1.028624 1.41578 0.4330127 0.921052 1.267719 0.25 0.8816779 1.213526 7.54979e-8 0.921052 1.267719 -0.2499999 1.028624 1.41578 -0.4330126 1.17557 1.618034 -0.5 1.322517 1.820288 -0.4330128 1.430089 1.968349 -0.2500003 2.377641 0.7725425 0 2.313933 0.7518423 0.25 2.139877 0.6952882 0.4330127 1.902113 0.618034 0.5 1.664349 0.5407798 0.4330127 1.490294 0.4842257 0.25 1.426585 0.4635255 7.54979e-8 1.490294 0.4842257 -0.2499999 1.664349 0.5407797 -0.4330126 1.902113 0.6180339 -0.5 2.139877 0.6952882 -0.4330128 2.313932 0.7518422 -0.2500003 2.377641 -0.7725425 0 2.313933 -0.7518423 0.25 2.139877 -0.6952882 0.4330127 1.902113 -0.618034 0.5 1.664349 -0.5407798 0.4330127 1.490294 -0.4842257 0.25 1.426585 -0.4635255 7.54979e-8 1.490294 -0.4842257 -0.2499999 1.664349 -0.5407797 -0.4330126 1.902113 -0.6180339 -0.5 2.139877 -0.6952882 -0.4330128 2.313932 -0.7518422 -0.2500003 1.469463 -2.022542 0 1.430089 -1.968349 0.25 1.322517 -1.820288 0.4330127 1.17557 -1.618034 0.5 1.028624 -1.41578 0.4330127 0.921052 -1.267719 0.25 0.8816779 -1.213526 7.54979e-8 0.921052 -1.267719 -0.2499999 1.028624 -1.41578 -0.4330126 1.17557 -1.618034 -0.5 1.322517 -1.820288 -0.4330128 1.430089 -1.968349 -0.2500003 -1.09278e-7 -2.5 0 -1.0635e-7 -2.433013 0.25 -9.83506e-8 -2.25 0.4330127 -8.74228e-8 -2 0.5 -7.64949e-8 -1.75 0.4330127 -6.84952e-8 -1.566987 0.25 -6.55671e-8 -1.5 7.54979e-8 -6.84952e-8 -1.566987 -0.2499999 -7.64949e-8 -1.75 -0.4330126 -8.74228e-8 -2 -0.5 -9.83506e-8 -2.25 -0.4330128 -1.0635e-7 -2.433012 -0.2500003 -1.469463 -2.022542 0 -1.430089 -1.968349 0.25 -1.322517 -1.820288 0.4330127 -1.17557 -1.618034 0.5 -1.028624 -1.41578 0.4330127 -0.9210519 -1.267719 0.25 -0.8816777 -1.213526 7.54979e-8 -0.9210519 -1.267719 -0.2499999 -1.028624 -1.41578 -0.4330126 -1.17557 -1.618034 -0.5 -1.322517 -1.820288 -0.4330128 -1.430089 -1.968349 -0.2500003 -2.377641 -0.7725426 0 -2.313932 -0.7518424 0.25 -2.139877 -0.6952883 0.4330127 -1.902113 -0.6180341 0.5 -1.664349 -0.5407798 0.4330127 -1.490293 -0.4842257 0.25 -1.426585 -0.4635255 7.54979e-8 -1.490293 -0.4842257 -0.2499999 -1.664349 -0.5407798 -0.4330126 -1.902113 -0.618034 -0.5 -2.139877 -0.6952882 -0.4330128 -2.313932 -0.7518423 -0.2500003 -2.377641 0.7725424 0 -2.313933 0.7518422 0.25 -2.139877 0.6952882 0.4330127 -1.902113 0.6180339 0.5 -1.664349 0.5407797 0.4330127 -1.490294 0.4842257 0.25 -1.426585 0.4635255 7.54979e-8 -1.490294 0.4842257 -0.2499999 -1.664349 0.5407797 -0.4330126 -1.902113 0.6180339 -0.5 -2.139877 0.6952881 -0.4330128 -2.313932 0.7518421 -0.2500003 -1.469464 2.022542 0 -1.430089 1.968348 0.25 -1.322517 1.820288 0.4330127 -1.175571 1.618034 0.5 -1.028625 1.415779 0.4330127 -0.9210523 1.267719 0.25 -0.8816781 1.213525 7.54979e-8 -0.9210523 1.267719 -0.2499999 -1.028624 1.415779 -0.4330126 -1.175571 1.618033 -0.5 -1.322517 1.820288 -0.4330128 -1.430089 1.968348 -0.2500003</float_array>
+          <technique_common>
+            <accessor source="#geom-Torus001-positions-array" count="120" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Torus001-normals">
+          <float_array id="geom-Torus001-normals-array" count="360">-1.39645e-7 1 -2.71833e-7 0.5159397 0.71013 0.4790842 0.5877851 0.809017 -1.46424e-7 -1.12014e-7 0.8777689 0.4790842 0.3154685 0.4342053 0.8437685 -9.73266e-8 0.5367071 0.8437687 0.03035063 0.04177406 0.9986659 -1.35335e-8 0.05163556 0.9986659 -0.2699911 -0.3716109 0.8882624 4.84062e-8 -0.4593363 0.8882624 -0.5008137 -0.6893111 0.5234843 1.02225e-7 -0.8520353 0.5234844 -0.5877852 -0.809017 1.46912e-8 1.32221e-7 -0.9999999 4.89707e-9 -0.5008138 -0.6893111 -0.5234841 9.24895e-8 -0.8520354 -0.5234841 -0.2699913 -0.3716112 -0.8882623 5.80874e-8 -0.4593366 -0.8882622 0.03035033 0.04177367 -0.998666 -2.46063e-8 0.05163517 -0.998666 0.3154682 0.4342048 -0.8437689 -8.70817e-8 0.5367067 -0.8437688 0.5159394 0.7101299 -0.4790846 -1.22682e-7 0.8777687 -0.4790847 0.8348078 0.2712456 0.4790843 0.9510565 0.3090169 -2.65732e-7 0.5104388 0.1658516 0.8437687 0.04910826 0.01595625 0.998666 -0.4368547 -0.1419427 0.8882625 -0.8103337 -0.2632934 0.5234844 -0.9510565 -0.309017 -9.79413e-9 -0.8103338 -0.2632935 -0.5234841 -0.4368552 -0.1419429 -0.8882623 0.04910788 0.01595613 -0.998666 0.5104386 0.1658515 -0.8437688 0.8348075 0.2712454 -0.4790847 0.8348078 -0.2712456 0.4790842 0.9510565 -0.309017 -3.52501e-7 0.5104389 -0.1658516 0.8437686 0.04910832 -0.01595627 0.9986659 -0.4368547 0.1419427 0.8882625 -0.8103337 0.2632934 0.5234844 -0.9510565 0.309017 2.44853e-8 -0.8103338 0.2632934 -0.5234841 -0.4368552 0.1419429 -0.8882623 0.04910788 -0.01595613 -0.998666 0.5104385 -0.1658515 -0.8437688 0.8348076 -0.2712455 -0.4790847 0.5159396 -0.7101301 0.4790841 0.5877853 -0.809017 -2.11501e-7 0.3154684 -0.4342052 0.8437686 0.03035063 -0.04177404 0.998666 -0.2699911 0.3716109 0.8882624 -0.5008137 0.6893111 0.5234843 -0.5877852 0.809017 9.79413e-9 -0.5008138 0.6893111 -0.5234841 -0.2699913 0.3716112 -0.8882622 0.03035034 -0.04177368 -0.998666 0.3154682 -0.4342048 -0.8437689 0.5159395 -0.7101298 -0.4790846 -6.40082e-8 -0.8777689 0.4790843 -7.59233e-8 -1 -2.38616e-7 -2.3051e-8 -0.536707 0.8437687 2.46063e-9 -0.05163559 0.998666 2.90437e-8 0.4593363 0.8882624 1.46036e-8 0.8520353 0.5234843 9.79413e-9 0.9999999 2.93824e-8 3.40751e-8 0.8520354 -0.5234841 1.69422e-8 0.4593367 -0.8882622 -2.46063e-9 -0.05163516 -0.998666 -3.07347e-8 -0.5367067 -0.8437688 -3.73381e-8 -0.8777686 -0.4790848 -0.5159397 -0.7101299 0.4790842 -0.5877852 -0.8090169 -2.54885e-7 -0.3154685 -0.4342053 0.8437686 -0.03035061 -0.04177405 0.9986659 0.2699912 0.3716109 0.8882624 0.5008138 0.689311 0.5234843 0.5877852 0.8090171 2.93824e-8 0.5008138 0.6893111 -0.5234842 0.2699913 0.3716112 -0.8882622 -0.03035032 -0.04177361 -0.998666 -0.3154683 -0.4342048 -0.8437689 -0.5159395 -0.7101299 -0.4790846 -0.8348078 -0.2712456 0.4790843 -0.9510564 -0.309017 -3.03693e-7 -0.5104389 -0.1658517 0.8437685 -0.04910835 -0.01595627 0.998666 0.4368547 0.1419428 0.8882624 0.8103337 0.2632934 0.5234843 0.9510565 0.3090171 9.79413e-9 0.8103338 0.2632935 -0.5234842 0.4368551 0.1419429 -0.8882622 -0.04910791 -0.01595615 -0.9986661 -0.5104385 -0.1658516 -0.8437688 -0.8348075 -0.2712456 -0.4790848 -0.8348079 0.2712454 0.4790843 -0.9510565 0.3090169 -3.36232e-7 -0.5104389 0.1658516 0.8437685 -0.04910829 0.01595625 0.998666 0.4368548 -0.1419427 0.8882625 0.8103337 -0.2632933 0.5234843 0.9510565 -0.3090169 3.91765e-8 0.8103339 -0.2632934 -0.5234841 0.4368552 -0.1419428 -0.8882623 -0.04910788 0.01595612 -0.998666 -0.5104386 0.1658515 -0.8437688 -0.8348076 0.2712454 -0.4790848 -0.5159396 0.71013 0.4790843 -0.5877853 0.8090169 -2.71155e-7 -0.3154685 0.434205 0.8437687 -0.03035063 0.04177407 0.998666 0.2699911 -0.3716108 0.8882625 0.5008138 -0.6893109 0.5234844 0.5877853 -0.8090169 1.46912e-8 0.500814 -0.6893111 -0.5234841 0.2699914 -0.3716112 -0.8882623 -0.03035034 0.04177367 -0.998666 -0.3154683 0.4342048 -0.8437688 -0.5159395 0.7101298 -0.4790846</float_array>
+          <technique_common>
+            <accessor source="#geom-Torus001-normals-array" count="120" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Torus001-map1">
+          <float_array id="geom-Torus001-map1-array" count="429">0 0 0 0.08333334 0 0 0.1666667 0 0 0.25 0 0 0.3333333 0 0 0.4166667 0 0 0.5 0 0 0.5833333 0 0 0.6666667 0 0 0.75 0 0 0.8333333 0 0 0.9166667 0 0 1 0 0 0 0.1 0 0.08333334 0.1 0 0.1666667 0.1 0 0.25 0.1 0 0.3333333 0.1 0 0.4166667 0.1 0 0.5 0.1 0 0.5833333 0.1 0 0.6666667 0.1 0 0.75 0.1 0 0.8333333 0.1 0 0.9166667 0.1 0 1 0.1 0 0 0.2 0 0.08333334 0.2 0 0.1666667 0.2 0 0.25 0.2 0 0.3333333 0.2 0 0.4166667 0.2 0 0.5 0.2 0 0.5833333 0.2 0 0.6666667 0.2 0 0.75 0.2 0 0.8333333 0.2 0 0.9166667 0.2 0 1 0.2 0 0 0.3 0 0.08333334 0.3 0 0.1666667 0.3 0 0.25 0.3 0 0.3333333 0.3 0 0.4166667 0.3 0 0.5 0.3 0 0.5833333 0.3 0 0.6666667 0.3 0 0.75 0.3 0 0.8333333 0.3 0 0.9166667 0.3 0 1 0.3 0 0 0.4 0 0.08333334 0.4 0 0.1666667 0.4 0 0.25 0.4 0 0.3333333 0.4 0 0.4166667 0.4 0 0.5 0.4 0 0.5833333 0.4 0 0.6666667 0.4 0 0.75 0.4 0 0.8333333 0.4 0 0.9166667 0.4 0 1 0.4 0 0 0.5 0 0.08333334 0.5 0 0.1666667 0.5 0 0.25 0.5 0 0.3333333 0.5 0 0.4166667 0.5 0 0.5 0.5 0 0.5833333 0.5 0 0.6666667 0.5 0 0.75 0.5 0 0.8333333 0.5 0 0.9166667 0.5 0 1 0.5 0 0 0.6 0 0.08333334 0.6 0 0.1666667 0.6 0 0.25 0.6 0 0.3333333 0.6 0 0.4166667 0.6 0 0.5 0.6 0 0.5833333 0.6 0 0.6666667 0.6 0 0.75 0.6 0 0.8333333 0.6 0 0.9166667 0.6 0 1 0.6 0 0 0.7 0 0.08333334 0.7 0 0.1666667 0.7 0 0.25 0.7 0 0.3333333 0.7 0 0.4166667 0.7 0 0.5 0.7 0 0.5833333 0.7 0 0.6666667 0.7 0 0.75 0.7 0 0.8333333 0.7 0 0.9166667 0.7 0 1 0.7 0 0 0.8 0 0.08333334 0.8 0 0.1666667 0.8 0 0.25 0.8 0 0.3333333 0.8 0 0.4166667 0.8 0 0.5 0.8 0 0.5833333 0.8 0 0.6666667 0.8 0 0.75 0.8 0 0.8333333 0.8 0 0.9166667 0.8 0 1 0.8 0 0 0.9 0 0.08333334 0.9 0 0.1666667 0.9 0 0.25 0.9 0 0.3333333 0.9 0 0.4166667 0.9 0 0.5 0.9 0 0.5833333 0.9 0 0.6666667 0.9 0 0.75 0.9 0 0.8333333 0.9 0 0.9166667 0.9 0 1 0.9 0 0 1 0 0.08333334 1 0 0.1666667 1 0 0.25 1 0 0.3333333 1 0 0.4166667 1 0 0.5 1 0 0.5833333 1 0 0.6666667 1 0 0.75 1 0 0.8333333 1 0 0.9166667 1 0 1 1 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Torus001-map1-array" count="143" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="geom-Torus001-vertices">
+          <input semantic="POSITION" source="#geom-Torus001-positions"/>
+        </vertices>
+        <triangles material="ColorMaterial" count="240">
+          <input semantic="VERTEX" source="#geom-Torus001-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Torus001-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Torus001-map1" offset="2" set="0"/>
+          <p>0 0 0 13 1 14 12 2 13 0 0 0 1 3 1 13 1 14 1 3 1 14 4 15 13 1 14 1 3 1 2 5 2 14 4 15 2 5 2 15 6 16 14 4 15 2 5 2 3 7 3 15 6 16 3 7 3 16 8 17 15 6 16 3 7 3 4 9 4 16 8 17 4 9 4 17 10 18 16 8 17 4 9 4 5 11 5 17 10 18 5 11 5 18 12 19 17 10 18 5 11 5 6 13 6 18 12 19 6 13 6 19 14 20 18 12 19 6 13 6 7 15 7 19 14 20 7 15 7 20 16 21 19 14 20 7 15 7 8 17 8 20 16 21 8 17 8 21 18 22 20 16 21 8 17 8 9 19 9 21 18 22 9 19 9 22 20 23 21 18 22 9 19 9 10 21 10 22 20 23 10 21 10 23 22 24 22 20 23 10 21 10 11 23 11 23 22 24 11 23 11 12 2 25 23 22 24 11 23 11 0 0 12 12 2 25 12 2 13 25 24 27 24 25 26 12 2 13 13 1 14 25 24 27 13 1 14 26 26 28 25 24 27 13 1 14 14 4 15 26 26 28 14 4 15 27 27 29 26 26 28 14 4 15 15 6 16 27 27 29 15 6 16 28 28 30 27 27 29 15 6 16 16 8 17 28 28 30 16 8 17 29 29 31 28 28 30 16 8 17 17 10 18 29 29 31 17 10 18 30 30 32 29 29 31 17 10 18 18 12 19 30 30 32 18 12 19 31 31 33 30 30 32 18 12 19 19 14 20 31 31 33 19 14 20 32 32 34 31 31 33 19 14 20 20 16 21 32 32 34 20 16 21 33 33 35 32 32 34 20 16 21 21 18 22 33 33 35 21 18 22 34 34 36 33 33 35 21 18 22 22 20 23 34 34 36 22 20 23 35 35 37 34 34 36 22 20 23 23 22 24 35 35 37 23 22 24 24 25 38 35 35 37 23 22 24 12 2 25 24 25 38 24 25 26 37 36 40 36 37 39 24 25 26 25 24 27 37 36 40 25 24 27 38 38 41 37 36 40 25 24 27 26 26 28 38 38 41 26 26 28 39 39 42 38 38 41 26 26 28 27 27 29 39 39 42 27 27 29 40 40 43 39 39 42 27 27 29 28 28 30 40 40 43 28 28 30 41 41 44 40 40 43 28 28 30 29 29 31 41 41 44 29 29 31 42 42 45 41 41 44 29 29 31 30 30 32 42 42 45 30 30 32 43 43 46 42 42 45 30 30 32 31 31 33 43 43 46 31 31 33 44 44 47 43 43 46 31 31 33 32 32 34 44 44 47 32 32 34 45 45 48 44 44 47 32 32 34 33 33 35 45 45 48 33 33 35 46 46 49 45 45 48 33 33 35 34 34 36 46 46 49 34 34 36 47 47 50 46 46 49 34 34 36 35 35 37 47 47 50 35 35 37 36 37 51 47 47 50 35 35 37 24 25 38 36 37 51 36 37 39 49 48 53 48 49 52 36 37 39 37 36 40 49 48 53 37 36 40 50 50 54 49 48 53 37 36 40 38 38 41 50 50 54 38 38 41 51 51 55 50 50 54 38 38 41 39 39 42 51 51 55 39 39 42 52 52 56 51 51 55 39 39 42 40 40 43 52 52 56 40 40 43 53 53 57 52 52 56 40 40 43 41 41 44 53 53 57 41 41 44 54 54 58 53 53 57 41 41 44 42 42 45 54 54 58 42 42 45 55 55 59 54 54 58 42 42 45 43 43 46 55 55 59 43 43 46 56 56 60 55 55 59 43 43 46 44 44 47 56 56 60 44 44 47 57 57 61 56 56 60 44 44 47 45 45 48 57 57 61 45 45 48 58 58 62 57 57 61 45 45 48 46 46 49 58 58 62 46 46 49 59 59 63 58 58 62 46 46 49 47 47 50 59 59 63 47 47 50 48 49 64 59 59 63 47 47 50 36 37 51 48 49 64 48 49 52 61 60 66 60 61 65 48 49 52 49 48 53 61 60 66 49 48 53 62 62 67 61 60 66 49 48 53 50 50 54 62 62 67 50 50 54 63 63 68 62 62 67 50 50 54 51 51 55 63 63 68 51 51 55 64 64 69 63 63 68 51 51 55 52 52 56 64 64 69 52 52 56 65 65 70 64 64 69 52 52 56 53 53 57 65 65 70 53 53 57 66 66 71 65 65 70 53 53 57 54 54 58 66 66 71 54 54 58 67 67 72 66 66 71 54 54 58 55 55 59 67 67 72 55 55 59 68 68 73 67 67 72 55 55 59 56 56 60 68 68 73 56 56 60 69 69 74 68 68 73 56 56 60 57 57 61 69 69 74 57 57 61 70 70 75 69 69 74 57 57 61 58 58 62 70 70 75 58 58 62 71 71 76 70 70 75 58 58 62 59 59 63 71 71 76 59 59 63 60 61 77 71 71 76 59 59 63 48 49 64 60 61 77 60 61 65 73 72 79 72 73 78 60 61 65 61 60 66 73 72 79 61 60 66 74 74 80 73 72 79 61 60 66 62 62 67 74 74 80 62 62 67 75 75 81 74 74 80 62 62 67 63 63 68 75 75 81 63 63 68 76 76 82 75 75 81 63 63 68 64 64 69 76 76 82 64 64 69 77 77 83 76 76 82 64 64 69 65 65 70 77 77 83 65 65 70 78 78 84 77 77 83 65 65 70 66 66 71 78 78 84 66 66 71 79 79 85 78 78 84 66 66 71 67 67 72 79 79 85 67 67 72 80 80 86 79 79 85 67 67 72 68 68 73 80 80 86 68 68 73 81 81 87 80 80 86 68 68 73 69 69 74 81 81 87 69 69 74 82 82 88 81 81 87 69 69 74 70 70 75 82 82 88 70 70 75 83 83 89 82 82 88 70 70 75 71 71 76 83 83 89 71 71 76 72 73 90 83 83 89 71 71 76 60 61 77 72 73 90 72 73 78 85 84 92 84 85 91 72 73 78 73 72 79 85 84 92 73 72 79 86 86 93 85 84 92 73 72 79 74 74 80 86 86 93 74 74 80 87 87 94 86 86 93 74 74 80 75 75 81 87 87 94 75 75 81 88 88 95 87 87 94 75 75 81 76 76 82 88 88 95 76 76 82 89 89 96 88 88 95 76 76 82 77 77 83 89 89 96 77 77 83 90 90 97 89 89 96 77 77 83 78 78 84 90 90 97 78 78 84 91 91 98 90 90 97 78 78 84 79 79 85 91 91 98 79 79 85 92 92 99 91 91 98 79 79 85 80 80 86 92 92 99 80 80 86 93 93 100 92 92 99 80 80 86 81 81 87 93 93 100 81 81 87 94 94 101 93 93 100 81 81 87 82 82 88 94 94 101 82 82 88 95 95 102 94 94 101 82 82 88 83 83 89 95 95 102 83 83 89 84 85 103 95 95 102 83 83 89 72 73 90 84 85 103 84 85 91 97 96 105 96 97 104 84 85 91 85 84 92 97 96 105 85 84 92 98 98 106 97 96 105 85 84 92 86 86 93 98 98 106 86 86 93 99 99 107 98 98 106 86 86 93 87 87 94 99 99 107 87 87 94 100 100 108 99 99 107 87 87 94 88 88 95 100 100 108 88 88 95 101 101 109 100 100 108 88 88 95 89 89 96 101 101 109 89 89 96 102 102 110 101 101 109 89 89 96 90 90 97 102 102 110 90 90 97 103 103 111 102 102 110 90 90 97 91 91 98 103 103 111 91 91 98 104 104 112 103 103 111 91 91 98 92 92 99 104 104 112 92 92 99 105 105 113 104 104 112 92 92 99 93 93 100 105 105 113 93 93 100 106 106 114 105 105 113 93 93 100 94 94 101 106 106 114 94 94 101 107 107 115 106 106 114 94 94 101 95 95 102 107 107 115 95 95 102 96 97 116 107 107 115 95 95 102 84 85 103 96 97 116 96 97 104 109 108 118 108 109 117 96 97 104 97 96 105 109 108 118 97 96 105 110 110 119 109 108 118 97 96 105 98 98 106 110 110 119 98 98 106 111 111 120 110 110 119 98 98 106 99 99 107 111 111 120 99 99 107 112 112 121 111 111 120 99 99 107 100 100 108 112 112 121 100 100 108 113 113 122 112 112 121 100 100 108 101 101 109 113 113 122 101 101 109 114 114 123 113 113 122 101 101 109 102 102 110 114 114 123 102 102 110 115 115 124 114 114 123 102 102 110 103 103 111 115 115 124 103 103 111 116 116 125 115 115 124 103 103 111 104 104 112 116 116 125 104 104 112 117 117 126 116 116 125 104 104 112 105 105 113 117 117 126 105 105 113 118 118 127 117 117 126 105 105 113 106 106 114 118 118 127 106 106 114 119 119 128 118 118 127 106 106 114 107 107 115 119 119 128 107 107 115 108 109 129 119 119 128 107 107 115 96 97 116 108 109 129 108 109 117 1 3 131 0 0 130 108 109 117 109 108 118 1 3 131 109 108 118 2 5 132 1 3 131 109 108 118 110 110 119 2 5 132 110 110 119 3 7 133 2 5 132 110 110 119 111 111 120 3 7 133 111 111 120 4 9 134 3 7 133 111 111 120 112 112 121 4 9 134 112 112 121 5 11 135 4 9 134 112 112 121 113 113 122 5 11 135 113 113 122 6 13 136 5 11 135 113 113 122 114 114 123 6 13 136 114 114 123 7 15 137 6 13 136 114 114 123 115 115 124 7 15 137 115 115 124 8 17 138 7 15 137 115 115 124 116 116 125 8 17 138 116 116 125 9 19 139 8 17 138 116 116 125 117 117 126 9 19 139 117 117 126 10 21 140 9 19 139 117 117 126 118 118 127 10 21 140 118 118 127 11 23 141 10 21 140 118 118 127 119 119 128 11 23 141 119 119 128 0 0 142 11 23 141 119 119 128 108 109 129 0 0 142</p>
+        </triangles>
+      </mesh>
+      <extra>
+        <technique profile="OpenCOLLADA3dsMax">
+          <max_torus>
+            <radius1 sid="radius1" type="float">2</radius1>
+            <radius2 sid="radius2" type="float">0.5</radius2>
+            <rotation sid="rotation" type="float">0</rotation>
+            <twist sid="twist" type="float">0</twist>
+            <segments sid="segments" type="int">10</segments>
+            <sides sid="sides" type="int">12</sides>
+            <smooth sid="smooth" type="int">2</smooth>
+            <sliceon sid="sliceon" type="int">0</sliceon>
+            <sliceto sid="sliceto" type="float">0</sliceto>
+            <slicefrom sid="slicefrom" type="float">0</slicefrom>
+            <generateuvs sid="generateuvs" type="int">1</generateuvs>
+          </max_torus>
+        </technique>
+      </extra>
     </geometry>
     <geometry id="geom-Cylinder001" name="Cylinder001">
       <mesh>
@@ -606,6 +730,49 @@
         </technique>
       </extra>
     </geometry>
+    <geometry id="geom-GeoSphere001" name="GeoSphere001">
+      <mesh>
+        <source id="geom-GeoSphere001-positions">
+          <float_array id="geom-GeoSphere001-positions-array" count="78">0 0 1.039281 0.929561 0 0.4647805 0.2872501 0.884065 0.4647805 -0.7520307 0.5463822 0.4647805 -0.7520306 -0.5463823 0.4647805 0.2872503 -0.884065 0.4647805 0.5463822 0 0.8840649 0.1688414 0.5196404 0.8840649 -0.4420325 0.3211554 0.8840649 -0.4420325 -0.3211555 0.8840649 0.1688415 -0.5196403 0.8840649 0.7152236 0.5196404 0.5463822 -0.2731912 0.8407957 0.5463822 -0.884065 -6.664e-8 0.5463822 -0.273191 -0.8407958 0.5463822 0.7152236 -0.5196403 0.5463822 0.9884146 0.3211554 0 -3.332e-8 1.039281 0 -0.9884147 0.3211553 0 -0.6108739 -0.8407958 0 0.6108741 -0.8407956 0 0.9884148 -0.3211552 0 0.6108739 0.8407957 0 -0.6108739 0.8407957 0 -0.9884146 -0.3211555 0 1.666e-8 -1.039281 0</float_array>
+          <technique_common>
+            <accessor source="#geom-GeoSphere001-positions-array" count="26" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-GeoSphere001-normals">
+          <float_array id="geom-GeoSphere001-normals-array" count="78">1.05124e-8 -2.6281e-9 1 0.5257311 1.32646e-8 0.8506508 0.1624598 0.5 0.8506508 0.8944272 5.25619e-8 0.4472137 0.6881909 0.5 0.5257311 0.2763931 0.8506508 0.4472136 -0.4253254 0.3090169 0.8506508 -0.2628656 0.8090169 0.5257311 -0.7236068 0.5257311 0.4472136 -0.4253254 -0.3090171 0.8506507 -0.8506508 -9.01996e-8 0.5257311 -0.7236068 -0.5257311 0.4472137 0.1624599 -0.5 0.8506508 -0.2628654 -0.8090169 0.5257312 0.2763933 -0.8506508 0.4472136 0.6881909 -0.4999999 0.5257311 0.9224887 -0.3159864 0.2217367 0.9224886 0.3159866 0.2217367 0.5855858 0.7796935 0.2217367 -0.01545645 0.9749841 0.2217368 -0.5605768 0.7978637 0.2217367 -0.9320413 0.2865866 0.2217367 -0.9320413 -0.2865868 0.2217367 -0.5605767 -0.7978638 0.2217368 -0.01545633 -0.9749841 0.2217368 0.585586 -0.7796935 0.2217367</float_array>
+          <technique_common>
+            <accessor source="#geom-GeoSphere001-normals-array" count="26" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-GeoSphere001-map1">
+          <float_array id="geom-GeoSphere001-map1-array" count="360">0.6 1 1.039281 0.5 0.8237918 1.039281 0.7 0.8237918 1.039281 0.5 0.8237918 1.039281 0.5 0.6475836 1.039281 0.6 0.6762082 1.039281 0.5 0.8237918 1.039281 0.6 0.6762082 1.039281 0.7 0.8237918 1.039281 0.7 0.8237918 1.039281 0.6 0.6762082 1.039281 0.7 0.6475836 1.039281 0.8 1 1.039281 0.7 0.8237918 1.039281 0.9 0.8237918 1.039281 0.7 0.8237918 1.039281 0.7 0.6475836 1.039281 0.8 0.6762082 1.039281 0.7 0.8237918 1.039281 0.8 0.6762082 1.039281 0.9 0.8237918 1.039281 0.9 0.8237918 1.039281 0.8 0.6762082 1.039281 0.9 0.6475836 1.039281 7.45058e-9 1 1.039281 -0.1 0.8237918 1.039281 0.1 0.8237918 1.039281 -0.1 0.8237918 1.039281 -0.1 0.6475836 1.039281 3.79455e-8 0.6762082 1.039281 -0.1 0.8237918 1.039281 3.79455e-8 0.6762082 1.039281 0.1 0.8237918 1.039281 0.1 0.8237918 1.039281 3.79455e-8 0.6762082 1.039281 0.1 0.6475836 1.039281 0.2 1 1.039281 0.1 0.8237918 1.039281 0.3 0.8237918 1.039281 0.1 0.8237918 1.039281 0.1 0.6475836 1.039281 0.2 0.6762082 1.039281 0.1 0.8237918 1.039281 0.2 0.6762082 1.039281 0.3 0.8237918 1.039281 0.3 0.8237918 1.039281 0.2 0.6762082 1.039281 0.3 0.6475836 1.039281 0.4 1 1.039281 0.3 0.8237918 1.039281 0.5 0.8237918 1.039281 0.3 0.8237918 1.039281 0.3 0.6475836 1.039281 0.4 0.6762082 1.039281 0.3 0.8237918 1.039281 0.4 0.6762082 1.039281 0.5 0.8237918 1.039281 0.5 0.8237918 1.039281 0.4 0.6762082 1.039281 0.5 0.6475836 1.039281 0.5 0.6475836 1.039281 0.45 0.5 1.039281 0.55 0.5 1.039281 0.7 0.6475836 1.039281 0.65 0.5 1.039281 0.75 0.5 1.039281 0.9 0.6475836 1.039281 0.85 0.5 1.039281 0.95 0.5 1.039281 0.1 0.6475836 1.039281 0.05000002 0.5 1.039281 0.15 0.5 1.039281 0.3 0.6475836 1.039281 0.25 0.5 1.039281 0.3500001 0.5 1.039281 0.65 0.5 1.039281 0.7 0.6475836 1.039281 0.6 0.6762082 1.039281 0.65 0.5 1.039281 0.6 0.6762082 1.039281 0.55 0.5 1.039281 0.55 0.5 1.039281 0.6 0.6762082 1.039281 0.5 0.6475836 1.039281 0.85 0.5 1.039281 0.9 0.6475836 1.039281 0.8 0.6762082 1.039281 0.85 0.5 1.039281 0.8 0.6762082 1.039281 0.75 0.5 1.039281 0.75 0.5 1.039281 0.8 0.6762082 1.039281 0.7 0.6475836 1.039281 0.05000002 0.5 1.039281 0.1 0.6475836 1.039281 3.79455e-8 0.6762082 1.039281 0.05000002 0.5 1.039281 3.79455e-8 0.6762082 1.039281 -0.05000001 0.5 1.039281 -0.05000001 0.5 1.039281 3.79455e-8 0.6762082 1.039281 -0.1 0.6475836 1.039281 0.25 0.5 1.039281 0.3 0.6475836 1.039281 0.2 0.6762082 1.039281 0.25 0.5 1.039281 0.2 0.6762082 1.039281 0.15 0.5 1.039281 0.15 0.5 1.039281 0.2 0.6762082 1.039281 0.1 0.6475836 1.039281 0.45 0.5 1.039281 0.5 0.6475836 1.039281 0.4 0.6762082 1.039281 0.45 0.5 1.039281 0.4 0.6762082 1.039281 0.3500001 0.5 1.039281 0.3500001 0.5 1.039281 0.4 0.6762082 1.039281 0.3 0.6475836 1.039281</float_array>
+          <technique_common>
+            <accessor source="#geom-GeoSphere001-map1-array" count="120" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="geom-GeoSphere001-vertices">
+          <input semantic="POSITION" source="#geom-GeoSphere001-positions"/>
+        </vertices>
+        <triangles material="ColorMaterial" count="40">
+          <input semantic="VERTEX" source="#geom-GeoSphere001-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-GeoSphere001-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-GeoSphere001-map1" offset="2" set="0"/>
+          <p>0 0 0 6 1 1 7 2 2 6 1 3 1 3 4 11 4 5 6 1 6 11 4 7 7 2 8 7 2 9 11 4 10 2 5 11 0 0 12 7 2 13 8 6 14 7 2 15 2 5 16 12 7 17 7 2 18 12 7 19 8 6 20 8 6 21 12 7 22 3 8 23 0 0 24 8 6 25 9 9 26 8 6 27 3 8 28 13 10 29 8 6 30 13 10 31 9 9 32 9 9 33 13 10 34 4 11 35 0 0 36 9 9 37 10 12 38 9 9 39 4 11 40 14 13 41 9 9 42 14 13 43 10 12 44 10 12 45 14 13 46 5 14 47 0 0 48 10 12 49 6 1 50 10 12 51 5 14 52 15 15 53 10 12 54 15 15 55 6 1 56 6 1 57 15 15 58 1 3 59 1 3 60 21 16 61 16 17 62 2 5 63 22 18 64 17 19 65 3 8 66 23 20 67 18 21 68 4 11 69 24 22 70 19 23 71 5 14 72 25 24 73 20 25 74 22 18 75 2 5 76 11 4 77 22 18 78 11 4 79 16 17 80 16 17 81 11 4 82 1 3 83 23 20 84 3 8 85 12 7 86 23 20 87 12 7 88 17 19 89 17 19 90 12 7 91 2 5 92 24 22 93 4 11 94 13 10 95 24 22 96 13 10 97 18 21 98 18 21 99 13 10 100 3 8 101 25 24 102 5 14 103 14 13 104 25 24 105 14 13 106 19 23 107 19 23 108 14 13 109 4 11 110 21 16 111 1 3 112 15 15 113 21 16 114 15 15 115 20 25 116 20 25 117 15 15 118 5 14 119</p>
+        </triangles>
+      </mesh>
+    </geometry>
   </library_geometries>
   <library_lights>
     <light id="EnvironmentAmbientLight" name="EnvironmentAmbientLight">
@@ -629,12 +796,34 @@
               <instance_material symbol="Material__15_1" target="#Material__15-material"/>
               <instance_material symbol="Material__16_1" target="#Material__16-material"/>
               <instance_material symbol="Material__17_1" target="#Material__17-material"/>
+              <instance_material symbol="Material__20_1" target="#Material__20-material"/>
               <instance_material symbol="Material__18_1" target="#Material__18-material"/>
               <instance_material symbol="Material__19_1" target="#Material__19-material"/>
-              <instance_material symbol="Material__20_1" target="#Material__20-material"/>
             </technique_common>
           </bind_material>
         </instance_geometry>
+        <node id="node-Torus001" name="Torus001">
+          <translate>5 1.14258e-7 2</translate>
+          <rotate sid="rotationZ">0 0 1 0</rotate>
+          <rotate sid="rotationY">0 1 0 2.00358e-5</rotate>
+          <rotate sid="rotationX">1 0 0 0</rotate>
+          <scale>0.5 0.5 0.5</scale>
+          <instance_geometry url="#geom-Torus001">
+            <bind_material>
+              <technique_common>
+                <instance_material symbol="ColorMaterial" target="#ColorEffectR26G177B26-material"/>
+              </technique_common>
+            </bind_material>
+          </instance_geometry>
+          <extra>
+            <technique profile="OpenCOLLADA">
+              <cast_shadows sid="cast_shadows" type="bool">1</cast_shadows>
+              <receive_shadows sid="receive_shadows" type="bool">1</receive_shadows>
+              <primary_visibility sid="primary_visibility" type="int">1</primary_visibility>
+              <secondary_visibility sid="secondary_visibility" type="int">1</secondary_visibility>
+            </technique>
+          </extra>
+        </node>
         <extra>
           <technique profile="OpenCOLLADA">
             <cast_shadows sid="cast_shadows" type="bool">1</cast_shadows>
@@ -668,6 +857,27 @@
           <bind_material>
             <technique_common>
               <instance_material symbol="ColorMaterial" target="#ColorEffectR28G149B177-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+        <extra>
+          <technique profile="OpenCOLLADA">
+            <cast_shadows sid="cast_shadows" type="bool">1</cast_shadows>
+            <receive_shadows sid="receive_shadows" type="bool">1</receive_shadows>
+            <primary_visibility sid="primary_visibility" type="int">1</primary_visibility>
+            <secondary_visibility sid="secondary_visibility" type="int">1</secondary_visibility>
+          </technique>
+        </extra>
+      </node>
+      <node id="node-GeoSphere001" name="GeoSphere001">
+        <translate>0.03164387 -0.03838623 0</translate>
+        <rotate sid="InverseScaleAxisRotation">0 0 0 0</rotate>
+        <scale sid="scale">1 1 1</scale>
+        <rotate sid="ScaleAxisRotation">0 0 0 0</rotate>
+        <instance_geometry url="#geom-GeoSphere001">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="ColorMaterial" target="#ColorEffectR198G224B87-material"/>
             </technique_common>
           </bind_material>
         </instance_geometry>
@@ -768,6 +978,154 @@
           </accessor>
         </technique_common>
       </source>
+      <source id="node-Torus001_rotationX.ANGLE-input">
+        <float_array id="node-Torus001_rotationX.ANGLE-input-array" count="5">0 0.8333334 1.666667 2.5 3.333333</float_array>
+        <technique_common>
+          <accessor source="#node-Torus001_rotationX.ANGLE-input-array" count="5" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Torus001_rotationX.ANGLE-output">
+        <float_array id="node-Torus001_rotationX.ANGLE-output-array" count="5">0 -90 -180 -270 -360</float_array>
+        <technique_common>
+          <accessor source="#node-Torus001_rotationX.ANGLE-output-array" count="5" stride="1">
+            <param name="ANGLE" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Torus001_rotationX.ANGLE-intangent">
+        <float_array id="node-Torus001_rotationX.ANGLE-intangent-array" count="10">0.9997917 0 0.3270486 -89.70257 0.9961964 -179.1937 1.990403 -269.8432 2.6534 -360</float_array>
+        <technique_common>
+          <accessor source="#node-Torus001_rotationX.ANGLE-intangent-array" count="5" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Torus001_rotationX.ANGLE-outtangent">
+        <float_array id="node-Torus001_rotationX.ANGLE-outtangent-array" count="10">0.6602973 0 1.324714 -90.28867 2.332406 -180.8006 3.004865 -270.1553 2.333542 -360</float_array>
+        <technique_common>
+          <accessor source="#node-Torus001_rotationX.ANGLE-outtangent-array" count="5" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Torus001_rotationX.ANGLE-interpolation">
+        <Name_array id="node-Torus001_rotationX.ANGLE-interpolation-array" count="5">BEZIER BEZIER BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#node-Torus001_rotationX.ANGLE-interpolation-array" count="5" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-GeoSphere001_scale-input">
+        <float_array id="node-GeoSphere001_scale-input-array" count="3">0 1.666667 3.333333</float_array>
+        <technique_common>
+          <accessor source="#node-GeoSphere001_scale-input-array" count="3" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-GeoSphere001_scale-output">
+        <float_array id="node-GeoSphere001_scale-output-array" count="9">1 1 1 1.996525 1.996525 1.996525 1 1 1</float_array>
+        <technique_common>
+          <accessor source="#node-GeoSphere001_scale-output-array" count="3" stride="3">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="Z" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-GeoSphere001_scale-intangent">
+        <float_array id="node-GeoSphere001_scale-intangent-array" count="18">0.9997917 1 0.9997917 1 0.9997917 1 1.111167 1.996525 1.111167 1.996525 1.111167 1.996525 2.777833 1 2.777833 1 2.777833 1</float_array>
+        <technique_common>
+          <accessor source="#node-GeoSphere001_scale-intangent-array" count="3" stride="6">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-GeoSphere001_scale-outtangent">
+        <float_array id="node-GeoSphere001_scale-outtangent-array" count="18">0.5555 1 0.5555 1 0.5555 1 2.222167 1.996525 2.222167 1.996525 2.222167 1.996525 2.333542 1 2.333542 1 2.333542 1</float_array>
+        <technique_common>
+          <accessor source="#node-GeoSphere001_scale-outtangent-array" count="3" stride="6">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-GeoSphere001_scale-interpolation">
+        <Name_array id="node-GeoSphere001_scale-interpolation-array" count="3">BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#node-GeoSphere001_scale-interpolation-array" count="3" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-GeoSphere001_InverseScaleAxisRotation-input">
+        <float_array id="node-GeoSphere001_InverseScaleAxisRotation-input-array" count="3">0 1.666667 3.333333</float_array>
+        <technique_common>
+          <accessor source="#node-GeoSphere001_InverseScaleAxisRotation-input-array" count="3" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-GeoSphere001_InverseScaleAxisRotation-output">
+        <float_array id="node-GeoSphere001_InverseScaleAxisRotation-output-array" count="12">0 0 0 0 0 0 0 0 0 0 0 0</float_array>
+        <technique_common>
+          <accessor source="#node-GeoSphere001_InverseScaleAxisRotation-output-array" count="3" stride="4">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="Z" type="float"/>
+            <param name="ANGLE" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-GeoSphere001_InverseScaleAxisRotation-interpolation">
+        <Name_array id="node-GeoSphere001_InverseScaleAxisRotation-interpolation-array" count="3">LINEAR LINEAR LINEAR</Name_array>
+        <technique_common>
+          <accessor source="#node-GeoSphere001_InverseScaleAxisRotation-interpolation-array" count="3" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-GeoSphere001_ScaleAxisRotation-input">
+        <float_array id="node-GeoSphere001_ScaleAxisRotation-input-array" count="3">0 1.666667 3.333333</float_array>
+        <technique_common>
+          <accessor source="#node-GeoSphere001_ScaleAxisRotation-input-array" count="3" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-GeoSphere001_ScaleAxisRotation-output">
+        <float_array id="node-GeoSphere001_ScaleAxisRotation-output-array" count="12">0 0 0 0 0 0 0 0 0 0 0 0</float_array>
+        <technique_common>
+          <accessor source="#node-GeoSphere001_ScaleAxisRotation-output-array" count="3" stride="4">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="Z" type="float"/>
+            <param name="ANGLE" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-GeoSphere001_ScaleAxisRotation-interpolation">
+        <Name_array id="node-GeoSphere001_ScaleAxisRotation-interpolation-array" count="3">LINEAR LINEAR LINEAR</Name_array>
+        <technique_common>
+          <accessor source="#node-GeoSphere001_ScaleAxisRotation-interpolation-array" count="3" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
       <sampler id="node-Cube_translation.X-sampler">
         <input semantic="INPUT" source="#node-Cube_translation.X-input"/>
         <input semantic="OUTPUT" source="#node-Cube_translation.X-output"/>
@@ -782,8 +1140,36 @@
         <input semantic="OUT_TANGENT" source="#node-Cube_translation.Y-outtangent"/>
         <input semantic="INTERPOLATION" source="#node-Cube_translation.Y-interpolation"/>
       </sampler>
+      <sampler id="node-Torus001_rotationX.ANGLE-sampler">
+        <input semantic="INPUT" source="#node-Torus001_rotationX.ANGLE-input"/>
+        <input semantic="OUTPUT" source="#node-Torus001_rotationX.ANGLE-output"/>
+        <input semantic="IN_TANGENT" source="#node-Torus001_rotationX.ANGLE-intangent"/>
+        <input semantic="OUT_TANGENT" source="#node-Torus001_rotationX.ANGLE-outtangent"/>
+        <input semantic="INTERPOLATION" source="#node-Torus001_rotationX.ANGLE-interpolation"/>
+      </sampler>
+      <sampler id="node-GeoSphere001_scale-sampler">
+        <input semantic="INPUT" source="#node-GeoSphere001_scale-input"/>
+        <input semantic="OUTPUT" source="#node-GeoSphere001_scale-output"/>
+        <input semantic="IN_TANGENT" source="#node-GeoSphere001_scale-intangent"/>
+        <input semantic="OUT_TANGENT" source="#node-GeoSphere001_scale-outtangent"/>
+        <input semantic="INTERPOLATION" source="#node-GeoSphere001_scale-interpolation"/>
+      </sampler>
+      <sampler id="node-GeoSphere001_InverseScaleAxisRotation-sampler">
+        <input semantic="INPUT" source="#node-GeoSphere001_InverseScaleAxisRotation-input"/>
+        <input semantic="OUTPUT" source="#node-GeoSphere001_InverseScaleAxisRotation-output"/>
+        <input semantic="INTERPOLATION" source="#node-GeoSphere001_InverseScaleAxisRotation-interpolation"/>
+      </sampler>
+      <sampler id="node-GeoSphere001_ScaleAxisRotation-sampler">
+        <input semantic="INPUT" source="#node-GeoSphere001_ScaleAxisRotation-input"/>
+        <input semantic="OUTPUT" source="#node-GeoSphere001_ScaleAxisRotation-output"/>
+        <input semantic="INTERPOLATION" source="#node-GeoSphere001_ScaleAxisRotation-interpolation"/>
+      </sampler>
       <channel source="#node-Cube_translation.X-sampler" target="node-Cube/translation.X"/>
       <channel source="#node-Cube_translation.Y-sampler" target="node-Cube/translation.Y"/>
+      <channel source="#node-Torus001_rotationX.ANGLE-sampler" target="node-Torus001/rotationX.ANGLE"/>
+      <channel source="#node-GeoSphere001_scale-sampler" target="node-GeoSphere001/scale"/>
+      <channel source="#node-GeoSphere001_InverseScaleAxisRotation-sampler" target="node-GeoSphere001/InverseScaleAxisRotation"/>
+      <channel source="#node-GeoSphere001_ScaleAxisRotation-sampler" target="node-GeoSphere001/ScaleAxisRotation"/>
     </animation>
   </library_animations>
   <scene>

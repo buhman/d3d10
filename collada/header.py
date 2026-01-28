@@ -475,8 +475,10 @@ def render_input_elements_list(state):
         yield "},"
     yield "};"
 
-def render_descriptor():
-    yield "descriptor const descriptor = {"
+def render_descriptor(namespace):
+    yield f"extern collada::descriptor const descriptor;"
+    yield ""
+    yield "collada::descriptor const descriptor = {"
     yield ".nodes = nodes,"
     yield ".nodes_count = (sizeof (nodes)) / (sizeof (nodes[0])),"
     yield ""
@@ -494,18 +496,6 @@ def render_animation_children(state, collada, animation_name, animations):
         yield "&animation_{animation_name},"
     yield "};"
 
-def array_c_type(accessor):
-    if accessor.params[0].name == "INTERPOLATION":
-        return "interpolation"
-    assert all(param.type == "float" for param in accessor.params)
-    if accessor.stride == 1:
-        return "float"
-    elif accessor.stride in {2, 3, 4}:
-        assert list(param.name for param in accessor.params) == ["X", "Y", "Z", "W"][:accessor.stride], accessor.params
-        return f"float{accessor.stride}"
-    else:
-        assert False, accessor.stride
-
 def render_array(state, collada, accessor, array):
     array_name = sanitize_name(state, array.id, array)
     # render the array
@@ -518,30 +508,26 @@ def render_array(state, collada, accessor, array):
             assert name in {"BEZIER", "LINEAR"}, name
             yield f"interpolation::{name},"
         yield "};"
-        return "interpolation"
     elif type(array) is types.FloatArray:
-        c_type = array_c_type(accessor)
-        yield f"{c_type} const array_{array_name}[] = {{"
+        yield f"float const array_{array_name}[] = {{"
         it = iter(array.floats)
         for i in range(accessor.count):
             vector = ", ".join(f"{float(f)}f" for f in islice(it, accessor.stride))
-            if accessor.stride == 1:
-                yield f"{vector},"
-            else:
-                yield f"{{ {vector} }},"
+            yield f"{vector},"
         yield "};"
     else:
         assert False, type(array)
 
 def render_source(state, collada, field_name, source):
     array_name = sanitize_name(state, source.array_element.id, source.array_element)
-    c_type = array_c_type(source.technique_common.accessor)
+    c_type = "interpolation" if type(source.array_element) is types.NameArray else "float"
     source_name = sanitize_name(state, source.id, source)
     #yield f"source const source_{source_name} = {{"
     yield f"// {source_name}"
     yield f".{field_name} = {{"
     yield f".{c_type}_array = array_{array_name},"
     yield f".count = {source.technique_common.accessor.count},"
+    yield f".stride = {source.technique_common.accessor.stride},"
     yield "},"
 
 def render_sampler(state, collada, sampler):
@@ -549,13 +535,32 @@ def render_sampler(state, collada, sampler):
                  enumerate(["INPUT", "OUTPUT", "IN_TANGENT", "OUT_TANGENT", "INTERPOLATION"]))
     inputs = sorted((input for input in sampler.inputs if input.semantic in order),
                     key=lambda input: order[input.semantic])
+    inputs_semantics = [input.semantic for input in inputs]
+    assert len(inputs_semantics) == len(set(inputs_semantics))
+    assert "INPUT" in inputs_semantics
+    assert "OUTPUT" in inputs_semantics
+    assert "INTERPOLATION" in inputs_semantics
+
+    # sampler validation
+    counts = set()
+    for input in inputs:
+        source = collada.lookup(input.source, types.SourceCore)
+        if input.semantic == "INTERPOLATION":
+            nonlinear_interpolation_params = [e for e in source.array_element.names if e != "LINEAR"]
+            if nonlinear_interpolation_params:
+                assert "IN_TANGENT" in inputs_semantics
+                assert "OUT_TANGENT" in inputs_semantics
+        counts.add(source.technique_common.accessor.count)
+    assert len(counts) == 1
 
     # render the source arrays first
     for input in inputs:
         assert type(input) is types.InputUnshared
         source = collada.lookup(input.source, types.SourceCore)
+
         yield from render_array(state, collada, source.technique_common.accessor, source.array_element)
 
+    # render the sampler
     sampler_name = sanitize_name(state, sampler.id, sampler)
     yield f"sampler const sampler_{sampler_name} = {{"
     for input in inputs:
@@ -565,7 +570,7 @@ def render_sampler(state, collada, sampler):
     yield "};"
 
 target_attributes = {
-    "A", "ANGLE", "B", "G", "P", "Q", "R", "S", "T", "TIME", "U", "V", "W", "X", "Y", "Z"
+    "A", "ANGLE", "B", "G", "P", "Q", "R", "S", "T", "TIME", "U", "V", "W", "X", "Y", "Z", "ALL"
 }
 
 def find_transform_index_in_node(node, transform):
@@ -588,11 +593,14 @@ def render_channel(state, collada, channel):
     sampler_name = sanitize_name(state, sampler.id, sampler)
 
     assert '/' in channel.target, channel.target
-    assert '.' in channel.target, channel.target
     assert "(" not in channel.target, channel.target
 
     node_id, rest = channel.target.split("/")
-    node_transform_sid, target_attribute = rest.split(".")
+    if '.' in rest:
+        node_transform_sid, target_attribute = rest.split(".")
+    else:
+        node_transform_sid = rest
+        target_attribute = 'ALL'
     assert target_attribute in target_attributes
 
     node = collada.lookup(f"#{node_id}", types.Node)
@@ -659,9 +667,19 @@ def render_all(collada, namespace):
     # root elements
     render(render_library_visual_scenes(state, collada))
     render(render_input_elements_list(state))
-    render(render_descriptor())
+    render(render_descriptor(namespace))
     render(render_end_of_namespace())
     return state, out
+
+def render_hpp(namespace):
+    yield f"namespace {namespace} {{"
+    yield "extern collada::descriptor const descriptor;"
+    yield "}"
+
+def render_all_hpp(namespace):
+    render, out = renderer()
+    render(render_hpp(namespace))
+    return out
 
 if __name__ == "__main__":
     import sys

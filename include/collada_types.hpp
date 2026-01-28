@@ -220,12 +220,10 @@ namespace collada {
   struct source {
     union {
       float const * const float_array;
-      float2 const * const float2_array;
-      float3 const * const float3_array;
-      float4 const * const float4_array;
       enum interpolation const * const interpolation_array;
     };
     int const count;
+    int const stride;
   };
 
   struct sampler {
@@ -253,6 +251,7 @@ namespace collada {
     X, // first cartesian coordinate
     Y, // second cartesian coordinate
     Z, // third cartesian coordinate
+    ALL,
   };
 
   struct channel {

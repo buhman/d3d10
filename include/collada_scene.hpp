@@ -15,9 +15,7 @@ namespace collada_scene {
     union {
       lookat lookat;
       XMMATRIX matrix;
-      XMVECTOR rotate;
-      XMVECTOR scale;
-      XMVECTOR translate;
+      XMVECTOR vector;
     };
     collada::transform_type type;
   };

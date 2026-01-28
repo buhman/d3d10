@@ -83,13 +83,13 @@ namespace collada_scene {
         transform.matrix = XMLoadFloat4x4((XMFLOAT4X4 *)&node->transforms[i].matrix);
         break;
       case transform_type::ROTATE:
-        transform.rotate = XMLoadFloat4((XMFLOAT4 *)&node->transforms[i].rotate);
+        transform.vector = XMLoadFloat4((XMFLOAT4 *)&node->transforms[i].rotate);
         break;
       case transform_type::SCALE:
-        transform.scale = XMLoadFloat3((XMFLOAT3 *)&node->transforms[i].scale);
+        transform.vector = XMLoadFloat3((XMFLOAT3*)&node->transforms[i].scale);
         break;
       case transform_type::TRANSLATE:
-        transform.translate = XMLoadFloat3((XMFLOAT3*)&node->transforms[i].translate);
+        transform.vector = XMLoadFloat3((XMFLOAT3*)&node->transforms[i].translate);
         break;
       default:
         assert(false);
@@ -271,12 +271,12 @@ namespace collada_scene {
   {
     switch (transform.type) {
     case transform_type::TRANSLATE:
-      return XMMatrixTranslationFromVector(transform.translate);
+      return XMMatrixTranslationFromVector(transform.vector);
     case transform_type::ROTATE:
-      return XMMatrixRotationNormal(transform.rotate,
-                                    XMConvertToRadians(XMVectorGetW(transform.rotate)));
+      return XMMatrixRotationNormal(transform.vector,
+                                    XMConvertToRadians(XMVectorGetW(transform.vector)));
     case transform_type::SCALE:
-      return XMMatrixScalingFromVector(transform.scale);
+      return XMMatrixScalingFromVector(transform.vector);
     default:
       assert(false);
       break;
@@ -360,17 +360,17 @@ namespace collada_scene {
     return -1;
   }
 
-  static inline float interpolation_value(source const& source, int ix, float t)
+  static inline float linear_interpolate_iv(source const& source, int frame_ix, float t)
   {
-    float prev = source.float_array[ix];
-    float next = source.float_array[ix+1];
+    float prev = source.float_array[(frame_ix+0) * source.stride];
+    float next = source.float_array[(frame_ix+1) * source.stride];
     return (t - prev) / (next - prev);
   }
 
-  static inline float linear_interpolate(source const& source, int ix, float iv)
+  static inline float linear_interpolate_value(source const& source, int frame_ix, int parameter_ix, float iv)
   {
-    float prev = source.float_array[ix];
-    float next = source.float_array[ix+1];
+    float prev = source.float_array[(frame_ix+0) * source.stride + parameter_ix];
+    float next = source.float_array[(frame_ix+1) * source.stride + parameter_ix];
     return prev + iv * (next - prev);
   }
 
@@ -425,7 +425,13 @@ namespace collada_scene {
     assert(false);
   }
 
-  static float bezier_sampler(sampler const * const sampler, int ix, float t)
+  static inline XMFLOAT2 const * tangent_index(source const& source, int frame_ix, int parameter_ix)
+  {
+    int ix = frame_ix * source.stride + parameter_ix * 2;
+    return (XMFLOAT2 const *)&source.float_array[ix];
+  }
+
+  static float bezier_sampler(sampler const * const sampler, int frame_ix, int parameter_ix, float t)
   {
     /*
       P0 is (INPUT[i] , OUTPUT[i])
@@ -433,12 +439,98 @@ namespace collada_scene {
       C1 (or T1) is (IN_TANGENT[i+1][0], IN_TANGENT[i+1][1])
       P1 is (INPUT[i+1], OUTPUT[i+1])
     */
-    XMVECTOR p0 = XMVectorSet(sampler->input.float_array[ix], sampler->output.float_array[ix], 0, 0);
-    XMVECTOR c0 = XMLoadFloat2((XMFLOAT2 *)&sampler->out_tangent.float2_array[ix]);
-    XMVECTOR c1 = XMLoadFloat2((XMFLOAT2 *)&sampler->in_tangent.float2_array[ix+1]);
-    XMVECTOR p1 = XMVectorSet(sampler->input.float_array[ix+1], sampler->output.float_array[ix+1], 0, 0);
+
+    float frame0_input = sampler->input.float_array[frame_ix+0];
+    float frame1_input = sampler->input.float_array[frame_ix+1];
+
+    float frame0_output = sampler->output.float_array[(frame_ix+0) * sampler->output.stride + parameter_ix];
+    float frame1_output = sampler->output.float_array[(frame_ix+1) * sampler->output.stride + parameter_ix];
+
+    XMVECTOR p0 = XMVectorSet(frame0_input, frame0_output, 0, 0);
+    XMVECTOR c0 = XMLoadFloat2(tangent_index(sampler->out_tangent, frame_ix + 0, parameter_ix));
+    XMVECTOR c1 = XMLoadFloat2(tangent_index(sampler->in_tangent, frame_ix + 1, parameter_ix));
+    XMVECTOR p1 = XMVectorSet(frame1_input, frame1_output, 0, 0);
 
     return bezier_binary_search(p0, c0, c1, p1, t);
+  }
+
+  static void apply_transform_target(transform& transform,
+                                     enum target_attribute channel_target_attribute,
+                                     float value)
+  {
+    switch (transform.type) {
+    case transform_type::TRANSLATE: __attribute__((fallthrough));
+    case transform_type::SCALE:
+      switch (channel_target_attribute) {
+      case target_attribute::X: transform.vector = XMVectorSetX(transform.vector, value); return;
+      case target_attribute::Y: transform.vector = XMVectorSetY(transform.vector, value); return;
+      case target_attribute::Z: transform.vector = XMVectorSetZ(transform.vector, value); return;
+      default: assert(false);
+      }
+    case transform_type::ROTATE:
+      switch (channel_target_attribute) {
+      case target_attribute::X: transform.vector = XMVectorSetX(transform.vector, value); return;
+      case target_attribute::Y: transform.vector = XMVectorSetY(transform.vector, value); return;
+      case target_attribute::Z: transform.vector = XMVectorSetZ(transform.vector, value); return;
+      case target_attribute::ANGLE: transform.vector = XMVectorSetW(transform.vector, value); return;
+      default: assert(false);
+      }
+    default:
+      assert(false);
+      break;
+    }
+  }
+
+  static enum target_attribute const rotate_target_attributes[] = {
+    target_attribute::X,
+    target_attribute::Y,
+    target_attribute::Z,
+    target_attribute::ANGLE,
+  };
+
+  static enum target_attribute const translate_scale_target_attributes[] = {
+    target_attribute::X,
+    target_attribute::Y,
+    target_attribute::Z,
+  };
+
+  static void animate_channel_segment(channel const& channel,
+                                      transform& transform,
+                                      int frame_ix, float t)
+  {
+    enum target_attribute const * target_attributes = &channel.target_attribute;
+    int target_attributes_count = 1;
+    if (channel.target_attribute == target_attribute::ALL) {
+      switch (transform.type) {
+      case transform_type::TRANSLATE: __attribute__((fallthrough));
+      case transform_type::SCALE:
+        target_attributes = translate_scale_target_attributes;
+        target_attributes_count = 3;
+        break;
+      case transform_type::ROTATE:
+        target_attributes = rotate_target_attributes;
+        target_attributes_count = 4;
+        break;
+      default:
+        assert(false);
+        break;
+      }
+    }
+
+    for (int parameter_ix = 0; parameter_ix < target_attributes_count; parameter_ix++) {
+
+      enum collada::interpolation interpolation = channel.source_sampler->interpolation.interpolation_array[frame_ix];
+
+      float value;
+      if (interpolation == interpolation::BEZIER) {
+        value = bezier_sampler(channel.source_sampler, frame_ix, parameter_ix, t);
+      } else {
+        float iv = linear_interpolate_iv(channel.source_sampler->input, frame_ix, t);
+        value = linear_interpolate_value(channel.source_sampler->output, frame_ix, parameter_ix, iv);
+      }
+
+      apply_transform_target(transform, target_attributes[parameter_ix], value);
+    }
   }
 
   static void animate_node(node const& node, node_instance& node_instance, float t)
@@ -448,32 +540,9 @@ namespace collada_scene {
       transform& transform = node_instance.transforms[channel.target_transform_index];
 
       int frame_ix = find_frame_ix(channel.source_sampler->input, t);
-      if (frame_ix < 0)
-        continue; // animation is missing a key frame
+      assert(frame_ix >= 0); // animation is missing a key frame
 
-      enum collada::interpolation const * const interpolation =
-        channel.source_sampler->interpolation.interpolation_array;
-
-      float value;
-      if (interpolation[frame_ix] == interpolation::BEZIER) {
-        value = bezier_sampler(channel.source_sampler, frame_ix, t);
-      } else {
-        float iv = interpolation_value(channel.source_sampler->input, frame_ix, t);
-        value = linear_interpolate(channel.source_sampler->output, frame_ix, iv);
-      }
-
-      switch (transform.type) {
-      case transform_type::TRANSLATE:
-        switch (channel.target_attribute) {
-        case target_attribute::X: transform.translate = XMVectorSetX(transform.translate, value); break;
-        case target_attribute::Y: transform.translate = XMVectorSetY(transform.translate, value); break;
-        case target_attribute::Z: transform.translate = XMVectorSetZ(transform.translate, value); break;
-        default: break;
-        }
-        break;
-      default:
-        break;
-      }
+      animate_channel_segment(channel, transform, frame_ix, t);
     }
   }
 
