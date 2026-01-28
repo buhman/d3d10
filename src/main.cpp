@@ -129,8 +129,8 @@ XMFLOAT4 g_vLightColors[2] = {
 
 //
 
-XMVECTOR g_Eye = XMVectorSet(0.0f, -30.0f, 15.0f, 1.0f);
-XMVECTOR g_At = XMVectorSet(0.0f, 0.0f, 15.0f, 1.0f);
+XMVECTOR g_Eye = XMVectorSet(0.0f, -3.0f, 13.0f, 1.0f);
+XMVECTOR g_At = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 
 // collada scene state
 

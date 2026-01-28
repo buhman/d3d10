@@ -374,6 +374,73 @@ namespace collada_scene {
     return prev + iv * (next - prev);
   }
 
+  static inline float pow3(float f)
+  {
+    return f * f * f;
+  }
+
+  static inline float pow2(float f)
+  {
+    return f * f;
+  }
+
+  static inline XMVECTOR bezier(XMVECTOR p0, XMVECTOR c0, XMVECTOR c1, XMVECTOR p1, float s)
+  {
+    return
+        p0 * pow3(1 - s)
+      + 3 * c0 * s * pow2(1 - s)
+      + 3 * c1 * pow2(s) * (1 - s)
+      + p1 * pow3(s);
+  }
+
+  static inline float bezier_binary_search(XMVECTOR p0, XMVECTOR c0, XMVECTOR c1, XMVECTOR p1, float want)
+  {
+    float low = 0.0f;
+    float high = 1.0f;
+
+    int iterations = 0;
+    while (iterations < 20) {
+      iterations += 1;
+
+      float s = (high + low) * 0.5f;
+      XMVECTOR bs = bezier(p0, c0, c1, p1, s);
+      float t = XMVectorGetX(bs);
+
+      const float epsilon = 0.001f;
+      if (fabsf(t - want) < epsilon) {
+        return XMVectorGetY(bs);
+      }
+
+      if (t > want) {
+        high = s;
+      } else {
+        low = s;
+      }
+    }
+
+    print("%f %f\n", XMVectorGetX(p0), XMVectorGetY(p0));
+    print("%f %f\n", XMVectorGetX(c0), XMVectorGetY(c0));
+    print("%f %f\n", XMVectorGetX(c1), XMVectorGetY(c1));
+    print("%f %f\n", XMVectorGetX(p1), XMVectorGetY(p1));
+    assert(false);
+  }
+
+  static float bezier_sampler(sampler const * const sampler, int ix, float t)
+  {
+    /*
+      P0 is (INPUT[i] , OUTPUT[i])
+      C0 (or T0) is (OUT_TANGENT[i][0] , OUT_TANGENT[i][1])
+      C1 (or T1) is (IN_TANGENT[i+1][0], IN_TANGENT[i+1][1])
+      P1 is (INPUT[i+1], OUTPUT[i+1])
+    */
+    XMVECTOR p0 = XMVectorSet(sampler->input.float_array[ix], sampler->output.float_array[ix], 0, 0);
+    XMVECTOR c0 = XMLoadFloat2((XMFLOAT2 *)&sampler->out_tangent.float2_array[ix]);
+    XMVECTOR c1 = XMLoadFloat2((XMFLOAT2 *)&sampler->in_tangent.float2_array[ix+1]);
+    XMVECTOR p1 = XMVectorSet(sampler->input.float_array[ix+1], sampler->output.float_array[ix+1], 0, 0);
+
+    return bezier_binary_search(p0, c0, c1, p1, t);
+  }
+
   static void animate_node(node const& node, node_instance& node_instance, float t)
   {
     for (int i = 0; i < node.channels_count; i++) {
@@ -384,8 +451,17 @@ namespace collada_scene {
       if (frame_ix < 0)
         continue; // animation is missing a key frame
 
-      float iv = interpolation_value(channel.source_sampler->input, frame_ix, t);
-      float value = linear_interpolate(channel.source_sampler->output, frame_ix, iv);
+      enum collada::interpolation const * const interpolation =
+        channel.source_sampler->interpolation.interpolation_array;
+
+      float value;
+      if (interpolation[frame_ix] == interpolation::BEZIER) {
+        value = bezier_sampler(channel.source_sampler, frame_ix, t);
+      } else {
+        float iv = interpolation_value(channel.source_sampler->input, frame_ix, t);
+        value = linear_interpolate(channel.source_sampler->output, frame_ix, iv);
+      }
+
       switch (transform.type) {
       case transform_type::TRANSLATE:
         switch (channel.target_attribute) {
