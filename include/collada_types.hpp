@@ -97,12 +97,31 @@ namespace collada {
   };
 
   //////////////////////////////////////////////////////////////////////
+  // image
+  //////////////////////////////////////////////////////////////////////
+
+  struct image {
+    const wchar_t * resource_name;
+  };
+
+  //////////////////////////////////////////////////////////////////////
   // effect
   //////////////////////////////////////////////////////////////////////
 
+  enum color_or_texture_type {
+    COLOR,
+    TEXTURE,
+  };
+
+  struct texture {
+    int const image_index; // index in to images
+  };
+
   struct color_or_texture {
+    color_or_texture_type type;
     union {
       float4 color;
+      texture texture;
     };
   };
 
@@ -216,9 +235,19 @@ namespace collada {
     effect const * const effect;
   };
 
+  struct bind_vertex_input {
+    int input_set; // TEXCOORD semantic input slot
+  };
+
   struct instance_material {
-    int element_index; // an index into mesh.triangles
+    int const element_index; // an index into mesh.triangles
     material const * const material;
+
+    // heavily simplified from collada data model
+    bind_vertex_input const emission;
+    bind_vertex_input const ambient;
+    bind_vertex_input const diffuse;
+    bind_vertex_input const specular;
   };
 
   struct instance_geometry {
@@ -327,6 +356,9 @@ namespace collada {
 
     inputs const * const inputs_list;
     int const inputs_list_count;
+
+    image const * const * const images;
+    int const images_count;
 
     //animation const * const animations;
     //int const animations_count;

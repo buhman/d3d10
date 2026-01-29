@@ -6,8 +6,8 @@
       <authoring_tool>OpenCOLLADA for 3ds Max;  Version: 1.6;  Revision: 68</authoring_tool>
       <source_data>file:///C:/cygwin/home/bilbo/d3d10/scenes/curve_interpolation/curve_interpolation.max</source_data>
     </contributor>
-    <created>2026-01-28T15:18:44</created>
-    <modified>2026-01-28T15:18:44</modified>
+    <created>2026-01-29T17:33:59</created>
+    <modified>2026-01-29T17:33:59</modified>
     <unit name="inch" meter="0.0254"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -377,18 +377,31 @@
         </technique>
       </profile_COMMON>
     </effect>
-    <effect id="ColorEffectR229G154B215">
+    <effect id="Grass">
       <profile_COMMON>
+        <newparam sid="SiteWork_Planting_Grass_Bermuda1_jpg-surface">
+          <surface type="2D">
+            <init_from>SiteWork_Planting_Grass_Bermuda1_jpg</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="SiteWork_Planting_Grass_Bermuda1_jpg-sampler">
+          <sampler2D>
+            <source>SiteWork_Planting_Grass_Bermuda1_jpg-surface</source>
+          </sampler2D>
+        </newparam>
         <technique sid="common">
-          <phong>
+          <blinn>
+            <emission>
+              <color>0 0 0 1</color>
+            </emission>
             <ambient>
-              <color>0.8980392 0.6039216 0.8431373 1</color>
+              <color>0.588 0.588 0.588 1</color>
             </ambient>
             <diffuse>
-              <color>0.8980392 0.6039216 0.8431373 1</color>
+              <texture texture="SiteWork_Planting_Grass_Bermuda1_jpg-sampler" texcoord="CHANNEL1"/>
             </diffuse>
             <specular>
-              <color>1 1 1 1</color>
+              <color>0 0 0 1</color>
             </specular>
             <shininess>
               <float>10</float>
@@ -396,28 +409,85 @@
             <reflective>
               <color>0 0 0 1</color>
             </reflective>
-            <transparent>
+            <transparent opaque="A_ONE">
               <color>1 1 1 1</color>
             </transparent>
             <transparency>
               <float>1</float>
             </transparency>
-          </phong>
+          </blinn>
         </technique>
       </profile_COMMON>
+      <extra>
+        <technique profile="OpenCOLLADA3dsMax">
+          <extended_shader>
+            <opacity_type sid="opacity_type" type="int">0</opacity_type>
+            <falloff_type sid="falloff_type" type="int">0</falloff_type>
+            <falloff sid="falloff" type="float">0</falloff>
+            <index_of_refraction sid="index_of_refraction" type="float">1.5</index_of_refraction>
+            <wire_size sid="wire_size" type="float">1</wire_size>
+            <wire_units sid="wire_units" type="int">0</wire_units>
+            <apply_reflection_dimming sid="apply_reflection_dimming" type="bool">0</apply_reflection_dimming>
+            <dim_level sid="dim_level" type="float">0</dim_level>
+            <reflection_level sid="reflection_level" type="float">3</reflection_level>
+          </extended_shader>
+          <shader>
+            <ambient_diffuse_texture_lock sid="ambient_diffuse_texture_lock" type="bool">1</ambient_diffuse_texture_lock>
+            <ambient_diffuse_lock sid="ambient_diffuse_lock" type="bool">1</ambient_diffuse_lock>
+            <diffuse_specular_lock sid="diffuse_specular_lock" type="bool">0</diffuse_specular_lock>
+            <use_self_illum_color sid="use_self_illum_color" type="bool">0</use_self_illum_color>
+            <self_illumination sid="self_illumination" type="float">0</self_illumination>
+            <specular_level sid="specular_level" type="float">0</specular_level>
+            <soften sid="soften" type="float">0.1</soften>
+          </shader>
+        </technique>
+      </extra>
     </effect>
-    <effect id="ColorEffectR28G149B177">
+    <effect id="Wood">
       <profile_COMMON>
+        <newparam sid="american_cherry_png-surface">
+          <surface type="2D">
+            <init_from>american_cherry_png</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="american_cherry_png-sampler">
+          <sampler2D>
+            <source>american_cherry_png-surface</source>
+          </sampler2D>
+        </newparam>
+        <newparam sid="Finishes_Flooring_Tile_Square_Medium_Blue_png-surface">
+          <surface type="2D">
+            <init_from>Finishes_Flooring_Tile_Square_Medium_Blue_png</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="Finishes_Flooring_Tile_Square_Medium_Blue_png-sampler">
+          <sampler2D>
+            <source>Finishes_Flooring_Tile_Square_Medium_Blue_png-surface</source>
+          </sampler2D>
+        </newparam>
+        <newparam sid="_02_png-surface">
+          <surface type="2D">
+            <init_from>_02_png</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="_02_png-sampler">
+          <sampler2D>
+            <source>_02_png-surface</source>
+          </sampler2D>
+        </newparam>
         <technique sid="common">
-          <phong>
+          <blinn>
+            <emission>
+              <color>0 0 0 1</color>
+            </emission>
             <ambient>
-              <color>0.1098039 0.5843137 0.6941176 1</color>
+              <color>0.588 0.588 0.588 1</color>
             </ambient>
             <diffuse>
-              <color>0.1098039 0.5843137 0.6941176 1</color>
+              <texture texture="american_cherry_png-sampler" texcoord="CHANNEL1"/>
             </diffuse>
             <specular>
-              <color>1 1 1 1</color>
+              <texture texture="Finishes_Flooring_Tile_Square_Medium_Blue_png-sampler" texcoord="CHANNEL1"/>
             </specular>
             <shininess>
               <float>10</float>
@@ -425,15 +495,46 @@
             <reflective>
               <color>0 0 0 1</color>
             </reflective>
-            <transparent>
+            <transparent opaque="A_ONE">
               <color>1 1 1 1</color>
             </transparent>
             <transparency>
               <float>1</float>
             </transparency>
-          </phong>
+          </blinn>
+          <extra>
+            <technique profile="OpenCOLLADA3dsMax">
+              <specularLevel>
+                <texture texture="_02_png-sampler" texcoord="CHANNEL1"/>
+              </specularLevel>
+            </technique>
+          </extra>
         </technique>
       </profile_COMMON>
+      <extra>
+        <technique profile="OpenCOLLADA3dsMax">
+          <extended_shader>
+            <opacity_type sid="opacity_type" type="int">0</opacity_type>
+            <falloff_type sid="falloff_type" type="int">0</falloff_type>
+            <falloff sid="falloff" type="float">0</falloff>
+            <index_of_refraction sid="index_of_refraction" type="float">1.5</index_of_refraction>
+            <wire_size sid="wire_size" type="float">1</wire_size>
+            <wire_units sid="wire_units" type="int">0</wire_units>
+            <apply_reflection_dimming sid="apply_reflection_dimming" type="bool">0</apply_reflection_dimming>
+            <dim_level sid="dim_level" type="float">0</dim_level>
+            <reflection_level sid="reflection_level" type="float">3</reflection_level>
+          </extended_shader>
+          <shader>
+            <ambient_diffuse_texture_lock sid="ambient_diffuse_texture_lock" type="bool">1</ambient_diffuse_texture_lock>
+            <ambient_diffuse_lock sid="ambient_diffuse_lock" type="bool">1</ambient_diffuse_lock>
+            <diffuse_specular_lock sid="diffuse_specular_lock" type="bool">0</diffuse_specular_lock>
+            <use_self_illum_color sid="use_self_illum_color" type="bool">0</use_self_illum_color>
+            <self_illumination sid="self_illumination" type="float">0</self_illumination>
+            <specular_level sid="specular_level" type="float">0</specular_level>
+            <soften sid="soften" type="float">0.1</soften>
+          </shader>
+        </technique>
+      </extra>
     </effect>
     <effect id="ColorEffectR198G224B87">
       <profile_COMMON>
@@ -525,12 +626,6 @@
     <material id="ColorEffectR26G177B26-material" name="ColorEffectR26G177B26-material">
       <instance_effect url="#ColorEffectR26G177B26"/>
     </material>
-    <material id="ColorEffectR229G154B215-material" name="ColorEffectR229G154B215-material">
-      <instance_effect url="#ColorEffectR229G154B215"/>
-    </material>
-    <material id="ColorEffectR28G149B177-material" name="ColorEffectR28G149B177-material">
-      <instance_effect url="#ColorEffectR28G149B177"/>
-    </material>
     <material id="ColorEffectR198G224B87-material" name="ColorEffectR198G224B87-material">
       <instance_effect url="#ColorEffectR198G224B87"/>
     </material>
@@ -551,6 +646,12 @@
     </material>
     <material id="Material__20-material" name="Material__20">
       <instance_effect url="#Material__20"/>
+    </material>
+    <material id="Grass-material" name="Grass">
+      <instance_effect url="#Grass"/>
+    </material>
+    <material id="Wood-material" name="Wood">
+      <instance_effect url="#Wood"/>
     </material>
     <material id="LightEmit-material" name="LightEmit">
       <instance_effect url="#LightEmit"/>
@@ -713,7 +814,7 @@
           </technique_common>
         </source>
         <source id="geom-Cylinder-map1">
-          <float_array id="geom-Cylinder-map1-array" count="96">0.5975444 0.9903928 -0.25 0.691341 0.9619401 -0.25 0.7777845 0.9157352 -0.25 0.8535529 0.8535539 -0.25 0.9157345 0.7777857 -0.25 0.9619396 0.6913422 -0.25 0.9903926 0.5975457 -0.25 1 0.5000005 -0.25 0.9903927 0.4024553 -0.25 0.9619399 0.3086587 -0.25 0.915735 0.2222152 -0.25 0.8535537 0.1464469 -0.25 0.7777854 0.08426532 -0.25 0.6913419 0.03806034 -0.25 0.5975454 0.009607404 -0.25 0.5000002 0 -0.25 0.402455 0.009607315 -0.25 0.3086584 0.03806019 -0.25 0.2222149 0.08426517 -0.25 0.1464466 0.1464466 -0.25 0.08426517 0.2222149 -0.25 0.03806019 0.3086583 -0.25 0.009607345 0.4024549 -0.25 0 0.5 -0.25 0.009607345 0.5975451 -0.25 0.03806022 0.6913417 -0.25 0.08426517 0.7777851 -0.25 0.1464466 0.8535534 -0.25 0.2222148 0.9157348 -0.25 0.3086582 0.9619398 -0.25 0.4024548 0.9903927 -0.25 0.5 1 -0.25</float_array>
+          <float_array id="geom-Cylinder-map1-array" count="96">1.999001 0.9999998 0.5 1.979805 1.194895 0.5 1.922957 1.382301 0.5 1.830639 1.555015 0.5 1.706401 1.7064 0.5 1.555015 1.830639 0.5 1.382301 1.922956 0.5 1.194896 1.979805 0.5 1 1.999001 0.5 0.8051049 1.979805 0.5 0.6176993 1.922957 0.5 0.444985 1.830639 0.5 0.2935998 1.706401 0.5 0.1693612 1.555015 0.5 0.07704347 1.382301 0.5 0.02019453 1.194895 0.5 9.99033e-4 0.9999999 0.5 0.02019459 0.8051044 0.5 0.07704353 0.6176987 0.5 0.1693612 0.4449845 0.5 0.2936 0.2935994 0.5 0.4449852 0.1693608 0.5 0.6176994 0.07704329 0.5 0.8051052 0.02019441 0.5 1.000001 9.99033e-4 0.5 1.194896 0.02019471 0.5 1.382302 0.07704371 0.5 1.555016 0.1693616 0.5 1.706401 0.2936004 0.5 1.83064 0.4449857 0.5 1.922957 0.6177 0.5 1.979806 0.8051058 0.5</float_array>
           <technique_common>
             <accessor source="#geom-Cylinder-map1-array" count="32" stride="3">
               <param name="S" type="float"/>
@@ -725,11 +826,11 @@
         <vertices id="geom-Cylinder-vertices">
           <input semantic="POSITION" source="#geom-Cylinder-positions"/>
         </vertices>
-        <triangles material="ColorMaterial" count="30">
+        <triangles material="Grass" count="30">
           <input semantic="VERTEX" source="#geom-Cylinder-vertices" offset="0"/>
           <input semantic="NORMAL" source="#geom-Cylinder-normals" offset="1"/>
           <input semantic="TEXCOORD" source="#geom-Cylinder-map1" offset="2" set="0"/>
-          <p>0 0 31 1 1 30 2 2 29 2 2 29 3 3 28 4 4 27 0 0 31 2 2 29 4 4 27 4 4 27 5 5 26 6 6 25 6 6 25 7 7 24 8 8 23 4 4 27 6 6 25 8 8 23 0 0 31 4 4 27 8 8 23 8 8 23 9 9 22 10 10 21 10 10 21 11 11 20 12 12 19 8 8 23 10 10 21 12 12 19 12 12 19 13 13 18 14 14 17 14 14 17 15 15 16 16 16 15 12 12 19 14 14 17 16 16 15 8 8 23 12 12 19 16 16 15 0 0 31 8 8 23 16 16 15 16 16 15 17 17 14 18 18 13 18 18 13 19 19 12 20 20 11 16 16 15 18 18 13 20 20 11 20 20 11 21 21 10 22 22 9 22 22 9 23 23 8 24 24 7 20 20 11 22 22 9 24 24 7 16 16 15 20 20 11 24 24 7 0 0 31 16 16 15 24 24 7 24 24 7 25 25 6 26 26 5 26 26 5 27 27 4 28 28 3 24 24 7 26 26 5 28 28 3 0 0 31 24 24 7 28 28 3 28 28 3 29 29 2 30 30 1 0 0 31 28 28 3 30 30 1 31 31 0 0 0 31 30 30 1</p>
+          <p>0 0 0 1 1 1 2 2 2 2 2 2 3 3 3 4 4 4 0 0 0 2 2 2 4 4 4 4 4 4 5 5 5 6 6 6 6 6 6 7 7 7 8 8 8 4 4 4 6 6 6 8 8 8 0 0 0 4 4 4 8 8 8 8 8 8 9 9 9 10 10 10 10 10 10 11 11 11 12 12 12 8 8 8 10 10 10 12 12 12 12 12 12 13 13 13 14 14 14 14 14 14 15 15 15 16 16 16 12 12 12 14 14 14 16 16 16 8 8 8 12 12 12 16 16 16 0 0 0 8 8 8 16 16 16 16 16 16 17 17 17 18 18 18 18 18 18 19 19 19 20 20 20 16 16 16 18 18 18 20 20 20 20 20 20 21 21 21 22 22 22 22 22 22 23 23 23 24 24 24 20 20 20 22 22 22 24 24 24 16 16 16 20 20 20 24 24 24 0 0 0 16 16 16 24 24 24 24 24 24 25 25 25 26 26 26 26 26 26 27 27 27 28 28 28 24 24 24 26 26 26 28 28 28 0 0 0 24 24 24 28 28 28 28 28 28 29 29 29 30 30 30 0 0 0 28 28 28 30 30 30 31 31 31 0 0 0 30 30 30</p>
         </triangles>
       </mesh>
     </geometry>
@@ -756,9 +857,9 @@
           </technique_common>
         </source>
         <source id="geom-Plane-map1">
-          <float_array id="geom-Plane-map1-array" count="24">0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 1 0 1 1 0</float_array>
+          <float_array id="geom-Plane-map1-array" count="12">9.99093e-4 9.9957e-4 1 1.999 9.99093e-4 1 9.9957e-4 1.999001 1 1.999001 1.999 1</float_array>
           <technique_common>
-            <accessor source="#geom-Plane-map1-array" count="8" stride="3">
+            <accessor source="#geom-Plane-map1-array" count="4" stride="3">
               <param name="S" type="float"/>
               <param name="T" type="float"/>
               <param name="P" type="float"/>
@@ -768,26 +869,13 @@
         <vertices id="geom-Plane-vertices">
           <input semantic="POSITION" source="#geom-Plane-positions"/>
         </vertices>
-        <triangles material="ColorMaterial" count="2">
+        <triangles material="Wood" count="2">
           <input semantic="VERTEX" source="#geom-Plane-vertices" offset="0"/>
           <input semantic="NORMAL" source="#geom-Plane-normals" offset="1"/>
           <input semantic="TEXCOORD" source="#geom-Plane-map1" offset="2" set="0"/>
-          <p>2 0 6 0 1 4 3 2 7 1 3 5 3 2 7 0 1 4</p>
+          <p>2 0 2 0 1 0 3 2 3 1 3 1 3 2 3 0 1 0</p>
         </triangles>
       </mesh>
-      <extra>
-        <technique profile="OpenCOLLADA3dsMax">
-          <max_plane>
-            <lenght sid="lenght" type="float">14.14213</lenght>
-            <width sid="width" type="float">14.14213</width>
-            <widthsegments sid="widthsegments" type="int">1</widthsegments>
-            <lenghtsegments sid="lenghtsegments" type="int">1</lenghtsegments>
-            <density sid="density" type="float">1</density>
-            <scale sid="scale" type="float">1</scale>
-            <generateuvs sid="generateuvs" type="bool">1</generateuvs>
-          </max_plane>
-        </technique>
-      </extra>
     </geometry>
     <geometry id="geom-GeoSphere" name="GeoSphere">
       <mesh>
@@ -902,19 +990,21 @@
     </light>
     <light id="Light-light" name="Light">
       <technique_common>
-        <directional>
+        <point>
           <color>1 1 1</color>
-        </directional>
+          <constant_attenuation>0</constant_attenuation>
+          <linear_attenuation>0</linear_attenuation>
+          <quadratic_attenuation>1</quadratic_attenuation>
+        </point>
       </technique_common>
       <extra>
         <technique profile="OpenCOLLADA3dsMax">
           <max_light>
-            <overshoot sid="overshoot" type="bool">0</overshoot>
             <affect_specular sid="affect_specular" type="int">1</affect_specular>
             <affect_diffuse sid="affect_diffuse" type="int">1</affect_diffuse>
             <decay_type sid="decay_type" type="int">2</decay_type>
             <multiplier sid="multiplier" type="float">1</multiplier>
-            <decay_radius sid="decay_radius" type="float">10</decay_radius>
+            <decay_radius sid="decay_radius" type="float">20</decay_radius>
             <use_near_attenuation sid="use_near_attenuation" type="bool">0</use_near_attenuation>
             <use_far_attenuation sid="use_far_attenuation" type="bool">0</use_far_attenuation>
             <attenuation_near_start sid="attenuation_near_start" type="float">7</attenuation_near_start>
@@ -930,6 +1020,20 @@
       </extra>
     </light>
   </library_lights>
+  <library_images>
+    <image id="american_cherry_png">
+      <init_from>file:///C:/Program%20Files/Common%20Files/Autodesk%20Shared/Materials/Textures/1/Mats/american_cherry.png</init_from>
+    </image>
+    <image id="_02_png">
+      <init_from>file:///C:/Program%20Files/Common%20Files/Autodesk%20Shared/Materials/Textures/3/Mats/102.png</init_from>
+    </image>
+    <image id="Finishes_Flooring_Tile_Square_Medium_Blue_png">
+      <init_from>file:///C:/Program%20Files/Common%20Files/Autodesk%20Shared/Materials/Textures/3/Mats/Finishes.Flooring.Tile.Square.Medium%20Blue.png</init_from>
+    </image>
+    <image id="SiteWork_Planting_Grass_Bermuda1_jpg">
+      <init_from>file:///C:/Program%20Files/Common%20Files/Autodesk%20Shared/Materials/Textures/3/Mats/SiteWork.Planting.Grass.Bermuda1.jpg</init_from>
+    </image>
+  </library_images>
   <library_visual_scenes>
     <visual_scene id="MaxScene">
       <node name="EnvironmentAmbientLight">
@@ -984,7 +1088,9 @@
         <instance_geometry url="#geom-Cylinder">
           <bind_material>
             <technique_common>
-              <instance_material symbol="ColorMaterial" target="#ColorEffectR229G154B215-material"/>
+              <instance_material symbol="Grass" target="#Grass-material">
+                <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="0"/>
+              </instance_material>
             </technique_common>
           </bind_material>
         </instance_geometry>
@@ -1003,7 +1109,11 @@
         <instance_geometry url="#geom-Plane">
           <bind_material>
             <technique_common>
-              <instance_material symbol="ColorMaterial" target="#ColorEffectR28G149B177-material"/>
+              <instance_material symbol="Wood" target="#Wood-material">
+                <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="0"/>
+                <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="0"/>
+                <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="0"/>
+              </instance_material>
             </technique_common>
           </bind_material>
         </instance_geometry>
@@ -1037,7 +1147,7 @@
         </extra>
       </node>
       <node id="node-Light" name="Light">
-        <translate>2.124535 8.291501 6.185831</translate>
+        <translate sid="translation">2.124535 8.291501 6.185831</translate>
         <instance_light url="#Light-light"/>
         <node id="node-LightIndicator" name="LightIndicator">
           <rotate>0.5773504 -0.5773501 -0.5773504 -120</rotate>
@@ -1302,6 +1412,132 @@
           </accessor>
         </technique_common>
       </source>
+      <source id="node-Light_translation.X-input">
+        <float_array id="node-Light_translation.X-input-array" count="7">0 0.5 1 1.5 2 2.833333 3.333333</float_array>
+        <technique_common>
+          <accessor source="#node-Light_translation.X-input-array" count="7" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Light_translation.X-output">
+        <float_array id="node-Light_translation.X-output-array" count="7">2.124535 -5.611371 -5.611371 0.04967833 0.04967833 2.124535 2.124535</float_array>
+        <technique_common>
+          <accessor source="#node-Light_translation.X-output-array" count="7" stride="1">
+            <param name="X" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Light_translation.X-intangent">
+        <float_array id="node-Light_translation.X-intangent-array" count="14">0.9997917 2.124535 0.33335 -5.611371 0.83335 -5.611371 1.33335 0.04967833 1.83335 0.04967833 2.555583 2.124535 3.166683 2.124535</float_array>
+        <technique_common>
+          <accessor source="#node-Light_translation.X-intangent-array" count="7" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Light_translation.X-outtangent">
+        <float_array id="node-Light_translation.X-outtangent-array" count="14">0.16665 2.124535 0.66665 -5.611371 1.16665 -5.611371 1.66665 0.04967833 2.27775 0.04967833 2.999983 2.124535 3.666564 2.124535</float_array>
+        <technique_common>
+          <accessor source="#node-Light_translation.X-outtangent-array" count="7" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Light_translation.X-interpolation">
+        <Name_array id="node-Light_translation.X-interpolation-array" count="7">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#node-Light_translation.X-interpolation-array" count="7" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Light_translation.Y-input">
+        <float_array id="node-Light_translation.Y-input-array" count="7">0 0.5 1 1.5 2 2.833333 3.333333</float_array>
+        <technique_common>
+          <accessor source="#node-Light_translation.Y-input-array" count="7" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Light_translation.Y-output">
+        <float_array id="node-Light_translation.Y-output-array" count="7">8.291501 0.2940993 0.2940993 -3.820096 -3.820096 8.291501 8.291501</float_array>
+        <technique_common>
+          <accessor source="#node-Light_translation.Y-output-array" count="7" stride="1">
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Light_translation.Y-intangent">
+        <float_array id="node-Light_translation.Y-intangent-array" count="14">0.9997917 8.291501 0.33335 0.2940993 0.83335 0.2940993 1.33335 -3.820096 1.83335 -3.820096 2.555583 8.291501 3.166683 8.291501</float_array>
+        <technique_common>
+          <accessor source="#node-Light_translation.Y-intangent-array" count="7" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Light_translation.Y-outtangent">
+        <float_array id="node-Light_translation.Y-outtangent-array" count="14">0.16665 8.291501 0.66665 0.2940993 1.16665 0.2940993 1.66665 -3.820096 2.27775 -3.820096 2.999983 8.291501 3.666564 8.291501</float_array>
+        <technique_common>
+          <accessor source="#node-Light_translation.Y-outtangent-array" count="7" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Light_translation.Y-interpolation">
+        <Name_array id="node-Light_translation.Y-interpolation-array" count="7">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#node-Light_translation.Y-interpolation-array" count="7" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Light_translation.Z-input">
+        <float_array id="node-Light_translation.Z-input-array" count="7">0 0.5 1 1.5 2 2.833333 3.333333</float_array>
+        <technique_common>
+          <accessor source="#node-Light_translation.Z-input-array" count="7" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Light_translation.Z-output">
+        <float_array id="node-Light_translation.Z-output-array" count="7">6.185831 6.185831 6.185831 6.185831 6.185831 6.185831 6.185831</float_array>
+        <technique_common>
+          <accessor source="#node-Light_translation.Z-output-array" count="7" stride="1">
+            <param name="Z" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Light_translation.Z-intangent">
+        <float_array id="node-Light_translation.Z-intangent-array" count="14">0.9997917 6.185831 0.33335 6.185831 0.83335 6.185831 1.33335 6.185831 1.83335 6.185831 2.555583 6.185831 3.166683 6.185831</float_array>
+        <technique_common>
+          <accessor source="#node-Light_translation.Z-intangent-array" count="7" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Light_translation.Z-outtangent">
+        <float_array id="node-Light_translation.Z-outtangent-array" count="14">0.16665 6.185831 0.66665 6.185831 1.16665 6.185831 1.66665 6.185831 2.27775 6.185831 2.999983 6.185831 3.666564 6.185831</float_array>
+        <technique_common>
+          <accessor source="#node-Light_translation.Z-outtangent-array" count="7" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Light_translation.Z-interpolation">
+        <Name_array id="node-Light_translation.Z-interpolation-array" count="7">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#node-Light_translation.Z-interpolation-array" count="7" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
       <sampler id="node-Cube_translation.X-sampler">
         <input semantic="INPUT" source="#node-Cube_translation.X-input"/>
         <input semantic="OUTPUT" source="#node-Cube_translation.X-output"/>
@@ -1340,12 +1576,36 @@
         <input semantic="OUTPUT" source="#node-GeoSphere_ScaleAxisRotation-output"/>
         <input semantic="INTERPOLATION" source="#node-GeoSphere_ScaleAxisRotation-interpolation"/>
       </sampler>
+      <sampler id="node-Light_translation.X-sampler">
+        <input semantic="INPUT" source="#node-Light_translation.X-input"/>
+        <input semantic="OUTPUT" source="#node-Light_translation.X-output"/>
+        <input semantic="IN_TANGENT" source="#node-Light_translation.X-intangent"/>
+        <input semantic="OUT_TANGENT" source="#node-Light_translation.X-outtangent"/>
+        <input semantic="INTERPOLATION" source="#node-Light_translation.X-interpolation"/>
+      </sampler>
+      <sampler id="node-Light_translation.Y-sampler">
+        <input semantic="INPUT" source="#node-Light_translation.Y-input"/>
+        <input semantic="OUTPUT" source="#node-Light_translation.Y-output"/>
+        <input semantic="IN_TANGENT" source="#node-Light_translation.Y-intangent"/>
+        <input semantic="OUT_TANGENT" source="#node-Light_translation.Y-outtangent"/>
+        <input semantic="INTERPOLATION" source="#node-Light_translation.Y-interpolation"/>
+      </sampler>
+      <sampler id="node-Light_translation.Z-sampler">
+        <input semantic="INPUT" source="#node-Light_translation.Z-input"/>
+        <input semantic="OUTPUT" source="#node-Light_translation.Z-output"/>
+        <input semantic="IN_TANGENT" source="#node-Light_translation.Z-intangent"/>
+        <input semantic="OUT_TANGENT" source="#node-Light_translation.Z-outtangent"/>
+        <input semantic="INTERPOLATION" source="#node-Light_translation.Z-interpolation"/>
+      </sampler>
       <channel source="#node-Cube_translation.X-sampler" target="node-Cube/translation.X"/>
       <channel source="#node-Cube_translation.Y-sampler" target="node-Cube/translation.Y"/>
       <channel source="#node-Torus_rotationX.ANGLE-sampler" target="node-Torus/rotationX.ANGLE"/>
       <channel source="#node-GeoSphere_scale-sampler" target="node-GeoSphere/scale"/>
       <channel source="#node-GeoSphere_InverseScaleAxisRotation-sampler" target="node-GeoSphere/InverseScaleAxisRotation"/>
       <channel source="#node-GeoSphere_ScaleAxisRotation-sampler" target="node-GeoSphere/ScaleAxisRotation"/>
+      <channel source="#node-Light_translation.X-sampler" target="node-Light/translation.X"/>
+      <channel source="#node-Light_translation.Y-sampler" target="node-Light/translation.Y"/>
+      <channel source="#node-Light_translation.Z-sampler" target="node-Light/translation.Z"/>
     </animation>
   </library_animations>
   <scene>

@@ -1,9 +1,12 @@
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Tuple
 
+from operator import attrgetter
 from collections import defaultdict
 from dataclasses import dataclass
 from itertools import islice, chain
+from urllib.parse import unquote
 from io import BytesIO
+import os.path
 import struct
 
 from collada.util import matrix_transpose, find_semantics
@@ -45,28 +48,58 @@ class State:
     linearized_nodes: List[types.Node]
     node_parents: Dict[int, int]
 
+    # image_paths: filename: path
+    image_paths: Dict[str, str]
+
+    # image_indices: image_id: image_index
+    image_indices: Dict[str, str]
+
+    # resource_names: resource compiler names already emitted
+    resource_names: Dict[str, str]
+
+    # effect_textures_by_texcoord: (effect_id, channel): [sampler_sid]
+    effect_textures_by_texcoord: Dict[Tuple[str, str], list]
+
     def __init__(self):
         self.vertex_buffer = BytesIO()
         self.index_buffer = BytesIO()
         self.geometry__indices = {}
         self.geometry__vertex_index_tables = {}
-        self.node_names = {}
         self.symbol_names = {}
         self.emitted_input_elements_arrays = {}
         self.node_animation_channels = defaultdict(set)
         self.linearized_nodes = []
         self.node_parents = {}
+        self.image_paths = {}
+        self.image_indices = {}
+        self.resource_names = {}
+        self.effect_textures_by_texcoord = defaultdict(list)
+
+def _sanitize(name):
+    return name.replace(' ', '_').replace('-', '_').replace('.', '_').replace('/', '_')
+
+def _validate_name_value(name, value):
+    assert name is not None, name
+    assert value is not None, value
+    assert type(name) is str, name
+    assert '\\' not in name, name
+
+def sanitize_resource_name(state, name, value):
+    _validate_name_value(name, value)
+    assert '/' not in name, name
+    resource_name = _sanitize(name).upper()
+    assert resource_name not in state.resource_names or state.resource_names[resource_name] is value
+    state.resource_names[resource_name] = value
+    return resource_name
 
 def sanitize_name(state, name, value, *, allow_slash=False):
-    assert name is not None, value
-    assert type(name) is str
+    _validate_name_value(name, value)
+    assert ' ' not in name, name
     if not allow_slash:
         assert '/' not in name, name
-    c_id = name.lower().replace('-', '_').replace('.', '_').replace('/', '_')
-
-    assert c_id not in state.node_names or state.node_names[c_id] is value
+    c_id = _sanitize(name).lower()
+    assert c_id not in state.symbol_names or state.symbol_names[c_id] is value
     state.symbol_names[c_id] = value
-
     return c_id
 
 def render_matrix(fs):
@@ -243,6 +276,23 @@ def find_material_symbol(geometry, material_symbol):
             return i # element index
     assert False, material_symbol
 
+def shader_to_input_set(channel_to_input_set, shader, op):
+    if type(shader) is types.Constant:
+        return -1
+
+    shader_op = op(shader)
+
+    if type(shader_op) is types.Color:
+        return -1
+    if shader_op is None:
+        return -1
+
+    assert type(shader_op) is types.Texture
+    texture = shader_op
+    assert texture.texcoord in channel_to_input_set
+
+    return channel_to_input_set[texture.texcoord]
+
 def render_node_instance_geometry_instance_materials(state, collada, node_name, i, geometry, instance_materials):
     yield f"instance_material const instance_materials_{node_name}_{i}[] = {{"
     for instance_material in instance_materials:
@@ -256,9 +306,32 @@ def render_node_instance_geometry_instance_materials(state, collada, node_name, 
         material = collada.lookup(instance_material.target, types.Material)
         material_name = sanitize_name(state, material.id, material)
 
+        channel_to_input_set = {}
+        for bind_vertex_input in instance_material.bind_vertex_inputs:
+            assert bind_vertex_input.input_semantic == "TEXCOORD", bind_vertex_input
+            if bind_vertex_input.semantic in channel_to_input_set:
+                assert channel_to_input_set[bind_vertex_input.semantic] == bind_vertex_input.input_set
+            else:
+                channel_to_input_set[bind_vertex_input.semantic] = bind_vertex_input.input_set
+
+
+        effect = collada.lookup(material.instance_effect.url, types.Effect)
+        profile_common, = effect.profile_common
+        shader = profile_common.technique.shader
+
+        emission_input_set = shader_to_input_set(channel_to_input_set, shader, attrgetter("emission"))
+        ambient_input_set = shader_to_input_set(channel_to_input_set, shader, attrgetter("ambient"))
+        diffuse_input_set = shader_to_input_set(channel_to_input_set, shader, attrgetter("diffuse"))
+        specular_input_set = shader_to_input_set(channel_to_input_set, shader, attrgetter("specular"))
+
         yield "{"
         yield f".element_index = {element_index}, // an index into mesh.triangles"
         yield f".material = &material_{material_name},"
+        yield ""
+        yield f".emission = {{ .input_set = {emission_input_set} }},"
+        yield f".ambient = {{ .input_set = {ambient_input_set} }},"
+        yield f".diffuse = {{ .input_set = {diffuse_input_set} }},"
+        yield f".specular = {{ .input_set = {specular_input_set} }},"
         yield "},"
     yield "};"
 
@@ -391,14 +464,39 @@ def render_header(namespace):
     yield 'using namespace collada;'
 
 def render_opt_color(field_name, color):
-    yield f".color = {render_float_tuple(color.value)},"
+    yield f".{field_name} = {render_float_tuple(color.value)},"
 
-def render_opt_color_or_texture(field_name, color_or_texture):
+def render_opt_texture(state, profile_common, field_name, texture):
+    sampler_sid = texture.texture
+    sampler = profile_common.sid_lookup[sampler_sid]
+    assert type(sampler) is types.Newparam, sampler
+    assert type(sampler.parameter_type) is types.Sampler2D, sampler
+
+    surface_sid = sampler.parameter_type.source.sid
+    surface = profile_common.sid_lookup[surface_sid]
+    assert type(surface) is types.Newparam, surface
+    assert type(surface.parameter_type) is types.Surface, surface
+    assert surface.parameter_type.type is types.FxSurfaceType._2D
+    image_id = surface.parameter_type.init_from.uri
+    image_index = state.image_indices[image_id]
+
+    yield f".{field_name} = {{ .image_index = {image_index} }},"
+
+def render_opt_color_or_texture(state, profile_common, field_name, color_or_texture):
     if color_or_texture is None:
         color_or_texture = types.Color(value=(0.0, 0.0, 0.0, 0.0))
-    assert type(color_or_texture) is types.Color, color_or_texture
+    opt_type = {
+        types.Color: "COLOR",
+        types.Texture: "TEXTURE",
+    }[type(color_or_texture)]
     yield f".{field_name} = {{"
-    yield from render_opt_color("color", color_or_texture)
+    yield f".type = color_or_texture_type::{opt_type},"
+    if type(color_or_texture) is types.Color:
+        yield from render_opt_color("color", color_or_texture)
+    elif type(color_or_texture) is types.Texture:
+        yield from render_opt_texture(state, profile_common, "texture", color_or_texture)
+    else:
+        assert False, color_or_texture
     yield "},"
 
 def render_opt_float(field_name, f):
@@ -408,7 +506,7 @@ def render_opt_float(field_name, f):
 
 def render_effect(state, collada, effect):
     profile_common, = effect.profile_common
-    assert profile_common.newparam == []
+
     shader = profile_common.technique.shader
     effect_name = sanitize_name(state, effect.id, effect)
     yield f"effect const effect_{effect_name} = {{"
@@ -416,40 +514,40 @@ def render_effect(state, collada, effect):
     if type(shader) is types.Blinn:
         yield ".type = effect_type::BLINN,"
         yield ".blinn = {"
-        yield from render_opt_color_or_texture("emission", shader.emission)
-        yield from render_opt_color_or_texture("ambient", shader.ambient)
-        yield from render_opt_color_or_texture("diffuse", shader.diffuse)
-        yield from render_opt_color_or_texture("specular", shader.specular)
+        yield from render_opt_color_or_texture(state, profile_common, "emission", shader.emission)
+        yield from render_opt_color_or_texture(state, profile_common, "ambient", shader.ambient)
+        yield from render_opt_color_or_texture(state, profile_common, "diffuse", shader.diffuse)
+        yield from render_opt_color_or_texture(state, profile_common, "specular", shader.specular)
         yield from render_opt_float("shininess", shader.shininess)
-        yield from render_opt_color_or_texture("reflective", shader.reflective)
+        yield from render_opt_color_or_texture(state, profile_common, "reflective", shader.reflective)
         yield from render_opt_float("reflectivity", shader.reflectivity)
-        yield from render_opt_color_or_texture("transparent", shader.transparent)
+        yield from render_opt_color_or_texture(state, profile_common, "transparent", shader.transparent)
         yield from render_opt_float("transparency", shader.transparency)
         yield from render_opt_float("index_of_refraction", shader.index_of_refraction)
         yield "}"
     elif type(shader) is types.Lambert:
         yield ".type = effect_type::LAMBERT,"
         yield ".lambert = {"
-        yield from render_opt_color_or_texture("emission", shader.emission)
-        yield from render_opt_color_or_texture("ambient", shader.ambient)
-        yield from render_opt_color_or_texture("diffuse", shader.diffuse)
-        yield from render_opt_color_or_texture("reflective", shader.reflective)
+        yield from render_opt_color_or_texture(state, profile_common, "emission", shader.emission)
+        yield from render_opt_color_or_texture(state, profile_common, "ambient", shader.ambient)
+        yield from render_opt_color_or_texture(state, profile_common, "diffuse", shader.diffuse)
+        yield from render_opt_color_or_texture(state, profile_common, "reflective", shader.reflective)
         yield from render_opt_float("reflectivity", shader.reflectivity)
-        yield from render_opt_color_or_texture("transparent", shader.transparent)
+        yield from render_opt_color_or_texture(state, profile_common, "transparent", shader.transparent)
         yield from render_opt_float("transparency", shader.transparency)
         yield from render_opt_float("index_of_refraction", shader.index_of_refraction)
         yield "}"
     elif type(shader) is types.Phong:
         yield ".type = effect_type::PHONG,"
         yield ".phong = {"
-        yield from render_opt_color_or_texture("emission", shader.emission)
-        yield from render_opt_color_or_texture("ambient", shader.ambient)
-        yield from render_opt_color_or_texture("diffuse", shader.diffuse)
-        yield from render_opt_color_or_texture("specular", shader.specular)
+        yield from render_opt_color_or_texture(state, profile_common, "emission", shader.emission)
+        yield from render_opt_color_or_texture(state, profile_common, "ambient", shader.ambient)
+        yield from render_opt_color_or_texture(state, profile_common, "diffuse", shader.diffuse)
+        yield from render_opt_color_or_texture(state, profile_common, "specular", shader.specular)
         yield from render_opt_float("shininess", shader.shininess)
-        yield from render_opt_color_or_texture("reflective", shader.reflective)
+        yield from render_opt_color_or_texture(state, profile_common, "reflective", shader.reflective)
         yield from render_opt_float("reflectivity", shader.reflectivity)
-        yield from render_opt_color_or_texture("transparent", shader.transparent)
+        yield from render_opt_color_or_texture(state, profile_common, "transparent", shader.transparent)
         yield from render_opt_float("transparency", shader.transparency)
         yield from render_opt_float("index_of_refraction", shader.index_of_refraction)
         yield "}"
@@ -457,9 +555,9 @@ def render_effect(state, collada, effect):
         yield ".type = effect_type::CONSTANT,"
         yield ".constant = {"
         yield from render_opt_color("color", shader.color)
-        yield from render_opt_color_or_texture("reflective", shader.reflective)
+        yield from render_opt_color_or_texture(state, profile_common, "reflective", shader.reflective)
         yield from render_opt_float("reflectivity", shader.reflectivity)
-        yield from render_opt_color_or_texture("transparent", shader.transparent)
+        yield from render_opt_color_or_texture(state, profile_common, "transparent", shader.transparent)
         yield from render_opt_float("transparency", shader.transparency)
         yield from render_opt_float("index_of_refraction", shader.index_of_refraction)
         yield "}"
@@ -501,6 +599,9 @@ def render_descriptor(namespace):
     yield ""
     yield ".inputs_list = inputs_list,"
     yield ".inputs_list_count = (sizeof (inputs_list)) / (sizeof (inputs_list[0])),"
+    yield ""
+    yield ".images = images,"
+    yield ".images_count = (sizeof (images)) / (sizeof (images[0])),"
     yield "};"
 
 def render_end_of_namespace():
@@ -695,12 +796,63 @@ def render_library_lights(state, collada):
         for light in library_lights.lights:
             yield from render_light(state, collada, light)
 
+def escape_space(s):
+    def _escape_space(s):
+        for c in s:
+            if c == ' ':
+                yield '\\'
+            yield c
+    return str(_escape_space(s))
+
+def image_resource_name(state, uri):
+    uri = unquote(uri)
+    prefix = "file:///"
+    assert uri.startswith(prefix), uri
+    path = uri[len(prefix):]
+    assert os.path.exists(path), path
+    image_extensions = {".png", ".jpg", ".bmp", ".jpeg", ".tiff"}
+    assert os.path.splitext(path)[1].lower() in image_extensions, path
+
+    filename = os.path.split(path)[1]
+    assert filename not in state.image_paths, filename
+    state.image_paths[filename] = path
+    return sanitize_resource_name(state, filename, path.lower())
+
+def render_image(state, collada, image, image_index):
+    assert image.id is not None
+    assert image.id not in state.image_indices
+    state.image_indices[image.id] = image_index
+
+    assert type(image.image_source) is types.InitFrom
+    resource_name = image_resource_name(state, image.image_source.uri)
+    image_name = sanitize_name(state, image.id, image)
+
+    yield f"// image_index: {image_index}"
+    yield f"image const image_{image_name} = {{"
+    yield f'.resource_name = L"{resource_name}",'
+    yield "};"
+
+def render_library_images(state, collada):
+    image_index = 0
+    for library_images in collada.library_images:
+        for image in library_images.images:
+            yield from render_image(state, collada, image, image_index)
+            image_index += 1
+
+    yield "image const * const images[] = {"
+    for library_images in collada.library_images:
+        for image in library_images.images:
+            image_name = sanitize_name(state, image.id, image)
+            yield f"&image_{image_name},"
+    yield "};"
+
 def render_all(collada, namespace):
     state = State()
     render, out = renderer()
     render(render_header(namespace))
     render(render_library_lights(state, collada))
     render(render_library_animations(state, collada))
+    render(render_library_images(state, collada))
     render(render_library_effects(state, collada))
     render(render_library_materials(state, collada))
     render(render_library_geometries(state, collada))

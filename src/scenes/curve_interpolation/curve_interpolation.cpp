@@ -10,7 +10,7 @@ light const light_environmentambientlight = {
 };
 
 light const light_light_light = {
-  .type = light_type::DIRECTIONAL,
+  .type = light_type::POINT,
   .color = { 1.0f, 1.0f, 1.0f },
 };
 
@@ -364,6 +364,255 @@ sampler const sampler_node_geosphere_scaleaxisrotation_sampler = {
   },
 };
 
+float const array_node_light_translation_x_input_array[] = {
+  0.0f,
+  0.5f,
+  1.0f,
+  1.5f,
+  2.0f,
+  2.833333f,
+  3.333333f,
+};
+
+float const array_node_light_translation_x_output_array[] = {
+  2.124535f,
+  -5.611371f,
+  -5.611371f,
+  0.04967833f,
+  0.04967833f,
+  2.124535f,
+  2.124535f,
+};
+
+float const array_node_light_translation_x_intangent_array[] = {
+  0.9997917f, 2.124535f,
+  0.33335f, -5.611371f,
+  0.83335f, -5.611371f,
+  1.33335f, 0.04967833f,
+  1.83335f, 0.04967833f,
+  2.555583f, 2.124535f,
+  3.166683f, 2.124535f,
+};
+
+float const array_node_light_translation_x_outtangent_array[] = {
+  0.16665f, 2.124535f,
+  0.66665f, -5.611371f,
+  1.16665f, -5.611371f,
+  1.66665f, 0.04967833f,
+  2.27775f, 0.04967833f,
+  2.999983f, 2.124535f,
+  3.666564f, 2.124535f,
+};
+
+enum interpolation const array_node_light_translation_x_interpolation_array[] = {
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+};
+
+sampler const sampler_node_light_translation_x_sampler = {
+  // node_light_translation_x_input
+  .input = {
+    .float_array = array_node_light_translation_x_input_array,
+    .count = 7,
+    .stride = 1,
+  },
+  // node_light_translation_x_output
+  .output = {
+    .float_array = array_node_light_translation_x_output_array,
+    .count = 7,
+    .stride = 1,
+  },
+  // node_light_translation_x_intangent
+  .in_tangent = {
+    .float_array = array_node_light_translation_x_intangent_array,
+    .count = 7,
+    .stride = 2,
+  },
+  // node_light_translation_x_outtangent
+  .out_tangent = {
+    .float_array = array_node_light_translation_x_outtangent_array,
+    .count = 7,
+    .stride = 2,
+  },
+  // node_light_translation_x_interpolation
+  .interpolation = {
+    .interpolation_array = array_node_light_translation_x_interpolation_array,
+    .count = 7,
+    .stride = 1,
+  },
+};
+
+float const array_node_light_translation_y_input_array[] = {
+  0.0f,
+  0.5f,
+  1.0f,
+  1.5f,
+  2.0f,
+  2.833333f,
+  3.333333f,
+};
+
+float const array_node_light_translation_y_output_array[] = {
+  8.291501f,
+  0.2940993f,
+  0.2940993f,
+  -3.820096f,
+  -3.820096f,
+  8.291501f,
+  8.291501f,
+};
+
+float const array_node_light_translation_y_intangent_array[] = {
+  0.9997917f, 8.291501f,
+  0.33335f, 0.2940993f,
+  0.83335f, 0.2940993f,
+  1.33335f, -3.820096f,
+  1.83335f, -3.820096f,
+  2.555583f, 8.291501f,
+  3.166683f, 8.291501f,
+};
+
+float const array_node_light_translation_y_outtangent_array[] = {
+  0.16665f, 8.291501f,
+  0.66665f, 0.2940993f,
+  1.16665f, 0.2940993f,
+  1.66665f, -3.820096f,
+  2.27775f, -3.820096f,
+  2.999983f, 8.291501f,
+  3.666564f, 8.291501f,
+};
+
+enum interpolation const array_node_light_translation_y_interpolation_array[] = {
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+};
+
+sampler const sampler_node_light_translation_y_sampler = {
+  // node_light_translation_y_input
+  .input = {
+    .float_array = array_node_light_translation_y_input_array,
+    .count = 7,
+    .stride = 1,
+  },
+  // node_light_translation_y_output
+  .output = {
+    .float_array = array_node_light_translation_y_output_array,
+    .count = 7,
+    .stride = 1,
+  },
+  // node_light_translation_y_intangent
+  .in_tangent = {
+    .float_array = array_node_light_translation_y_intangent_array,
+    .count = 7,
+    .stride = 2,
+  },
+  // node_light_translation_y_outtangent
+  .out_tangent = {
+    .float_array = array_node_light_translation_y_outtangent_array,
+    .count = 7,
+    .stride = 2,
+  },
+  // node_light_translation_y_interpolation
+  .interpolation = {
+    .interpolation_array = array_node_light_translation_y_interpolation_array,
+    .count = 7,
+    .stride = 1,
+  },
+};
+
+float const array_node_light_translation_z_input_array[] = {
+  0.0f,
+  0.5f,
+  1.0f,
+  1.5f,
+  2.0f,
+  2.833333f,
+  3.333333f,
+};
+
+float const array_node_light_translation_z_output_array[] = {
+  6.185831f,
+  6.185831f,
+  6.185831f,
+  6.185831f,
+  6.185831f,
+  6.185831f,
+  6.185831f,
+};
+
+float const array_node_light_translation_z_intangent_array[] = {
+  0.9997917f, 6.185831f,
+  0.33335f, 6.185831f,
+  0.83335f, 6.185831f,
+  1.33335f, 6.185831f,
+  1.83335f, 6.185831f,
+  2.555583f, 6.185831f,
+  3.166683f, 6.185831f,
+};
+
+float const array_node_light_translation_z_outtangent_array[] = {
+  0.16665f, 6.185831f,
+  0.66665f, 6.185831f,
+  1.16665f, 6.185831f,
+  1.66665f, 6.185831f,
+  2.27775f, 6.185831f,
+  2.999983f, 6.185831f,
+  3.666564f, 6.185831f,
+};
+
+enum interpolation const array_node_light_translation_z_interpolation_array[] = {
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+};
+
+sampler const sampler_node_light_translation_z_sampler = {
+  // node_light_translation_z_input
+  .input = {
+    .float_array = array_node_light_translation_z_input_array,
+    .count = 7,
+    .stride = 1,
+  },
+  // node_light_translation_z_output
+  .output = {
+    .float_array = array_node_light_translation_z_output_array,
+    .count = 7,
+    .stride = 1,
+  },
+  // node_light_translation_z_intangent
+  .in_tangent = {
+    .float_array = array_node_light_translation_z_intangent_array,
+    .count = 7,
+    .stride = 2,
+  },
+  // node_light_translation_z_outtangent
+  .out_tangent = {
+    .float_array = array_node_light_translation_z_outtangent_array,
+    .count = 7,
+    .stride = 2,
+  },
+  // node_light_translation_z_interpolation
+  .interpolation = {
+    .interpolation_array = array_node_light_translation_z_interpolation_array,
+    .count = 7,
+    .stride = 1,
+  },
+};
+
 channel const node_channel_node_cube_translation_x = {
   .source_sampler = &sampler_node_cube_translation_x_sampler,
   .target_transform_index = 0,
@@ -400,27 +649,78 @@ channel const node_channel_node_geosphere_scaleaxisrotation = {
   .target_attribute = target_attribute::ALL,
 };
 
+channel const node_channel_node_light_translation_x = {
+  .source_sampler = &sampler_node_light_translation_x_sampler,
+  .target_transform_index = 0,
+  .target_attribute = target_attribute::X,
+};
+
+channel const node_channel_node_light_translation_y = {
+  .source_sampler = &sampler_node_light_translation_y_sampler,
+  .target_transform_index = 0,
+  .target_attribute = target_attribute::Y,
+};
+
+channel const node_channel_node_light_translation_z = {
+  .source_sampler = &sampler_node_light_translation_z_sampler,
+  .target_transform_index = 0,
+  .target_attribute = target_attribute::Z,
+};
+
+// image_index: 0
+image const image_american_cherry_png = {
+  .resource_name = L"AMERICAN_CHERRY_PNG",
+};
+
+// image_index: 1
+image const image__02_png = {
+  .resource_name = L"102_PNG",
+};
+
+// image_index: 2
+image const image_finishes_flooring_tile_square_medium_blue_png = {
+  .resource_name = L"FINISHES_FLOORING_TILE_SQUARE_MEDIUM_BLUE_PNG",
+};
+
+// image_index: 3
+image const image_sitework_planting_grass_bermuda1_jpg = {
+  .resource_name = L"SITEWORK_PLANTING_GRASS_BERMUDA1_JPG",
+};
+
+image const * const images[] = {
+  &image_american_cherry_png,
+  &image__02_png,
+  &image_finishes_flooring_tile_square_medium_blue_png,
+  &image_sitework_planting_grass_bermuda1_jpg,
+};
+
 effect const effect_material__15 = {
   .type = effect_type::BLINN,
   .blinn = {
     .emission = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .ambient = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.6705883f, 0.5843138f, 1.0f, 1.0f},
     },
     .diffuse = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.6705883f, 0.5843138f, 1.0f, 1.0f},
     },
     .specular = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .shininess = 10.0f,
     .reflective = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .reflectivity = 0.0f,
     .transparent = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 1.0f, 1.0f, 1.0f},
     },
     .transparency = 1.0f,
@@ -432,23 +732,29 @@ effect const effect_material__16 = {
   .type = effect_type::BLINN,
   .blinn = {
     .emission = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .ambient = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.5803922f, 1.0f, 0.9647059f, 1.0f},
     },
     .diffuse = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.5803922f, 1.0f, 0.9647059f, 1.0f},
     },
     .specular = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .shininess = 10.0f,
     .reflective = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .reflectivity = 0.0f,
     .transparent = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 1.0f, 1.0f, 1.0f},
     },
     .transparency = 1.0f,
@@ -460,23 +766,29 @@ effect const effect_material__17 = {
   .type = effect_type::BLINN,
   .blinn = {
     .emission = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .ambient = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.6509804f, 1.0f, 0.5803922f, 1.0f},
     },
     .diffuse = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.6509804f, 1.0f, 0.5803922f, 1.0f},
     },
     .specular = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .shininess = 10.0f,
     .reflective = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .reflectivity = 0.0f,
     .transparent = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 1.0f, 1.0f, 1.0f},
     },
     .transparency = 1.0f,
@@ -488,23 +800,29 @@ effect const effect_material__18 = {
   .type = effect_type::BLINN,
   .blinn = {
     .emission = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .ambient = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.9333334f, 1.0f, 0.5647059f, 1.0f},
     },
     .diffuse = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.9333334f, 1.0f, 0.5647059f, 1.0f},
     },
     .specular = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .shininess = 10.0f,
     .reflective = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .reflectivity = 0.0f,
     .transparent = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 1.0f, 1.0f, 1.0f},
     },
     .transparency = 1.0f,
@@ -516,23 +834,29 @@ effect const effect_material__19 = {
   .type = effect_type::BLINN,
   .blinn = {
     .emission = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .ambient = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 0.7686275f, 0.5803922f, 1.0f},
     },
     .diffuse = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 0.7686275f, 0.5803922f, 1.0f},
     },
     .specular = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .shininess = 10.0f,
     .reflective = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .reflectivity = 0.0f,
     .transparent = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 1.0f, 1.0f, 1.0f},
     },
     .transparency = 1.0f,
@@ -544,23 +868,29 @@ effect const effect_material__20 = {
   .type = effect_type::BLINN,
   .blinn = {
     .emission = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .ambient = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 0.5803922f, 0.5803922f, 1.0f},
     },
     .diffuse = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 0.5803922f, 0.5803922f, 1.0f},
     },
     .specular = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .shininess = 10.0f,
     .reflective = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .reflectivity = 0.0f,
     .transparent = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 1.0f, 1.0f, 1.0f},
     },
     .transparency = 1.0f,
@@ -572,23 +902,29 @@ effect const effect_coloreffectr26g177b26 = {
   .type = effect_type::PHONG,
   .phong = {
     .emission = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 0.0f},
     },
     .ambient = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.1019608f, 0.6941176f, 0.1019608f, 1.0f},
     },
     .diffuse = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.1019608f, 0.6941176f, 0.1019608f, 1.0f},
     },
     .specular = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 1.0f, 1.0f, 1.0f},
     },
     .shininess = 10.0f,
     .reflective = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .reflectivity = 0.0f,
     .transparent = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 1.0f, 1.0f, 1.0f},
     },
     .transparency = 1.0f,
@@ -596,27 +932,33 @@ effect const effect_coloreffectr26g177b26 = {
   }
 };
 
-effect const effect_coloreffectr229g154b215 = {
-  .type = effect_type::PHONG,
-  .phong = {
+effect const effect_grass = {
+  .type = effect_type::BLINN,
+  .blinn = {
     .emission = {
-      .color = {0.0f, 0.0f, 0.0f, 0.0f},
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .ambient = {
-      .color = {0.8980392f, 0.6039216f, 0.8431373f, 1.0f},
+      .type = color_or_texture_type::COLOR,
+      .color = {0.588f, 0.588f, 0.588f, 1.0f},
     },
     .diffuse = {
-      .color = {0.8980392f, 0.6039216f, 0.8431373f, 1.0f},
+      .type = color_or_texture_type::TEXTURE,
+      .texture = { .image_index = 3 },
     },
     .specular = {
-      .color = {1.0f, 1.0f, 1.0f, 1.0f},
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .shininess = 10.0f,
     .reflective = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .reflectivity = 0.0f,
     .transparent = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 1.0f, 1.0f, 1.0f},
     },
     .transparency = 1.0f,
@@ -624,27 +966,33 @@ effect const effect_coloreffectr229g154b215 = {
   }
 };
 
-effect const effect_coloreffectr28g149b177 = {
-  .type = effect_type::PHONG,
-  .phong = {
+effect const effect_wood = {
+  .type = effect_type::BLINN,
+  .blinn = {
     .emission = {
-      .color = {0.0f, 0.0f, 0.0f, 0.0f},
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .ambient = {
-      .color = {0.1098039f, 0.5843137f, 0.6941176f, 1.0f},
+      .type = color_or_texture_type::COLOR,
+      .color = {0.588f, 0.588f, 0.588f, 1.0f},
     },
     .diffuse = {
-      .color = {0.1098039f, 0.5843137f, 0.6941176f, 1.0f},
+      .type = color_or_texture_type::TEXTURE,
+      .texture = { .image_index = 0 },
     },
     .specular = {
-      .color = {1.0f, 1.0f, 1.0f, 1.0f},
+      .type = color_or_texture_type::TEXTURE,
+      .texture = { .image_index = 2 },
     },
     .shininess = 10.0f,
     .reflective = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .reflectivity = 0.0f,
     .transparent = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 1.0f, 1.0f, 1.0f},
     },
     .transparency = 1.0f,
@@ -656,23 +1004,29 @@ effect const effect_coloreffectr198g224b87 = {
   .type = effect_type::PHONG,
   .phong = {
     .emission = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 0.0f},
     },
     .ambient = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.7764706f, 0.8784314f, 0.3411765f, 1.0f},
     },
     .diffuse = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.7764706f, 0.8784314f, 0.3411765f, 1.0f},
     },
     .specular = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 1.0f, 1.0f, 1.0f},
     },
     .shininess = 10.0f,
     .reflective = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .reflectivity = 0.0f,
     .transparent = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 1.0f, 1.0f, 1.0f},
     },
     .transparency = 1.0f,
@@ -684,23 +1038,29 @@ effect const effect_lightemit = {
   .type = effect_type::BLINN,
   .blinn = {
     .emission = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 1.0f, 1.0f, 1.0f},
     },
     .ambient = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .diffuse = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .specular = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .shininess = 10.0f,
     .reflective = {
+      .type = color_or_texture_type::COLOR,
       .color = {0.0f, 0.0f, 0.0f, 1.0f},
     },
     .reflectivity = 0.0f,
     .transparent = {
+      .type = color_or_texture_type::COLOR,
       .color = {1.0f, 1.0f, 1.0f, 1.0f},
     },
     .transparency = 1.0f,
@@ -710,14 +1070,6 @@ effect const effect_lightemit = {
 
 material const material_coloreffectr26g177b26_material = {
   .effect = &effect_coloreffectr26g177b26,
-};
-
-material const material_coloreffectr229g154b215_material = {
-  .effect = &effect_coloreffectr229g154b215,
-};
-
-material const material_coloreffectr28g149b177_material = {
-  .effect = &effect_coloreffectr28g149b177,
 };
 
 material const material_coloreffectr198g224b87_material = {
@@ -746,6 +1098,14 @@ material const material_material__19_material = {
 
 material const material_material__20_material = {
   .effect = &effect_material__20,
+};
+
+material const material_grass_material = {
+  .effect = &effect_grass,
+};
+
+material const material_wood_material = {
+  .effect = &effect_wood,
 };
 
 material const material_lightemit_material = {
@@ -973,26 +1333,56 @@ instance_material const instance_materials_node_cube_0[] = {
   {
     .element_index = 1, // an index into mesh.triangles
     .material = &material_material__15_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
   },
   {
     .element_index = 0, // an index into mesh.triangles
     .material = &material_material__16_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
   },
   {
     .element_index = 5, // an index into mesh.triangles
     .material = &material_material__17_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
   },
   {
     .element_index = 4, // an index into mesh.triangles
     .material = &material_material__20_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
   },
   {
     .element_index = 3, // an index into mesh.triangles
     .material = &material_material__18_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
   },
   {
     .element_index = 2, // an index into mesh.triangles
     .material = &material_material__19_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
   },
 };
 
@@ -1008,8 +1398,8 @@ instance_light const instance_lights_node_cube[] = {
 };
 
 channel const * const node_channels_node_cube[] = {
-  &node_channel_node_cube_translation_y,
   &node_channel_node_cube_translation_x,
+  &node_channel_node_cube_translation_y,
 };
 
 node const node_node_cube = {
@@ -1057,6 +1447,11 @@ instance_material const instance_materials_node_torus_0[] = {
   {
     .element_index = 0, // an index into mesh.triangles
     .material = &material_coloreffectr26g177b26_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
   },
 };
 
@@ -1099,7 +1494,12 @@ transform const transforms_node_cylinder[] = {
 instance_material const instance_materials_node_cylinder_0[] = {
   {
     .element_index = 0, // an index into mesh.triangles
-    .material = &material_coloreffectr229g154b215_material,
+    .material = &material_grass_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = 0 },
+    .specular = { .input_set = -1 },
   },
 };
 
@@ -1149,7 +1549,12 @@ transform const transforms_node_plane[] = {
 instance_material const instance_materials_node_plane_0[] = {
   {
     .element_index = 0, // an index into mesh.triangles
-    .material = &material_coloreffectr28g149b177_material,
+    .material = &material_wood_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = 0 },
+    .specular = { .input_set = 0 },
   },
 };
 
@@ -1204,6 +1609,11 @@ instance_material const instance_materials_node_geosphere_0[] = {
   {
     .element_index = 0, // an index into mesh.triangles
     .material = &material_coloreffectr198g224b87_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
   },
 };
 
@@ -1259,6 +1669,9 @@ instance_light const instance_lights_node_light[] = {
 };
 
 channel const * const node_channels_node_light[] = {
+  &node_channel_node_light_translation_z,
+  &node_channel_node_light_translation_x,
+  &node_channel_node_light_translation_y,
 };
 
 node const node_node_light = {
@@ -1276,7 +1689,7 @@ node const node_node_light = {
   .instance_lights_count = 1,
 
   .channels = node_channels_node_light,
-  .channels_count = 0,
+  .channels_count = 3,
 };
 
 transform const transforms_node_lightindicator[] = {
@@ -1290,6 +1703,11 @@ instance_material const instance_materials_node_lightindicator_0[] = {
   {
     .element_index = 0, // an index into mesh.triangles
     .material = &material_lightemit_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
   },
 };
 
@@ -1351,6 +1769,9 @@ collada::descriptor const descriptor = {
 
   .inputs_list = inputs_list,
   .inputs_list_count = (sizeof (inputs_list)) / (sizeof (inputs_list[0])),
+
+  .images = images,
+  .images_count = (sizeof (images)) / (sizeof (images[0])),
 };
 
 }

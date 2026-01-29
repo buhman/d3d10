@@ -22,6 +22,19 @@ cbuffer cbPerMaterial
   float4 Diffuse;
   float4 Specular;
   float Shininess;
+
+  int4 TextureChannel;
+};
+
+Texture2D TexEmission;
+Texture2D TexAmbient;
+Texture2D TexDiffuse;
+Texture2D TexSpecular;
+
+SamplerState samLinear {
+  Filter = MIN_MAG_MIP_LINEAR;
+  AddressU = Wrap;
+  AddressV = Wrap;
 };
 
 struct VS_INPUT
