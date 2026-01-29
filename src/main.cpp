@@ -20,7 +20,7 @@
 #include "collada.hpp"
 #include "collada_scene.hpp"
 
-#include "scenes/curve_interpolation.hpp"
+#include "scenes/curve_interpolation/curve_interpolation.hpp"
 
 HINSTANCE g_hInstance = NULL;
 HWND g_hWnd = NULL;
@@ -1843,7 +1843,8 @@ void Render(float t, float dt)
 
   //collada::Render(t);
 
-  g_SceneState.render(t);
+  g_SceneState.update(t);
+  g_SceneState.render();
 
   RenderFont(dt);
 

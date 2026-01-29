@@ -9,6 +9,7 @@
 #include "new.hpp"
 
 extern ID3D10Device * g_pd3dDevice;
+extern XMVECTOR g_Eye;
 extern XMMATRIX g_View;
 extern XMMATRIX g_Projection;
 
@@ -21,6 +22,11 @@ namespace collada_scene {
   ID3D10EffectMatrixVariable * g_pWorldVariable = NULL;
   ID3D10EffectMatrixVariable * g_pViewVariable = NULL;
   ID3D10EffectMatrixVariable * g_pProjectionVariable = NULL;
+
+  ID3D10EffectVectorVariable * g_pViewEyeVariable = NULL;
+  ID3D10EffectVectorVariable * g_pLightPosVariable = NULL;
+  ID3D10EffectVectorVariable * g_pLightDirVariable = NULL;
+  ID3D10EffectVectorVariable * g_pLightColorVariable = NULL;
 
   ID3D10EffectVectorVariable * g_pEmissionVariable = NULL;
   ID3D10EffectVectorVariable * g_pAmbientVariable = NULL;
@@ -67,8 +73,52 @@ namespace collada_scene {
     return S_OK;
   }
 
+  void scene_state::update_light_instance_vectors(light const& light,
+                                                  node_instance const& node_instance,
+                                                  int light_index)
+  {
+    const XMVECTOR position = XMVectorSet(0, 0, 0, 1);
+    const XMVECTOR direction = XMVectorSet(0, 0, -1, 0);
+    XMVECTOR light_position = XMVector3Transform(position, node_instance.world);
+    XMVECTOR light_direction = XMVector3TransformNormal(direction, node_instance.world);
+    XMVECTOR light_color = XMLoadFloat3((XMFLOAT3 *)&light.color);
+
+    XMStoreFloat4(&m_lightPositions[light_index], light_position);
+    XMStoreFloat4(&m_lightDirections[light_index], light_direction);
+    XMStoreFloat4(&m_lightColors[light_index], light_color);
+  }
+
+  void scene_state::update_light_instances()
+  {
+    int light_index = 0;
+    for (int i = 0; i < m_descriptor->nodes_count; i++) {
+      node const& node = *m_descriptor->nodes[i];
+      node_instance const& node_instance = m_nodeInstances[i];
+      for (int j = 0; j < node.instance_lights_count; j++) {
+        light const& light = *node.instance_lights[j].light;
+        update_light_instance_vectors(light, node_instance, light_index);
+        light_index += 1;
+      }
+    }
+  }
+
+  void scene_state::allocate_light_instances()
+  {
+    // count light instances
+    int count = 0;
+    for (int i = 0; i < m_descriptor->nodes_count; i++) {
+      count += m_descriptor->nodes[i]->instance_lights_count;
+    }
+
+    // allocate
+    m_lightInstancesCount = count;
+    m_lightPositions = New<XMFLOAT4>(m_lightInstancesCount);
+    m_lightDirections = New<XMFLOAT4>(m_lightInstancesCount);
+    m_lightColors = New<XMFLOAT4>(m_lightInstancesCount);
+  }
+
   static void initialize_node_transforms(node const * const node,
-                                         node_instance * node_instance)
+                                         node_instance * const node_instance)
   {
     for (int i = 0; i < node->transforms_count; i++) {
       transform& transform = node_instance->transforms[i];
@@ -98,7 +148,7 @@ namespace collada_scene {
   }
 
   void scene_state::allocate_node_instance(node const * const node,
-                                           node_instance * node_instance)
+                                           node_instance * const node_instance)
   {
     node_instance->transforms = New<transform>(node->transforms_count);
     initialize_node_transforms(node, node_instance);
@@ -133,6 +183,7 @@ namespace collada_scene {
       return E_FAIL;
 
     allocate_node_instances();
+    allocate_light_instances();
 
     return S_OK;
   }
@@ -143,6 +194,7 @@ namespace collada_scene {
 
     D3D10_INPUT_ELEMENT_DESC layout[inputs.elements_count];
 
+    assert(inputs.elements_count == 3);
     int byte_offset = 0;
     for (int i = 0; i < inputs.elements_count; i++) {
       layout[i].SemanticName = inputs.elements[i].semantic;
@@ -199,6 +251,11 @@ namespace collada_scene {
     g_pWorldVariable = g_pEffect->GetVariableByName("World")->AsMatrix();
     g_pViewVariable = g_pEffect->GetVariableByName("View")->AsMatrix();
     g_pProjectionVariable = g_pEffect->GetVariableByName("Projection")->AsMatrix();
+
+    g_pViewEyeVariable = g_pEffect->GetVariableByName("ViewEye")->AsVector();
+    g_pLightPosVariable = g_pEffect->GetVariableByName("LightPos")->AsVector();
+    g_pLightDirVariable = g_pEffect->GetVariableByName("LightDir")->AsVector();
+    g_pLightColorVariable = g_pEffect->GetVariableByName("LightColor")->AsVector();
 
     g_pEmissionVariable = g_pEffect->GetVariableByName("Emission")->AsVector();
     g_pAmbientVariable = g_pEffect->GetVariableByName("Ambient")->AsVector();
@@ -559,27 +616,58 @@ namespace collada_scene {
     }
   }
 
-  void scene_state::render(float t)
+  void scene_state::update(float t)
   {
-    g_pViewVariable->SetMatrix((float *)&g_View);
-    g_pProjectionVariable->SetMatrix((float *)&g_Projection);
-
-    g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
     t = loop(t / 2.0f, 3.333333f);
 
+    // animate and update all world transforms
     for (int i = 0; i < m_descriptor->nodes_count; i++) {
       node const& node = *m_descriptor->nodes[i];
       node_instance& node_instance = m_nodeInstances[i];
 
       animate_node(node, node_instance, t);
       node_world_transform(node, node_instance);
+    }
 
-      g_pWorldVariable->SetMatrix((float *)&node_instance.world);
+    // update all lights (after world transforms are computed)
+    update_light_instances();
+  }
+
+  static int min(int a, int b)
+  {
+    return a < b ? a : b;
+  }
+
+  void scene_state::render()
+  {
+    XMFLOAT4 eye;
+    XMFLOAT4X4 projection;
+    XMFLOAT4X4 view;
+    XMStoreFloat4(&eye, g_Eye);
+    XMStoreFloat4x4(&view, g_View);
+    XMStoreFloat4x4(&projection, g_Projection);
+
+    g_pViewVariable->SetMatrix((float *)&view);
+    g_pProjectionVariable->SetMatrix((float *)&projection);
+
+    g_pViewEyeVariable->SetFloatVector((float *)&eye);
+
+    int lights = min(2, m_lightInstancesCount);
+    g_pLightPosVariable->SetFloatVectorArray((float *)m_lightPositions, 0, lights);
+    g_pLightDirVariable->SetFloatVectorArray((float *)m_lightDirections, 0, lights);
+    g_pLightColorVariable->SetFloatVectorArray((float *)m_lightColors, 0, lights);
+
+    g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    for (int i = 0; i < m_descriptor->nodes_count; i++) {
+      node const& node = *m_descriptor->nodes[i];
+      node_instance& node_instance = m_nodeInstances[i];
 
       // joints aren't rendered
       if (node.type != node_type::NODE)
         continue;
+
+      g_pWorldVariable->SetMatrix((float *)&node_instance.world);
 
       render_geometries(node.instance_geometries, node.instance_geometries_count);
     }

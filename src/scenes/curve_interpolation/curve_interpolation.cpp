@@ -1008,8 +1008,8 @@ instance_light const instance_lights_node_cube[] = {
 };
 
 channel const * const node_channels_node_cube[] = {
-  &node_channel_node_cube_translation_x,
   &node_channel_node_cube_translation_y,
+  &node_channel_node_cube_translation_x,
 };
 
 node const node_node_cube = {
