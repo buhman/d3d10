@@ -37,20 +37,33 @@ namespace collada_scene {
 
     node_instance * m_nodeInstances = NULL;
 
+    XMFLOAT4 * m_lightPositions = NULL;
+    XMFLOAT4 * m_lightDirections = NULL;
+    XMFLOAT4 * m_lightColors = NULL;
+
+    int m_lightInstancesCount = 0;
+
     collada::descriptor const * m_descriptor;
 
     HRESULT load_scene(collada::descriptor const * const descriptor);
-    void render(float t);
+    void update(float t);
+    void render();
 
   private:
     HRESULT load_layouts();
     void allocate_node_instances();
     void allocate_node_instance(collada::node const * const node,
                                 node_instance * node_instance);
+    void allocate_light_instances();
+
+    void node_world_transform(collada::node const& node, node_instance& node_instance);
+    void update_light_instances();
+    void update_light_instance_vectors(collada::light const& light,
+                                       node_instance const& node_instance,
+                                       int light_index);
 
     void render_geometries(collada::instance_geometry const * const instance_geometries,
                            int const instance_geometries_count);
-    void node_world_transform(collada::node const& node, node_instance& node_instance);
   };
 
   HRESULT LoadEffect();

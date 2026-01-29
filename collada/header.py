@@ -310,12 +310,23 @@ def render_node_channels(state, collada, node, node_name):
         yield f"&node_channel_{target_name},"
     yield "};"
 
+def render_node_instance_lights(state, collada, node_name, instance_lights):
+    yield f"instance_light const instance_lights_{node_name}[] = {{"
+    for instance_light in instance_lights:
+        light = collada.lookup(instance_light.url, types.Light)
+        light_name = sanitize_name(state, light.id, light)
+        yield "{"
+        yield f".light = &light_{light_name},"
+        yield "}"
+    yield "};"
+
 def render_node(state, collada, node, node_index):
     node_name_id = get_node_name_id(node)
     node_name = sanitize_name(state, node_name_id, node)
     #yield from render_node_children(state, collada, node_name, node.nodes)
     yield from render_node_transforms(state, collada, node_name, node.transformation_elements)
     yield from render_node_instance_geometries(state, collada, node_name, node.instance_geometries)
+    yield from render_node_instance_lights(state, collada, node_name, node.instance_lights)
     yield from render_node_channels(state, collada, node, node_name)
 
     type = {
@@ -333,6 +344,9 @@ def render_node(state, collada, node, node_index):
     yield ""
     yield f".instance_geometries = instance_geometries_{node_name},"
     yield f".instance_geometries_count = {len(node.instance_geometries)},"
+    yield ""
+    yield f".instance_lights = instance_lights_{node_name},"
+    yield f".instance_lights_count = {len(node.instance_lights)},"
     yield ""
     yield f".channels = node_channels_{node_name},"
     yield f".channels_count = {len(state.node_animation_channels[node.id])},"
@@ -392,69 +406,72 @@ def render_opt_float(field_name, f):
         f = types.Float(value=0.0)
     yield f".{field_name} = {float(f.value)}f,"
 
+def render_effect(state, collada, effect):
+    profile_common, = effect.profile_common
+    assert profile_common.newparam == []
+    shader = profile_common.technique.shader
+    effect_name = sanitize_name(state, effect.id, effect)
+    yield f"effect const effect_{effect_name} = {{"
+
+    if type(shader) is types.Blinn:
+        yield ".type = effect_type::BLINN,"
+        yield ".blinn = {"
+        yield from render_opt_color_or_texture("emission", shader.emission)
+        yield from render_opt_color_or_texture("ambient", shader.ambient)
+        yield from render_opt_color_or_texture("diffuse", shader.diffuse)
+        yield from render_opt_color_or_texture("specular", shader.specular)
+        yield from render_opt_float("shininess", shader.shininess)
+        yield from render_opt_color_or_texture("reflective", shader.reflective)
+        yield from render_opt_float("reflectivity", shader.reflectivity)
+        yield from render_opt_color_or_texture("transparent", shader.transparent)
+        yield from render_opt_float("transparency", shader.transparency)
+        yield from render_opt_float("index_of_refraction", shader.index_of_refraction)
+        yield "}"
+    elif type(shader) is types.Lambert:
+        yield ".type = effect_type::LAMBERT,"
+        yield ".lambert = {"
+        yield from render_opt_color_or_texture("emission", shader.emission)
+        yield from render_opt_color_or_texture("ambient", shader.ambient)
+        yield from render_opt_color_or_texture("diffuse", shader.diffuse)
+        yield from render_opt_color_or_texture("reflective", shader.reflective)
+        yield from render_opt_float("reflectivity", shader.reflectivity)
+        yield from render_opt_color_or_texture("transparent", shader.transparent)
+        yield from render_opt_float("transparency", shader.transparency)
+        yield from render_opt_float("index_of_refraction", shader.index_of_refraction)
+        yield "}"
+    elif type(shader) is types.Phong:
+        yield ".type = effect_type::PHONG,"
+        yield ".phong = {"
+        yield from render_opt_color_or_texture("emission", shader.emission)
+        yield from render_opt_color_or_texture("ambient", shader.ambient)
+        yield from render_opt_color_or_texture("diffuse", shader.diffuse)
+        yield from render_opt_color_or_texture("specular", shader.specular)
+        yield from render_opt_float("shininess", shader.shininess)
+        yield from render_opt_color_or_texture("reflective", shader.reflective)
+        yield from render_opt_float("reflectivity", shader.reflectivity)
+        yield from render_opt_color_or_texture("transparent", shader.transparent)
+        yield from render_opt_float("transparency", shader.transparency)
+        yield from render_opt_float("index_of_refraction", shader.index_of_refraction)
+        yield "}"
+    elif type(shader) is types.Constant:
+        yield ".type = effect_type::CONSTANT,"
+        yield ".constant = {"
+        yield from render_opt_color("color", shader.color)
+        yield from render_opt_color_or_texture("reflective", shader.reflective)
+        yield from render_opt_float("reflectivity", shader.reflectivity)
+        yield from render_opt_color_or_texture("transparent", shader.transparent)
+        yield from render_opt_float("transparency", shader.transparency)
+        yield from render_opt_float("index_of_refraction", shader.index_of_refraction)
+        yield "}"
+    else:
+        assert False, type(shader)
+
+    yield "};"
+
 def render_library_effects(state, collada):
     for library_effects in collada.library_effects:
         for effect in library_effects.effects:
-            profile_common, = effect.profile_common
-            assert profile_common.newparam == []
-            shader = profile_common.technique.shader
-            effect_name = sanitize_name(state, effect.id, effect)
-            yield f"effect const effect_{effect_name} = {{"
-
-            if type(shader) is types.Blinn:
-                yield ".type = effect_type::BLINN,"
-                yield ".blinn = {"
-                yield from render_opt_color_or_texture("emission", shader.emission)
-                yield from render_opt_color_or_texture("ambient", shader.ambient)
-                yield from render_opt_color_or_texture("diffuse", shader.diffuse)
-                yield from render_opt_color_or_texture("specular", shader.specular)
-                yield from render_opt_float("shininess", shader.shininess)
-                yield from render_opt_color_or_texture("reflective", shader.reflective)
-                yield from render_opt_float("reflectivity", shader.reflectivity)
-                yield from render_opt_color_or_texture("transparent", shader.transparent)
-                yield from render_opt_float("transparency", shader.transparency)
-                yield from render_opt_float("index_of_refraction", shader.index_of_refraction)
-                yield "}"
-            elif type(shader) is types.Lambert:
-                yield ".type = effect_type::LAMBERT,"
-                yield ".lambert = {"
-                yield from render_opt_color_or_texture("emission", shader.emission)
-                yield from render_opt_color_or_texture("ambient", shader.ambient)
-                yield from render_opt_color_or_texture("diffuse", shader.diffuse)
-                yield from render_opt_color_or_texture("reflective", shader.reflective)
-                yield from render_opt_float("reflectivity", shader.reflectivity)
-                yield from render_opt_color_or_texture("transparent", shader.transparent)
-                yield from render_opt_float("transparency", shader.transparency)
-                yield from render_opt_float("index_of_refraction", shader.index_of_refraction)
-                yield "}"
-            elif type(shader) is types.Phong:
-                yield ".type = effect_type::PHONG,"
-                yield ".phong = {"
-                yield from render_opt_color_or_texture("emission", shader.emission)
-                yield from render_opt_color_or_texture("ambient", shader.ambient)
-                yield from render_opt_color_or_texture("diffuse", shader.diffuse)
-                yield from render_opt_color_or_texture("specular", shader.specular)
-                yield from render_opt_float("shininess", shader.shininess)
-                yield from render_opt_color_or_texture("reflective", shader.reflective)
-                yield from render_opt_float("reflectivity", shader.reflectivity)
-                yield from render_opt_color_or_texture("transparent", shader.transparent)
-                yield from render_opt_float("transparency", shader.transparency)
-                yield from render_opt_float("index_of_refraction", shader.index_of_refraction)
-                yield "}"
-            elif type(shader) is types.Constant:
-                yield ".type = effect_type::CONSTANT,"
-                yield ".constant = {"
-                yield from render_opt_color("color", shader.color)
-                yield from render_opt_color_or_texture("reflective", shader.reflective)
-                yield from render_opt_float("reflectivity", shader.reflectivity)
-                yield from render_opt_color_or_texture("transparent", shader.transparent)
-                yield from render_opt_float("transparency", shader.transparency)
-                yield from render_opt_float("index_of_refraction", shader.index_of_refraction)
-                yield "}"
-            else:
-                assert False, type(shader)
-
-            yield "};"
+            yield from render_effect(state, collada, effect)
 
 def render_library_materials(state, collada):
     for library_materials in collada.library_materials:
@@ -655,10 +672,34 @@ def render_library_animations(state, collada):
             yield from render_animation(state, collada, animation_name, animation)
             animation_ix += 1
 
+def render_light_type(technique_common: types.TechniqueCommon_Light):
+    return {
+        types.Ambient: "AMBIENT",
+        types.Directional: "DIRECTIONAL",
+        types.Point: "POINT",
+        types.Spot: "SPOT",
+    }[type(technique_common.light)]
+
+def render_light(state, collada, light):
+    technique_common = light.technique_common
+    light_name = sanitize_name(state, light.id, light)
+    color = ", ".join(f"{float(f)}f" for f in technique_common.light.color)
+    light_type = render_light_type(technique_common)
+    yield f"light const light_{light_name} = {{"
+    yield f".type = light_type::{light_type},"
+    yield f".color = {{ {color} }},"
+    yield "};"
+
+def render_library_lights(state, collada):
+    for library_lights in collada.library_lights:
+        for light in library_lights.lights:
+            yield from render_light(state, collada, light)
+
 def render_all(collada, namespace):
     state = State()
     render, out = renderer()
     render(render_header(namespace))
+    render(render_library_lights(state, collada))
     render(render_library_animations(state, collada))
     render(render_library_effects(state, collada))
     render(render_library_materials(state, collada))

@@ -4,6 +4,16 @@ namespace curve_interpolation {
 
 using namespace collada;
 
+light const light_environmentambientlight = {
+  .type = light_type::AMBIENT,
+  .color = { 0.0f, 0.0f, 0.0f },
+};
+
+light const light_light_light = {
+  .type = light_type::DIRECTIONAL,
+  .color = { 1.0f, 1.0f, 1.0f },
+};
+
 float const array_node_cube_translation_x_input_array[] = {
   0.0f,
   1.666667f,
@@ -140,7 +150,7 @@ sampler const sampler_node_cube_translation_y_sampler = {
   },
 };
 
-float const array_node_torus001_rotationx_angle_input_array[] = {
+float const array_node_torus_rotationx_angle_input_array[] = {
   0.0f,
   0.8333334f,
   1.666667f,
@@ -148,7 +158,7 @@ float const array_node_torus001_rotationx_angle_input_array[] = {
   3.333333f,
 };
 
-float const array_node_torus001_rotationx_angle_output_array[] = {
+float const array_node_torus_rotationx_angle_output_array[] = {
   0.0f,
   -90.0f,
   -180.0f,
@@ -156,7 +166,7 @@ float const array_node_torus001_rotationx_angle_output_array[] = {
   -360.0f,
 };
 
-float const array_node_torus001_rotationx_angle_intangent_array[] = {
+float const array_node_torus_rotationx_angle_intangent_array[] = {
   0.9997917f, 0.0f,
   0.3270486f, -89.70257f,
   0.9961964f, -179.1937f,
@@ -164,7 +174,7 @@ float const array_node_torus001_rotationx_angle_intangent_array[] = {
   2.6534f, -360.0f,
 };
 
-float const array_node_torus001_rotationx_angle_outtangent_array[] = {
+float const array_node_torus_rotationx_angle_outtangent_array[] = {
   0.6602973f, 0.0f,
   1.324714f, -90.28867f,
   2.332406f, -180.8006f,
@@ -172,7 +182,7 @@ float const array_node_torus001_rotationx_angle_outtangent_array[] = {
   2.333542f, -360.0f,
 };
 
-enum interpolation const array_node_torus001_rotationx_angle_interpolation_array[] = {
+enum interpolation const array_node_torus_rotationx_angle_interpolation_array[] = {
   interpolation::BEZIER,
   interpolation::BEZIER,
   interpolation::BEZIER,
@@ -180,175 +190,175 @@ enum interpolation const array_node_torus001_rotationx_angle_interpolation_array
   interpolation::BEZIER,
 };
 
-sampler const sampler_node_torus001_rotationx_angle_sampler = {
-  // node_torus001_rotationx_angle_input
+sampler const sampler_node_torus_rotationx_angle_sampler = {
+  // node_torus_rotationx_angle_input
   .input = {
-    .float_array = array_node_torus001_rotationx_angle_input_array,
+    .float_array = array_node_torus_rotationx_angle_input_array,
     .count = 5,
     .stride = 1,
   },
-  // node_torus001_rotationx_angle_output
+  // node_torus_rotationx_angle_output
   .output = {
-    .float_array = array_node_torus001_rotationx_angle_output_array,
+    .float_array = array_node_torus_rotationx_angle_output_array,
     .count = 5,
     .stride = 1,
   },
-  // node_torus001_rotationx_angle_intangent
+  // node_torus_rotationx_angle_intangent
   .in_tangent = {
-    .float_array = array_node_torus001_rotationx_angle_intangent_array,
+    .float_array = array_node_torus_rotationx_angle_intangent_array,
     .count = 5,
     .stride = 2,
   },
-  // node_torus001_rotationx_angle_outtangent
+  // node_torus_rotationx_angle_outtangent
   .out_tangent = {
-    .float_array = array_node_torus001_rotationx_angle_outtangent_array,
+    .float_array = array_node_torus_rotationx_angle_outtangent_array,
     .count = 5,
     .stride = 2,
   },
-  // node_torus001_rotationx_angle_interpolation
+  // node_torus_rotationx_angle_interpolation
   .interpolation = {
-    .interpolation_array = array_node_torus001_rotationx_angle_interpolation_array,
+    .interpolation_array = array_node_torus_rotationx_angle_interpolation_array,
     .count = 5,
     .stride = 1,
   },
 };
 
-float const array_node_geosphere001_scale_input_array[] = {
+float const array_node_geosphere_scale_input_array[] = {
   0.0f,
   1.666667f,
   3.333333f,
 };
 
-float const array_node_geosphere001_scale_output_array[] = {
+float const array_node_geosphere_scale_output_array[] = {
   1.0f, 1.0f, 1.0f,
   1.996525f, 1.996525f, 1.996525f,
   1.0f, 1.0f, 1.0f,
 };
 
-float const array_node_geosphere001_scale_intangent_array[] = {
+float const array_node_geosphere_scale_intangent_array[] = {
   0.9997917f, 1.0f, 0.9997917f, 1.0f, 0.9997917f, 1.0f,
   1.111167f, 1.996525f, 1.111167f, 1.996525f, 1.111167f, 1.996525f,
   2.777833f, 1.0f, 2.777833f, 1.0f, 2.777833f, 1.0f,
 };
 
-float const array_node_geosphere001_scale_outtangent_array[] = {
+float const array_node_geosphere_scale_outtangent_array[] = {
   0.5555f, 1.0f, 0.5555f, 1.0f, 0.5555f, 1.0f,
   2.222167f, 1.996525f, 2.222167f, 1.996525f, 2.222167f, 1.996525f,
   2.333542f, 1.0f, 2.333542f, 1.0f, 2.333542f, 1.0f,
 };
 
-enum interpolation const array_node_geosphere001_scale_interpolation_array[] = {
+enum interpolation const array_node_geosphere_scale_interpolation_array[] = {
   interpolation::BEZIER,
   interpolation::BEZIER,
   interpolation::BEZIER,
 };
 
-sampler const sampler_node_geosphere001_scale_sampler = {
-  // node_geosphere001_scale_input
+sampler const sampler_node_geosphere_scale_sampler = {
+  // node_geosphere_scale_input
   .input = {
-    .float_array = array_node_geosphere001_scale_input_array,
+    .float_array = array_node_geosphere_scale_input_array,
     .count = 3,
     .stride = 1,
   },
-  // node_geosphere001_scale_output
+  // node_geosphere_scale_output
   .output = {
-    .float_array = array_node_geosphere001_scale_output_array,
+    .float_array = array_node_geosphere_scale_output_array,
     .count = 3,
     .stride = 3,
   },
-  // node_geosphere001_scale_intangent
+  // node_geosphere_scale_intangent
   .in_tangent = {
-    .float_array = array_node_geosphere001_scale_intangent_array,
+    .float_array = array_node_geosphere_scale_intangent_array,
     .count = 3,
     .stride = 6,
   },
-  // node_geosphere001_scale_outtangent
+  // node_geosphere_scale_outtangent
   .out_tangent = {
-    .float_array = array_node_geosphere001_scale_outtangent_array,
+    .float_array = array_node_geosphere_scale_outtangent_array,
     .count = 3,
     .stride = 6,
   },
-  // node_geosphere001_scale_interpolation
+  // node_geosphere_scale_interpolation
   .interpolation = {
-    .interpolation_array = array_node_geosphere001_scale_interpolation_array,
+    .interpolation_array = array_node_geosphere_scale_interpolation_array,
     .count = 3,
     .stride = 1,
   },
 };
 
-float const array_node_geosphere001_inversescaleaxisrotation_input_array[] = {
+float const array_node_geosphere_inversescaleaxisrotation_input_array[] = {
   0.0f,
   1.666667f,
   3.333333f,
 };
 
-float const array_node_geosphere001_inversescaleaxisrotation_output_array[] = {
+float const array_node_geosphere_inversescaleaxisrotation_output_array[] = {
   0.0f, 0.0f, 0.0f, 0.0f,
   0.0f, 0.0f, 0.0f, 0.0f,
   0.0f, 0.0f, 0.0f, 0.0f,
 };
 
-enum interpolation const array_node_geosphere001_inversescaleaxisrotation_interpolation_array[] = {
+enum interpolation const array_node_geosphere_inversescaleaxisrotation_interpolation_array[] = {
   interpolation::LINEAR,
   interpolation::LINEAR,
   interpolation::LINEAR,
 };
 
-sampler const sampler_node_geosphere001_inversescaleaxisrotation_sampler = {
-  // node_geosphere001_inversescaleaxisrotation_input
+sampler const sampler_node_geosphere_inversescaleaxisrotation_sampler = {
+  // node_geosphere_inversescaleaxisrotation_input
   .input = {
-    .float_array = array_node_geosphere001_inversescaleaxisrotation_input_array,
+    .float_array = array_node_geosphere_inversescaleaxisrotation_input_array,
     .count = 3,
     .stride = 1,
   },
-  // node_geosphere001_inversescaleaxisrotation_output
+  // node_geosphere_inversescaleaxisrotation_output
   .output = {
-    .float_array = array_node_geosphere001_inversescaleaxisrotation_output_array,
+    .float_array = array_node_geosphere_inversescaleaxisrotation_output_array,
     .count = 3,
     .stride = 4,
   },
-  // node_geosphere001_inversescaleaxisrotation_interpolation
+  // node_geosphere_inversescaleaxisrotation_interpolation
   .interpolation = {
-    .interpolation_array = array_node_geosphere001_inversescaleaxisrotation_interpolation_array,
+    .interpolation_array = array_node_geosphere_inversescaleaxisrotation_interpolation_array,
     .count = 3,
     .stride = 1,
   },
 };
 
-float const array_node_geosphere001_scaleaxisrotation_input_array[] = {
+float const array_node_geosphere_scaleaxisrotation_input_array[] = {
   0.0f,
   1.666667f,
   3.333333f,
 };
 
-float const array_node_geosphere001_scaleaxisrotation_output_array[] = {
+float const array_node_geosphere_scaleaxisrotation_output_array[] = {
   0.0f, 0.0f, 0.0f, 0.0f,
   0.0f, 0.0f, 0.0f, 0.0f,
   0.0f, 0.0f, 0.0f, 0.0f,
 };
 
-enum interpolation const array_node_geosphere001_scaleaxisrotation_interpolation_array[] = {
+enum interpolation const array_node_geosphere_scaleaxisrotation_interpolation_array[] = {
   interpolation::LINEAR,
   interpolation::LINEAR,
   interpolation::LINEAR,
 };
 
-sampler const sampler_node_geosphere001_scaleaxisrotation_sampler = {
-  // node_geosphere001_scaleaxisrotation_input
+sampler const sampler_node_geosphere_scaleaxisrotation_sampler = {
+  // node_geosphere_scaleaxisrotation_input
   .input = {
-    .float_array = array_node_geosphere001_scaleaxisrotation_input_array,
+    .float_array = array_node_geosphere_scaleaxisrotation_input_array,
     .count = 3,
     .stride = 1,
   },
-  // node_geosphere001_scaleaxisrotation_output
+  // node_geosphere_scaleaxisrotation_output
   .output = {
-    .float_array = array_node_geosphere001_scaleaxisrotation_output_array,
+    .float_array = array_node_geosphere_scaleaxisrotation_output_array,
     .count = 3,
     .stride = 4,
   },
-  // node_geosphere001_scaleaxisrotation_interpolation
+  // node_geosphere_scaleaxisrotation_interpolation
   .interpolation = {
-    .interpolation_array = array_node_geosphere001_scaleaxisrotation_interpolation_array,
+    .interpolation_array = array_node_geosphere_scaleaxisrotation_interpolation_array,
     .count = 3,
     .stride = 1,
   },
@@ -366,27 +376,27 @@ channel const node_channel_node_cube_translation_y = {
   .target_attribute = target_attribute::Y,
 };
 
-channel const node_channel_node_torus001_rotationx_angle = {
-  .source_sampler = &sampler_node_torus001_rotationx_angle_sampler,
+channel const node_channel_node_torus_rotationx_angle = {
+  .source_sampler = &sampler_node_torus_rotationx_angle_sampler,
   .target_transform_index = 3,
   .target_attribute = target_attribute::ANGLE,
 };
 
-channel const node_channel_node_geosphere001_scale = {
-  .source_sampler = &sampler_node_geosphere001_scale_sampler,
-  .target_transform_index = 2,
-  .target_attribute = target_attribute::ALL,
-};
-
-channel const node_channel_node_geosphere001_inversescaleaxisrotation = {
-  .source_sampler = &sampler_node_geosphere001_inversescaleaxisrotation_sampler,
+channel const node_channel_node_geosphere_scale = {
+  .source_sampler = &sampler_node_geosphere_scale_sampler,
   .target_transform_index = 1,
   .target_attribute = target_attribute::ALL,
 };
 
-channel const node_channel_node_geosphere001_scaleaxisrotation = {
-  .source_sampler = &sampler_node_geosphere001_scaleaxisrotation_sampler,
-  .target_transform_index = 3,
+channel const node_channel_node_geosphere_inversescaleaxisrotation = {
+  .source_sampler = &sampler_node_geosphere_inversescaleaxisrotation_sampler,
+  .target_transform_index = 0,
+  .target_attribute = target_attribute::ALL,
+};
+
+channel const node_channel_node_geosphere_scaleaxisrotation = {
+  .source_sampler = &sampler_node_geosphere_scaleaxisrotation_sampler,
+  .target_transform_index = 2,
   .target_attribute = target_attribute::ALL,
 };
 
@@ -670,6 +680,34 @@ effect const effect_coloreffectr198g224b87 = {
   }
 };
 
+effect const effect_lightemit = {
+  .type = effect_type::BLINN,
+  .blinn = {
+    .emission = {
+      .color = {1.0f, 1.0f, 1.0f, 1.0f},
+    },
+    .ambient = {
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .diffuse = {
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .specular = {
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .shininess = 10.0f,
+    .reflective = {
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .reflectivity = 0.0f,
+    .transparent = {
+      .color = {1.0f, 1.0f, 1.0f, 1.0f},
+    },
+    .transparency = 1.0f,
+    .index_of_refraction = 0.0f,
+  }
+};
+
 material const material_coloreffectr26g177b26_material = {
   .effect = &effect_coloreffectr26g177b26,
 };
@@ -708,6 +746,10 @@ material const material_material__19_material = {
 
 material const material_material__20_material = {
   .effect = &effect_material__20,
+};
+
+material const material_lightemit_material = {
+  .effect = &effect_lightemit,
 };
 
 input_element const input_elements_position_0_3_normal_0_3_texcoord_0_3[] = {
@@ -774,7 +816,7 @@ geometry const geometry_geom_cube = {
   }
 };
 
-triangles const triangles_geom_torus001[] = {
+triangles const triangles_geom_torus[] = {
   {
     .count = 240, // triangles
     .index_offset = 0, // indices
@@ -782,9 +824,9 @@ triangles const triangles_geom_torus001[] = {
   },
 };
 
-geometry const geometry_geom_torus001 = {
+geometry const geometry_geom_torus = {
   .mesh = {
-    .triangles = triangles_geom_torus001,
+    .triangles = triangles_geom_torus,
     .triangles_count = 1,
 
     .vertex_buffer_offset = 864,
@@ -795,7 +837,7 @@ geometry const geometry_geom_torus001 = {
   }
 };
 
-triangles const triangles_geom_cylinder001[] = {
+triangles const triangles_geom_cylinder[] = {
   {
     .count = 30, // triangles
     .index_offset = 0, // indices
@@ -803,9 +845,9 @@ triangles const triangles_geom_cylinder001[] = {
   },
 };
 
-geometry const geometry_geom_cylinder001 = {
+geometry const geometry_geom_cylinder = {
   .mesh = {
-    .triangles = triangles_geom_cylinder001,
+    .triangles = triangles_geom_cylinder,
     .triangles_count = 1,
 
     .vertex_buffer_offset = 6012,
@@ -816,7 +858,7 @@ geometry const geometry_geom_cylinder001 = {
   }
 };
 
-triangles const triangles_geom_plane001[] = {
+triangles const triangles_geom_plane[] = {
   {
     .count = 2, // triangles
     .index_offset = 0, // indices
@@ -824,9 +866,9 @@ triangles const triangles_geom_plane001[] = {
   },
 };
 
-geometry const geometry_geom_plane001 = {
+geometry const geometry_geom_plane = {
   .mesh = {
-    .triangles = triangles_geom_plane001,
+    .triangles = triangles_geom_plane,
     .triangles_count = 1,
 
     .vertex_buffer_offset = 7164,
@@ -837,7 +879,7 @@ geometry const geometry_geom_plane001 = {
   }
 };
 
-triangles const triangles_geom_geosphere001[] = {
+triangles const triangles_geom_geosphere[] = {
   {
     .count = 40, // triangles
     .index_offset = 0, // indices
@@ -845,9 +887,9 @@ triangles const triangles_geom_geosphere001[] = {
   },
 };
 
-geometry const geometry_geom_geosphere001 = {
+geometry const geometry_geom_geosphere = {
   .mesh = {
-    .triangles = triangles_geom_geosphere001,
+    .triangles = triangles_geom_geosphere,
     .triangles_count = 1,
 
     .vertex_buffer_offset = 7308,
@@ -858,18 +900,46 @@ geometry const geometry_geom_geosphere001 = {
   }
 };
 
+triangles const triangles_geom_lightindicator[] = {
+  {
+    .count = 8, // triangles
+    .index_offset = 0, // indices
+    .inputs_index = 0, // index into inputs_list
+  },
+};
+
+geometry const geometry_geom_lightindicator = {
+  .mesh = {
+    .triangles = triangles_geom_lightindicator,
+    .triangles_count = 1,
+
+    .vertex_buffer_offset = 11628,
+    .vertex_buffer_size = 864,
+
+    .index_buffer_offset = 3888,
+    .index_buffer_size = 96,
+  }
+};
+
 geometry const * const geometries[] = {
   &geometry_geom_cube,
-  &geometry_geom_torus001,
-  &geometry_geom_cylinder001,
-  &geometry_geom_plane001,
-  &geometry_geom_geosphere001,
+  &geometry_geom_torus,
+  &geometry_geom_cylinder,
+  &geometry_geom_plane,
+  &geometry_geom_geosphere,
+  &geometry_geom_lightindicator,
 };
 
 transform const transforms_node_environmentambientlight[] = {
 };
 
 instance_geometry const instance_geometries_node_environmentambientlight[] = {
+};
+
+instance_light const instance_lights_node_environmentambientlight[] = {
+  {
+    .light = &light_environmentambientlight,
+  }
 };
 
 channel const * const node_channels_node_environmentambientlight[] = {};
@@ -884,6 +954,9 @@ node const node_node_environmentambientlight = {
 
   .instance_geometries = instance_geometries_node_environmentambientlight,
   .instance_geometries_count = 0,
+
+  .instance_lights = instance_lights_node_environmentambientlight,
+  .instance_lights_count = 1,
 
   .channels = node_channels_node_environmentambientlight,
   .channels_count = 0,
@@ -931,9 +1004,12 @@ instance_geometry const instance_geometries_node_cube[] = {
   },
 };
 
+instance_light const instance_lights_node_cube[] = {
+};
+
 channel const * const node_channels_node_cube[] = {
-  &node_channel_node_cube_translation_y,
   &node_channel_node_cube_translation_x,
+  &node_channel_node_cube_translation_y,
 };
 
 node const node_node_cube = {
@@ -947,11 +1023,14 @@ node const node_node_cube = {
   .instance_geometries = instance_geometries_node_cube,
   .instance_geometries_count = 1,
 
+  .instance_lights = instance_lights_node_cube,
+  .instance_lights_count = 0,
+
   .channels = node_channels_node_cube,
   .channels_count = 2,
 };
 
-transform const transforms_node_torus001[] = {
+transform const transforms_node_torus[] = {
   {
     .type = transform_type::TRANSLATE,
     .translate = {5.0f, 1.14258e-07f, 2.0f},
@@ -974,77 +1053,89 @@ transform const transforms_node_torus001[] = {
   },
 };
 
-instance_material const instance_materials_node_torus001_0[] = {
+instance_material const instance_materials_node_torus_0[] = {
   {
     .element_index = 0, // an index into mesh.triangles
     .material = &material_coloreffectr26g177b26_material,
   },
 };
 
-instance_geometry const instance_geometries_node_torus001[] = {
+instance_geometry const instance_geometries_node_torus[] = {
   {
-    .geometry = &geometry_geom_torus001,
-    .instance_materials = instance_materials_node_torus001_0,
+    .geometry = &geometry_geom_torus,
+    .instance_materials = instance_materials_node_torus_0,
     .instance_materials_count = 1,
   },
 };
 
-channel const * const node_channels_node_torus001[] = {
-  &node_channel_node_torus001_rotationx_angle,
+instance_light const instance_lights_node_torus[] = {
 };
 
-node const node_node_torus001 = {
+channel const * const node_channels_node_torus[] = {
+  &node_channel_node_torus_rotationx_angle,
+};
+
+node const node_node_torus = {
   .parent_index = 1,
 
   .type = node_type::NODE,
 
-  .transforms = transforms_node_torus001,
+  .transforms = transforms_node_torus,
   .transforms_count = 5,
 
-  .instance_geometries = instance_geometries_node_torus001,
+  .instance_geometries = instance_geometries_node_torus,
   .instance_geometries_count = 1,
 
-  .channels = node_channels_node_torus001,
+  .instance_lights = instance_lights_node_torus,
+  .instance_lights_count = 0,
+
+  .channels = node_channels_node_torus,
   .channels_count = 1,
 };
 
-transform const transforms_node_cylinder001[] = {
+transform const transforms_node_cylinder[] = {
 };
 
-instance_material const instance_materials_node_cylinder001_0[] = {
+instance_material const instance_materials_node_cylinder_0[] = {
   {
     .element_index = 0, // an index into mesh.triangles
     .material = &material_coloreffectr229g154b215_material,
   },
 };
 
-instance_geometry const instance_geometries_node_cylinder001[] = {
+instance_geometry const instance_geometries_node_cylinder[] = {
   {
-    .geometry = &geometry_geom_cylinder001,
-    .instance_materials = instance_materials_node_cylinder001_0,
+    .geometry = &geometry_geom_cylinder,
+    .instance_materials = instance_materials_node_cylinder_0,
     .instance_materials_count = 1,
   },
 };
 
-channel const * const node_channels_node_cylinder001[] = {
+instance_light const instance_lights_node_cylinder[] = {
 };
 
-node const node_node_cylinder001 = {
+channel const * const node_channels_node_cylinder[] = {
+};
+
+node const node_node_cylinder = {
   .parent_index = -1,
 
   .type = node_type::NODE,
 
-  .transforms = transforms_node_cylinder001,
+  .transforms = transforms_node_cylinder,
   .transforms_count = 0,
 
-  .instance_geometries = instance_geometries_node_cylinder001,
+  .instance_geometries = instance_geometries_node_cylinder,
   .instance_geometries_count = 1,
 
-  .channels = node_channels_node_cylinder001,
+  .instance_lights = instance_lights_node_cylinder,
+  .instance_lights_count = 0,
+
+  .channels = node_channels_node_cylinder,
   .channels_count = 0,
 };
 
-transform const transforms_node_plane001[] = {
+transform const transforms_node_plane[] = {
   {
     .type = transform_type::TRANSLATE,
     .translate = {0.0f, 0.0f, 0.01f},
@@ -1055,44 +1146,46 @@ transform const transforms_node_plane001[] = {
   },
 };
 
-instance_material const instance_materials_node_plane001_0[] = {
+instance_material const instance_materials_node_plane_0[] = {
   {
     .element_index = 0, // an index into mesh.triangles
     .material = &material_coloreffectr28g149b177_material,
   },
 };
 
-instance_geometry const instance_geometries_node_plane001[] = {
+instance_geometry const instance_geometries_node_plane[] = {
   {
-    .geometry = &geometry_geom_plane001,
-    .instance_materials = instance_materials_node_plane001_0,
+    .geometry = &geometry_geom_plane,
+    .instance_materials = instance_materials_node_plane_0,
     .instance_materials_count = 1,
   },
 };
 
-channel const * const node_channels_node_plane001[] = {
+instance_light const instance_lights_node_plane[] = {
 };
 
-node const node_node_plane001 = {
+channel const * const node_channels_node_plane[] = {
+};
+
+node const node_node_plane = {
   .parent_index = -1,
 
   .type = node_type::NODE,
 
-  .transforms = transforms_node_plane001,
+  .transforms = transforms_node_plane,
   .transforms_count = 2,
 
-  .instance_geometries = instance_geometries_node_plane001,
+  .instance_geometries = instance_geometries_node_plane,
   .instance_geometries_count = 1,
 
-  .channels = node_channels_node_plane001,
+  .instance_lights = instance_lights_node_plane,
+  .instance_lights_count = 0,
+
+  .channels = node_channels_node_plane,
   .channels_count = 0,
 };
 
-transform const transforms_node_geosphere001[] = {
-  {
-    .type = transform_type::TRANSLATE,
-    .translate = {0.03164387f, -0.03838623f, 0.0f},
-  },
+transform const transforms_node_geosphere[] = {
   {
     .type = transform_type::ROTATE,
     .rotate = {0.0f, 0.0f, 0.0f, 0.0f},
@@ -1107,49 +1200,140 @@ transform const transforms_node_geosphere001[] = {
   },
 };
 
-instance_material const instance_materials_node_geosphere001_0[] = {
+instance_material const instance_materials_node_geosphere_0[] = {
   {
     .element_index = 0, // an index into mesh.triangles
     .material = &material_coloreffectr198g224b87_material,
   },
 };
 
-instance_geometry const instance_geometries_node_geosphere001[] = {
+instance_geometry const instance_geometries_node_geosphere[] = {
   {
-    .geometry = &geometry_geom_geosphere001,
-    .instance_materials = instance_materials_node_geosphere001_0,
+    .geometry = &geometry_geom_geosphere,
+    .instance_materials = instance_materials_node_geosphere_0,
     .instance_materials_count = 1,
   },
 };
 
-channel const * const node_channels_node_geosphere001[] = {
-  &node_channel_node_geosphere001_inversescaleaxisrotation,
-  &node_channel_node_geosphere001_scale,
-  &node_channel_node_geosphere001_scaleaxisrotation,
+instance_light const instance_lights_node_geosphere[] = {
 };
 
-node const node_node_geosphere001 = {
+channel const * const node_channels_node_geosphere[] = {
+  &node_channel_node_geosphere_scale,
+  &node_channel_node_geosphere_inversescaleaxisrotation,
+  &node_channel_node_geosphere_scaleaxisrotation,
+};
+
+node const node_node_geosphere = {
   .parent_index = -1,
 
   .type = node_type::NODE,
 
-  .transforms = transforms_node_geosphere001,
-  .transforms_count = 4,
+  .transforms = transforms_node_geosphere,
+  .transforms_count = 3,
 
-  .instance_geometries = instance_geometries_node_geosphere001,
+  .instance_geometries = instance_geometries_node_geosphere,
   .instance_geometries_count = 1,
 
-  .channels = node_channels_node_geosphere001,
+  .instance_lights = instance_lights_node_geosphere,
+  .instance_lights_count = 0,
+
+  .channels = node_channels_node_geosphere,
   .channels_count = 3,
+};
+
+transform const transforms_node_light[] = {
+  {
+    .type = transform_type::TRANSLATE,
+    .translate = {2.124535f, 8.291501f, 6.185831f},
+  },
+};
+
+instance_geometry const instance_geometries_node_light[] = {
+};
+
+instance_light const instance_lights_node_light[] = {
+  {
+    .light = &light_light_light,
+  }
+};
+
+channel const * const node_channels_node_light[] = {
+};
+
+node const node_node_light = {
+  .parent_index = -1,
+
+  .type = node_type::NODE,
+
+  .transforms = transforms_node_light,
+  .transforms_count = 1,
+
+  .instance_geometries = instance_geometries_node_light,
+  .instance_geometries_count = 0,
+
+  .instance_lights = instance_lights_node_light,
+  .instance_lights_count = 1,
+
+  .channels = node_channels_node_light,
+  .channels_count = 0,
+};
+
+transform const transforms_node_lightindicator[] = {
+  {
+    .type = transform_type::ROTATE,
+    .rotate = {0.5773504f, -0.5773501f, -0.5773504f, -120.0f},
+  },
+};
+
+instance_material const instance_materials_node_lightindicator_0[] = {
+  {
+    .element_index = 0, // an index into mesh.triangles
+    .material = &material_lightemit_material,
+  },
+};
+
+instance_geometry const instance_geometries_node_lightindicator[] = {
+  {
+    .geometry = &geometry_geom_lightindicator,
+    .instance_materials = instance_materials_node_lightindicator_0,
+    .instance_materials_count = 1,
+  },
+};
+
+instance_light const instance_lights_node_lightindicator[] = {
+};
+
+channel const * const node_channels_node_lightindicator[] = {
+};
+
+node const node_node_lightindicator = {
+  .parent_index = 6,
+
+  .type = node_type::NODE,
+
+  .transforms = transforms_node_lightindicator,
+  .transforms_count = 1,
+
+  .instance_geometries = instance_geometries_node_lightindicator,
+  .instance_geometries_count = 1,
+
+  .instance_lights = instance_lights_node_lightindicator,
+  .instance_lights_count = 0,
+
+  .channels = node_channels_node_lightindicator,
+  .channels_count = 0,
 };
 
 node const * const nodes[] = {
   &node_node_environmentambientlight,
   &node_node_cube,
-  &node_node_torus001,
-  &node_node_cylinder001,
-  &node_node_plane001,
-  &node_node_geosphere001,
+  &node_node_torus,
+  &node_node_cylinder,
+  &node_node_plane,
+  &node_node_geosphere,
+  &node_node_light,
+  &node_node_lightindicator,
 };
 
 inputs const inputs_list[] = {

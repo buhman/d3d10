@@ -81,47 +81,24 @@ namespace collada {
   };
 
   //////////////////////////////////////////////////////////////////////
-  // node
+  // light
   //////////////////////////////////////////////////////////////////////
 
-  struct lookat {
-    float3 const eye;
-    float3 const at;
-    float3 const up;
+  enum class light_type {
+    AMBIENT,
+    DIRECTIONAL,
+    POINT,
+    SPOT,
   };
 
-  struct matrix {
-    float const _11, _12, _13, _14;
-    float const _21, _22, _23, _24;
-    float const _31, _32, _33, _34;
-    float const _41, _42, _43, _44;
+  struct light {
+    light_type type;
+    float3 color;
   };
 
-  enum class transform_type {
-    LOOKAT,
-    MATRIX,
-    ROTATE,
-    SCALE,
-    SKEW,
-    TRANSLATE,
-  };
-
-  struct transform {
-    transform_type const type;
-    union {
-      lookat const lookat;
-      matrix const matrix;
-      float4 const rotate;
-      float3 const scale;
-      float7 const skew;
-      float3 const translate;
-    };
-  };
-
-  enum class node_type {
-    JOINT,
-    NODE,
-  };
+  //////////////////////////////////////////////////////////////////////
+  // effect
+  //////////////////////////////////////////////////////////////////////
 
   struct color_or_texture {
     union {
@@ -192,12 +169,55 @@ namespace collada {
     };
   };
 
+  //////////////////////////////////////////////////////////////////////
+  // node
+  //////////////////////////////////////////////////////////////////////
+
+  struct lookat {
+    float3 const eye;
+    float3 const at;
+    float3 const up;
+  };
+
+  struct matrix {
+    float const _11, _12, _13, _14;
+    float const _21, _22, _23, _24;
+    float const _31, _32, _33, _34;
+    float const _41, _42, _43, _44;
+  };
+
+  enum class transform_type {
+    LOOKAT,
+    MATRIX,
+    ROTATE,
+    SCALE,
+    SKEW,
+    TRANSLATE,
+  };
+
+  struct transform {
+    transform_type const type;
+    union {
+      lookat const lookat;
+      matrix const matrix;
+      float4 const rotate;
+      float3 const scale;
+      float7 const skew;
+      float3 const translate;
+    };
+  };
+
+  enum class node_type {
+    JOINT,
+    NODE,
+  };
+
   struct material {
     effect const * const effect;
   };
 
   struct instance_material {
-    int element_index;
+    int element_index; // an index into mesh.triangles
     material const * const material;
   };
 
@@ -206,6 +226,10 @@ namespace collada {
 
     instance_material const * const instance_materials;
     int const instance_materials_count;
+  };
+
+  struct instance_light {
+    light const * const light;
   };
 
   //////////////////////////////////////////////////////////////////////
@@ -285,6 +309,9 @@ namespace collada {
 
     instance_geometry const * const instance_geometries;
     int const instance_geometries_count;
+
+    instance_light const * const instance_lights;
+    int const instance_lights_count;
 
     channel const * const * const channels;
     int const channels_count;

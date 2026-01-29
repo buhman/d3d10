@@ -50,17 +50,27 @@ SHADERS = \
 	$(BUILD_TYPE)/effect/collada.fxo \
 	$(BUILD_TYPE)/effect/collada_scene.fxo
 
-BUFFERS = \
-	models/curve_interpolation/curve_interpolation.vtx \
-	models/curve_interpolation/curve_interpolation.idx
+SCENES = \
+	src/scenes/curve_interpolation/curve_interpolation.cpp
 
-$(BUILD_TYPE)/%.res: %.rc $(SHADERS) $(BUFFERS)
+$(BUILD_TYPE)/%.res: %.rc $(SHADERS) $(SCENES)
 	@mkdir -p $(@D)
 	$(WINDRES) -O coff -I$(BUILD_TYPE)/effect -o $@ $<
 
 $(BUILD_TYPE)/%.obj: src/%.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CXXSTD) $(CFLAGS) $(CXXFLAGS) $(WOPT) $(OPT) -o $@ -c $<
+
+COLLADA_PY_SOURCE = \
+	$(wildcard collada/*.py)
+
+include/scenes/%.hpp: $(COLLADA_PY_SOURCE)
+	@mkdir -p $(@D)
+	PYTHONPATH=. python -m collada.main $@
+
+src/scenes/%.cpp: scenes/%.DAE include/scenes/%.hpp
+	@mkdir -p $(@D)
+	PYTHONPATH=. python -m collada.main $< $@ $(<:.DAE=.vtx) $(<:.DAE=.idx)
 
 OBJS = \
 	$(BUILD_TYPE)/main.res \
@@ -72,7 +82,7 @@ OBJS = \
 	$(BUILD_TYPE)/input.obj \
 	$(BUILD_TYPE)/collada.obj \
 	$(BUILD_TYPE)/collada_scene.obj \
-	$(BUILD_TYPE)/scenes/curve_interpolation.obj
+	$(BUILD_TYPE)/scenes/curve_interpolation/curve_interpolation.obj
 
 $(BUILD_TYPE)/d3d10.exe: $(OBJS)
 	@mkdir -p $(@D)
