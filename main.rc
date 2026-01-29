@@ -4,7 +4,7 @@ RES_VOLUME_FXO RCDATA "volume.fxo"
 RES_BLOOM_FXO RCDATA "bloom.fxo"
 RES_STATIC_FXO RCDATA "static.fxo"
 RES_PERLIN RCDATA "texture/perlin.data"
-RES_ROBOT_PLAYER RCDATA "models/robot_player/robot_player.data"
+RES_ROBOT_PLAYER RCDATA "models/robot_player/robot_player.DDS"
 RES_FONT_TERMINUS_6X12 RCDATA "font/terminus_128x64_6x12.data"
 
 RES_COLLADA_FXO RCDATA "collada.fxo"

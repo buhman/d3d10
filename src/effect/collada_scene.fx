@@ -58,14 +58,18 @@ PS_INPUT VS(VS_INPUT input)
 float4 PS(PS_INPUT input) : SV_Target
 {
   float3 normal = normalize(input.Norm);
-  float3 view_dir = normalize(ViewEye.xyz - input.Pos.xyz);
+  float3 view_dir = normalize(ViewEye.xyz - input.WPos.xyz);
 
   float3 color = Emission.xyz;
 
   for (int i = 0; i < 2; i++) {
     float3 light_dir = normalize(-LightDir[i].xyz);
     float diffuse_intensity = max(dot(normal, light_dir), 0.0);
-    color += Diffuse.xyz * diffuse_intensity * LightColor[i].xyz;
+
+    float distance = length(LightPos[i].xyz - input.WPos.xyz);
+    float attenuation = 1.0 / (0.02 * distance * distance);
+
+    color += Diffuse.xyz * diffuse_intensity * LightColor[i].xyz * attenuation;
   }
 
   return float4(color.xyz, 1);

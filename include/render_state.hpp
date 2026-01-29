@@ -8,6 +8,9 @@ HRESULT LoadTexture2D(const wchar_t * resourceName,
                       const DXGI_FORMAT format,
                       ID3D10ShaderResourceView ** pTextureShaderResourceView);
 
+HRESULT LoadDDSTexture2D(const wchar_t * resourceName,
+                         ID3D10ShaderResourceView ** pTextureShaderResourceView);
+
 HRESULT LoadTexture3D(const wchar_t * resourceName,
                       const int width,
                       const int height,

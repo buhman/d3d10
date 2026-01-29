@@ -80,6 +80,7 @@ OBJS = \
 	$(BUILD_TYPE)/print.obj \
 	$(BUILD_TYPE)/render_state.obj \
 	$(BUILD_TYPE)/input.obj \
+	$(BUILD_TYPE)/dds_validate.obj \
 	$(BUILD_TYPE)/collada.obj \
 	$(BUILD_TYPE)/collada_scene.obj \
 	$(BUILD_TYPE)/scenes/curve_interpolation/curve_interpolation.obj

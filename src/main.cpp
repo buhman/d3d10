@@ -503,12 +503,8 @@ HRESULT LoadMesh()
   // textures
   //////////////////////////////////////////////////////////////////////
 
-  hr = LoadTexture2D(L"RES_ROBOT_PLAYER",
-                     64,     // width
-                     64,     // height
-                     64 * 4, // pitch
-                     DXGI_FORMAT_R8G8B8A8_UNORM,
-                     &g_pTextureShaderResourceView);
+  hr = LoadDDSTexture2D(L"RES_ROBOT_PLAYER",
+                        &g_pTextureShaderResourceView);
   if (FAILED(hr)) {
     print("LoadTexture2D\n");
     return hr;
@@ -1412,7 +1408,7 @@ void RenderModel(float t)
   XMMATRIX rx = XMMatrixRotationX(XM_PI * -0.0f);
   XMMATRIX ry = XMMatrixRotationY(XM_PI * -1.0f + t);
   XMMATRIX mWorldTranslate = XMMatrixTranslation(0.0f, 0.0f, 2.0f);
-  g_World1 = XMMatrixMultiply(rx, ry) * mWorldTranslate;
+  g_World1 = XMMatrixScaling(5, 5, 5), XMMatrixMultiply(rx, ry) * mWorldTranslate;
 
   // matrices
   g_pViewVariable->SetMatrix((float *)&g_View);
@@ -1701,7 +1697,8 @@ void RenderBloom()
 
 float deadzone(float f)
 {
-  const float threshold = 0.25f;
+  //const float threshold = 0.25f;
+  const float threshold = 0.01f;
   if (fabsf(f) <= threshold)
     return 0.0f;
   else {
@@ -1825,7 +1822,7 @@ void Render(float t, float dt)
   g_pd3dDevice->ClearDepthStencilView(g_pDepthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
 
   // render
-  //RenderModel(t);
+  RenderModel(t);
 
   const float ClearColorZero[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
   ID3D10RenderTargetView * RenderTargets[] = {

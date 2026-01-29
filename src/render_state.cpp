@@ -6,6 +6,7 @@
 #include "globals.hpp"
 #include "print.hpp"
 #include "render_state.hpp"
+#include "dds_validate.hpp"
 
 HRESULT LoadTexture2D(const wchar_t * resourceName,
                       const int width,
@@ -54,7 +55,60 @@ HRESULT LoadTexture2D(const wchar_t * resourceName,
   descSRV.Format = textureDesc.Format;
   descSRV.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
   descSRV.Texture2D.MostDetailedMip = 0;
-  descSRV.Texture2D.MipLevels = 1;
+  descSRV.Texture2D.MipLevels = textureDesc.MipLevels;
+  hr = g_pd3dDevice->CreateShaderResourceView(pTexture, &descSRV, pTextureShaderResourceView);
+  if (FAILED(hr)) {
+    print("CreateShaderResourceView\n");
+    return hr;
+  }
+
+  return S_OK;
+}
+
+HRESULT LoadDDSTexture2D(const wchar_t * resourceName,
+                         ID3D10ShaderResourceView ** pTextureShaderResourceView)
+{
+  HRESULT hr;
+
+  printW(L"LoadDDSTexture2D %s\n", resourceName);
+
+  // texture
+  HRSRC hRes = FindResource(NULL, resourceName, RT_RCDATA);
+  if (hRes == NULL) {
+    print("FindResource %s\n", resourceName);
+    return -1;
+  }
+  DWORD dwResourceSize = SizeofResource(NULL, hRes);
+  void const * data = LockResource(LoadResource(NULL, hRes));
+  DDS_FILE const * dds = (DDS_FILE const *)data;
+  D3D10_SUBRESOURCE_DATA subresourceData[dds->header.dwMipMapCount];
+  dds_validate(dds, dwResourceSize, subresourceData);
+
+  D3D10_TEXTURE2D_DESC textureDesc;
+  textureDesc.Width = dds->header.dwWidth;
+  textureDesc.Height = dds->header.dwHeight;
+  textureDesc.MipLevels = dds->header.dwMipMapCount;
+  textureDesc.ArraySize = 1;
+  textureDesc.Format = DXGI_FORMAT_BC1_UNORM;
+  textureDesc.SampleDesc.Count = 1;
+  textureDesc.SampleDesc.Quality = 0;
+  textureDesc.Usage = D3D10_USAGE_IMMUTABLE;
+  textureDesc.BindFlags = D3D10_BIND_SHADER_RESOURCE;
+  textureDesc.CPUAccessFlags = 0;
+  textureDesc.MiscFlags = 0;
+
+  ID3D10Texture2D * pTexture;
+  hr = g_pd3dDevice->CreateTexture2D(&textureDesc, subresourceData, &pTexture);
+  if (FAILED(hr)) {
+    print("DDS CreateTexture2D\n");
+    return hr;
+  }
+
+  D3D10_SHADER_RESOURCE_VIEW_DESC descSRV;
+  descSRV.Format = textureDesc.Format;
+  descSRV.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
+  descSRV.Texture2D.MostDetailedMip = 0;
+  descSRV.Texture2D.MipLevels = textureDesc.MipLevels;
   hr = g_pd3dDevice->CreateShaderResourceView(pTexture, &descSRV, pTextureShaderResourceView);
   if (FAILED(hr)) {
     print("CreateShaderResourceView\n");
@@ -113,7 +167,7 @@ HRESULT LoadTexture3D(const wchar_t * resourceName,
   descSRV.Format = textureDesc.Format;
   descSRV.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE3D;
   descSRV.Texture3D.MostDetailedMip = 0;
-  descSRV.Texture3D.MipLevels = 1;
+  descSRV.Texture3D.MipLevels = textureDesc.MipLevels;
   hr = g_pd3dDevice->CreateShaderResourceView(pTexture, &descSRV, pTextureShaderResourceView);
   if (FAILED(hr)) {
     print("CreateShaderResourceView\n");
@@ -161,7 +215,7 @@ HRESULT CreateTextureRenderTargetView(const int width,
   descSRV.Format = textureDesc.Format;
   descSRV.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
   descSRV.Texture2D.MostDetailedMip = 0;
-  descSRV.Texture2D.MipLevels = 1;
+  descSRV.Texture2D.MipLevels = textureDesc.MipLevels;
   hr = g_pd3dDevice->CreateShaderResourceView(pTexture, &descSRV, pTextureShaderResourceView);
   if (FAILED(hr)) {
     print("CreateShaderResourceView\n");
