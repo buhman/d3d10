@@ -103,30 +103,6 @@ def sanitize_name(state, name, value, *, allow_slash=False):
     state.symbol_names[c_id] = value
     return c_id
 
-def render_matrix(fs):
-    fsi = iter(fs)
-    for i in range(4):
-        s = ", ".join(f"{f}f" for f in islice(fsi, 4))
-        yield f"{s},"
-
-def render_inverse_bind_matrix(collada, skin):
-    inverse_bind_matrix_input, = find_semantics(skin.joints.inputs, "INV_BIND_MATRIX")
-    inverse_bind_matrix_source = collada.lookup(inverse_bind_matrix_input.source, types.SourceCore)
-    stride = inverse_bind_matrix_source.technique_common.accessor.stride
-    count = inverse_bind_matrix_source.technique_common.accessor.count
-    array = inverse_bind_matrix_source.array_element
-    assert type(inverse_bind_matrix_source.array_element) == types.FloatArray
-    assert stride == 16
-    assert array.count == count * stride
-
-    inverse_bind_matrices = []
-    yield "static const float inverse_bind_matrices[] = {"
-    for i in range(count):
-        offset = stride * i
-        matrix = matrix_transpose(array.floats[offset:offset+stride])
-        yield from render_matrix(matrix)
-    yield "};"
-
 def renderbin(f, elems, t):
     fmt = {
         float: '<f',
@@ -294,8 +270,8 @@ def shader_to_input_set(channel_to_input_set, shader, op):
 
     return channel_to_input_set[texture.texcoord]
 
-def render_node_instance_geometry_instance_materials(state, collada, node_name, i, geometry, instance_materials):
-    yield f"instance_material const instance_materials_{node_name}_{i}[] = {{"
+def render_node_geometry_instance_materials(state, collada, prefix, node_name, i, geometry, instance_materials):
+    yield f"instance_material const {prefix}_instance_materials_{node_name}_{i}[] = {{"
     for instance_material in instance_materials:
         # bind <triangles> with `symbol` to <effect> with `target`
 
@@ -343,7 +319,7 @@ def render_node_instance_geometries(state, collada, node_name, instance_geometri
     for i, instance_geometry in enumerate(instance_geometries):
         geometry = collada.lookup(instance_geometry.url, types.Geometry)
         instance_materials = get_instance_materials(instance_geometry)
-        yield from render_node_instance_geometry_instance_materials(state, collada, node_name, i, geometry, instance_materials)
+        yield from render_node_geometry_instance_materials(state, collada, "instance_geometry", node_name, i, geometry, instance_materials)
 
     yield f"instance_geometry const instance_geometries_{node_name}[] = {{"
     for i, instance_geometry in enumerate(instance_geometries):
@@ -354,7 +330,8 @@ def render_node_instance_geometries(state, collada, node_name, instance_geometri
 
         yield "{"
         yield f".geometry = &geometry_{geometry_name},"
-        yield f".instance_materials = instance_materials_{node_name}_{i},"
+        yield ""
+        yield f".instance_materials = instance_geometry_instance_materials_{node_name}_{i},"
         yield f".instance_materials_count = {len(instance_materials)},"
         yield "},"
     yield "};"
@@ -394,12 +371,83 @@ def render_node_instance_lights(state, collada, node_name, instance_lights):
         yield "}"
     yield "};"
 
+def find_node_by_sid(root_node, sid):
+    if sid == root_node.sid:
+        return root_node
+    for child_node in root_node.nodes:
+        node = find_node_by_sid(child_node, sid)
+        if node is not None:
+            return node
+    return None
+
+def find_node_index(state, node):
+    for other_index, other in enumerate(state.linearized_nodes):
+        if other is node:
+            return other_index
+
+def render_joint_node_indices(state, collada, skin, node_name, controller_name, skeleton_node):
+    joint_input, = find_semantics(skin.joints.inputs, "JOINT")
+    joint_source = collada.lookup(joint_input.source, types.SourceCore)
+    stride = joint_source.technique_common.accessor.stride
+    count = joint_source.technique_common.accessor.count
+    array = joint_source.array_element
+    assert type(joint_source.array_element) == types.NameArray, array
+    assert stride == 1
+    assert array.count == count * stride
+
+    yield f"int const joint_node_indices_{node_name}_{controller_name}[] = {{"
+    for node_sid in array.names:
+        joint_node = find_node_by_sid(skeleton_node, node_sid);
+        assert joint_node is not None, (node_sid, skeleton_node.sid_lookup)
+        joint_node_index = find_node_index(state, joint_node)
+        joint_node_name_id = get_node_name_id(joint_node)
+        joint_node_name = sanitize_name(state, joint_node_name_id, joint_node)
+        yield f"{joint_node_index}, // {node_sid} {joint_node_name}"
+    yield "};"
+
+def render_node_instance_controller_joint_node_indices(state, collada, node_name, instance_controller):
+    controller = collada.lookup(instance_controller.url, types.Controller)
+    controller_name = sanitize_name(state, controller.id, controller)
+    assert type(controller.control_element) is types.Skin
+    skin = controller.control_element
+    skeleton_node = collada.lookup(instance_controller.skeleton, types.Node)
+
+    yield from render_joint_node_indices(state, collada, skin, node_name, controller_name, skeleton_node)
+
+def render_node_instance_controllers(state, collada, node_name, instance_controllers):
+    for i, instance_controller in enumerate(instance_controllers):
+        yield from render_node_instance_controller_joint_node_indices(state, collada, node_name, instance_controller)
+        controller = collada.lookup(instance_controller.url, types.Controller)
+        assert type(controller.control_element) is types.Skin
+        geometry = collada.lookup(controller.control_element.source, types.Geometry)
+        instance_materials = get_instance_materials(instance_controller)
+        yield from render_node_geometry_instance_materials(state, collada, "instance_controller", node_name, i, geometry, instance_materials)
+
+    yield f"instance_controller const instance_controllers_{node_name}[] = {{"
+    for i, instance_controller in enumerate(instance_controllers):
+        controller = collada.lookup(instance_controller.url, types.Controller)
+        controller_name = sanitize_name(state, controller.id, controller)
+
+        instance_materials = get_instance_materials(instance_controller)
+
+        yield "{"
+        yield f".controller = &controller_{controller_name},"
+        yield ""
+        yield f".joint_node_indices = joint_node_indices_{node_name}_{controller_name},"
+        yield f".joint_count = (sizeof (joint_node_indices_{node_name}_{controller_name})) / (sizeof (int)),"
+        yield ""
+        yield f".instance_materials = instance_controller_instance_materials_{node_name}_{i},"
+        yield f".instance_materials_count = {len(instance_materials)},"
+        yield "},"
+    yield "};"
+
 def render_node(state, collada, node, node_index):
     node_name_id = get_node_name_id(node)
     node_name = sanitize_name(state, node_name_id, node)
     #yield from render_node_children(state, collada, node_name, node.nodes)
     yield from render_node_transforms(state, collada, node_name, node.transformation_elements)
     yield from render_node_instance_geometries(state, collada, node_name, node.instance_geometries)
+    yield from render_node_instance_controllers(state, collada, node_name, node.instance_controllers)
     yield from render_node_instance_lights(state, collada, node_name, node.instance_lights)
     yield from render_node_channels(state, collada, node, node_name)
 
@@ -418,6 +466,9 @@ def render_node(state, collada, node, node_index):
     yield ""
     yield f".instance_geometries = instance_geometries_{node_name},"
     yield f".instance_geometries_count = {len(node.instance_geometries)},"
+    yield ""
+    yield f".instance_controllers = instance_controllers_{node_name},"
+    yield f".instance_controllers_count = {len(node.instance_controllers)},"
     yield ""
     yield f".instance_lights = instance_lights_{node_name},"
     yield f".instance_lights_count = {len(node.instance_lights)},"
@@ -839,6 +890,62 @@ def render_library_images(state, collada):
             yield f"&image_{image_name},"
     yield "};"
 
+def render_matrix(fs):
+    fsi = iter(fs)
+    for i in range(4):
+        s = ", ".join(f"{f}f" for f in islice(fsi, 4))
+        yield f"{s},"
+
+def render_inverse_bind_matrices(collada, skin, controller_name):
+    inverse_bind_matrix_input, = find_semantics(skin.joints.inputs, "INV_BIND_MATRIX")
+    inverse_bind_matrix_source = collada.lookup(inverse_bind_matrix_input.source, types.SourceCore)
+    stride = inverse_bind_matrix_source.technique_common.accessor.stride
+    count = inverse_bind_matrix_source.technique_common.accessor.count
+    array = inverse_bind_matrix_source.array_element
+    assert type(inverse_bind_matrix_source.array_element) == types.FloatArray
+    assert stride == 16
+    assert array.count == count * stride
+
+    inverse_bind_matrices = []
+    # emitted in joint order
+    yield f"matrix const inverse_bind_matrices_{controller_name}[] = {{"
+    for i in range(count):
+        yield "{"
+        offset = stride * i
+        matrix = matrix_transpose(array.floats[offset:offset+stride])
+        yield from render_matrix(matrix)
+        yield "},"
+    yield "};"
+
+def render_controller(state, collada, controller):
+    controller_name = sanitize_name(state, controller.id, controller)
+
+    assert type(controller.control_element) == types.Skin
+    skin = controller.control_element
+    geometry = collada.lookup(skin.source, types.Geometry)
+    vertex_index_table = state.geometry__vertex_index_tables[geometry.id]
+    # this is a special index buffer that contains mixed floats/ints,
+    # and needs to be packed accordingly
+
+    # fixme: skin_vertex_buffer should multiply vertices by the bind shape matrix
+    vertex_buffer = buffer.skin_vertex_buffer(collada, skin, vertex_index_table)
+    # skin.vertex_weights and skin.source are entirely dealt with
+    FIXME emit vertex buffer
+    FIXME emit vertex buffer offset in controller struct
+
+    yield from render_inverse_bind_matrices(collada, skin, controller_name)
+
+    yield f"controller const controller_{controller_name} = {{"
+    yield ".skin = {"
+    yield f".inverse_bind_matrices = inverse_bind_matrices_{controller_name},"
+    yield "}"
+    yield "};"
+
+def render_library_controllers(state, collada):
+    for library_controller in collada.library_controllers:
+        for controller in library_controller.controllers:
+            yield from render_controller(state, collada, controller)
+
 def render_all(collada, namespace):
     state = State()
     render, out = renderer()
@@ -849,6 +956,7 @@ def render_all(collada, namespace):
     render(render_library_effects(state, collada))
     render(render_library_materials(state, collada))
     render(render_library_geometries(state, collada))
+    render(render_library_controllers(state, collada))
 
     # root elements
     render(render_library_visual_scenes(state, collada))
@@ -870,10 +978,6 @@ def render_all_hpp(namespace):
 if __name__ == "__main__":
     import sys
     collada = parse.parse_collada_file(sys.argv[1])
-
-    #skin = collada.library_controllers[0].controllers[0].control_element
-    #assert type(skin) is types.Skin
-    #foo = render_inverse_bind_matrix(collada, skin)
 
     state, out = render_all(collada, "test")
     print(out.getvalue())

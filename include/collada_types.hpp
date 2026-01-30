@@ -30,6 +30,13 @@ namespace collada {
     float const g;
   };
 
+  struct matrix {
+    float const _11, _12, _13, _14;
+    float const _21, _22, _23, _24;
+    float const _31, _32, _33, _34;
+    float const _41, _42, _43, _44;
+  };
+
   //////////////////////////////////////////////////////////////////////
   // geometry
   //////////////////////////////////////////////////////////////////////
@@ -198,13 +205,6 @@ namespace collada {
     float3 const up;
   };
 
-  struct matrix {
-    float const _11, _12, _13, _14;
-    float const _21, _22, _23, _24;
-    float const _31, _32, _33, _34;
-    float const _41, _42, _43, _44;
-  };
-
   enum class transform_type {
     LOOKAT,
     MATRIX,
@@ -252,6 +252,26 @@ namespace collada {
 
   struct instance_geometry {
     geometry const * const geometry;
+
+    instance_material const * const instance_materials;
+    int const instance_materials_count;
+  };
+
+  struct skin {
+    matrix const * const inverse_bind_matrices; // one per joint
+  };
+
+  struct controller {
+    skin skin;
+  };
+
+  struct instance_controller {
+    controller const * const controller;
+
+    //node const * const skeleton;
+
+    int const * const joint_node_indices; // one per joint
+    int const joint_count;
 
     instance_material const * const instance_materials;
     int const instance_materials_count;
@@ -338,6 +358,9 @@ namespace collada {
 
     instance_geometry const * const instance_geometries;
     int const instance_geometries_count;
+
+    instance_controller const * const instance_controllers;
+    int const instance_controllers_count;
 
     instance_light const * const instance_lights;
     int const instance_lights_count;

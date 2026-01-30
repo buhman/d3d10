@@ -743,6 +743,27 @@ def parse_instance_light(lookup, sid_lookup, root):
     lookup_add(sid_lookup, sid, instance_light)
     return instance_light
 
+def parse_instance_controller(lookup, sid_lookup, root):
+    sid = root.attrib.get("sid")
+    name = root.attrib.get("name")
+    url = root.attrib["url"]
+
+    skeleton = None
+    bind_material = None
+
+    for child in root.getchildren():
+        if child.tag == tag("bind_material"):
+            assert bind_material is None
+            bind_material = parse_bind_material(lookup, child)
+        if child.tag == tag("skeleton"):
+            assert skeleton is None
+            assert len(child.getchildren()) == 0
+            skeleton = child.text.strip()
+
+    instance_controller = types.InstanceController(sid, name, url, skeleton, bind_material)
+    lookup_add(sid_lookup, sid, instance_controller)
+    return instance_controller
+
 def parse_node(lookup, sid_lookup, root):
     id = root.attrib.get("id")
     name = root.attrib.get("name")
@@ -753,6 +774,7 @@ def parse_node(lookup, sid_lookup, root):
     transformation_elements = []
     instance_geometries = []
     instance_lights = []
+    instance_controllers = []
     nodes = []
 
     child_sid_lookup = {}
@@ -774,6 +796,8 @@ def parse_node(lookup, sid_lookup, root):
             instance_geometries.append(parse_instance_geometry(lookup, child_sid_lookup, child))
         if child.tag == tag("instance_light"):
             instance_lights.append(parse_instance_light(lookup, child_sid_lookup, child))
+        if child.tag == tag("instance_controller"):
+            instance_controllers.append(parse_instance_controller(lookup, child_sid_lookup, child))
         if child.tag == tag("node"):
             nodes.append(parse_node(lookup, child_sid_lookup, child))
 
@@ -781,6 +805,7 @@ def parse_node(lookup, sid_lookup, root):
                       transformation_elements,
                       instance_geometries,
                       instance_lights,
+                      instance_controllers,
                       nodes,
                       child_sid_lookup)
 

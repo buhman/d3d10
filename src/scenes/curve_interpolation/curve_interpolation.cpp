@@ -1296,6 +1296,9 @@ transform const transforms_node_environmentambientlight[] = {
 instance_geometry const instance_geometries_node_environmentambientlight[] = {
 };
 
+instance_controller const instance_controllers_node_environmentambientlight[] = {
+};
+
 instance_light const instance_lights_node_environmentambientlight[] = {
   {
     .light = &light_environmentambientlight,
@@ -1315,6 +1318,9 @@ node const node_node_environmentambientlight = {
   .instance_geometries = instance_geometries_node_environmentambientlight,
   .instance_geometries_count = 0,
 
+  .instance_controllers = instance_controllers_node_environmentambientlight,
+  .instance_controllers_count = 0,
+
   .instance_lights = instance_lights_node_environmentambientlight,
   .instance_lights_count = 1,
 
@@ -1329,7 +1335,7 @@ transform const transforms_node_cube[] = {
   },
 };
 
-instance_material const instance_materials_node_cube_0[] = {
+instance_material const instance_geometry_instance_materials_node_cube_0[] = {
   {
     .element_index = 1, // an index into mesh.triangles
     .material = &material_material__15_material,
@@ -1389,17 +1395,21 @@ instance_material const instance_materials_node_cube_0[] = {
 instance_geometry const instance_geometries_node_cube[] = {
   {
     .geometry = &geometry_geom_cube,
-    .instance_materials = instance_materials_node_cube_0,
+
+    .instance_materials = instance_geometry_instance_materials_node_cube_0,
     .instance_materials_count = 6,
   },
+};
+
+instance_controller const instance_controllers_node_cube[] = {
 };
 
 instance_light const instance_lights_node_cube[] = {
 };
 
 channel const * const node_channels_node_cube[] = {
-  &node_channel_node_cube_translation_y,
   &node_channel_node_cube_translation_x,
+  &node_channel_node_cube_translation_y,
 };
 
 node const node_node_cube = {
@@ -1412,6 +1422,9 @@ node const node_node_cube = {
 
   .instance_geometries = instance_geometries_node_cube,
   .instance_geometries_count = 1,
+
+  .instance_controllers = instance_controllers_node_cube,
+  .instance_controllers_count = 0,
 
   .instance_lights = instance_lights_node_cube,
   .instance_lights_count = 0,
@@ -1443,7 +1456,7 @@ transform const transforms_node_torus[] = {
   },
 };
 
-instance_material const instance_materials_node_torus_0[] = {
+instance_material const instance_geometry_instance_materials_node_torus_0[] = {
   {
     .element_index = 0, // an index into mesh.triangles
     .material = &material_coloreffectr26g177b26_material,
@@ -1458,9 +1471,13 @@ instance_material const instance_materials_node_torus_0[] = {
 instance_geometry const instance_geometries_node_torus[] = {
   {
     .geometry = &geometry_geom_torus,
-    .instance_materials = instance_materials_node_torus_0,
+
+    .instance_materials = instance_geometry_instance_materials_node_torus_0,
     .instance_materials_count = 1,
   },
+};
+
+instance_controller const instance_controllers_node_torus[] = {
 };
 
 instance_light const instance_lights_node_torus[] = {
@@ -1481,6 +1498,9 @@ node const node_node_torus = {
   .instance_geometries = instance_geometries_node_torus,
   .instance_geometries_count = 1,
 
+  .instance_controllers = instance_controllers_node_torus,
+  .instance_controllers_count = 0,
+
   .instance_lights = instance_lights_node_torus,
   .instance_lights_count = 0,
 
@@ -1491,7 +1511,7 @@ node const node_node_torus = {
 transform const transforms_node_cylinder[] = {
 };
 
-instance_material const instance_materials_node_cylinder_0[] = {
+instance_material const instance_geometry_instance_materials_node_cylinder_0[] = {
   {
     .element_index = 0, // an index into mesh.triangles
     .material = &material_grass_material,
@@ -1506,9 +1526,13 @@ instance_material const instance_materials_node_cylinder_0[] = {
 instance_geometry const instance_geometries_node_cylinder[] = {
   {
     .geometry = &geometry_geom_cylinder,
-    .instance_materials = instance_materials_node_cylinder_0,
+
+    .instance_materials = instance_geometry_instance_materials_node_cylinder_0,
     .instance_materials_count = 1,
   },
+};
+
+instance_controller const instance_controllers_node_cylinder[] = {
 };
 
 instance_light const instance_lights_node_cylinder[] = {
@@ -1528,6 +1552,9 @@ node const node_node_cylinder = {
   .instance_geometries = instance_geometries_node_cylinder,
   .instance_geometries_count = 1,
 
+  .instance_controllers = instance_controllers_node_cylinder,
+  .instance_controllers_count = 0,
+
   .instance_lights = instance_lights_node_cylinder,
   .instance_lights_count = 0,
 
@@ -1546,7 +1573,7 @@ transform const transforms_node_plane[] = {
   },
 };
 
-instance_material const instance_materials_node_plane_0[] = {
+instance_material const instance_geometry_instance_materials_node_plane_0[] = {
   {
     .element_index = 0, // an index into mesh.triangles
     .material = &material_wood_material,
@@ -1561,9 +1588,13 @@ instance_material const instance_materials_node_plane_0[] = {
 instance_geometry const instance_geometries_node_plane[] = {
   {
     .geometry = &geometry_geom_plane,
-    .instance_materials = instance_materials_node_plane_0,
+
+    .instance_materials = instance_geometry_instance_materials_node_plane_0,
     .instance_materials_count = 1,
   },
+};
+
+instance_controller const instance_controllers_node_plane[] = {
 };
 
 instance_light const instance_lights_node_plane[] = {
@@ -1582,6 +1613,9 @@ node const node_node_plane = {
 
   .instance_geometries = instance_geometries_node_plane,
   .instance_geometries_count = 1,
+
+  .instance_controllers = instance_controllers_node_plane,
+  .instance_controllers_count = 0,
 
   .instance_lights = instance_lights_node_plane,
   .instance_lights_count = 0,
@@ -1605,7 +1639,7 @@ transform const transforms_node_geosphere[] = {
   },
 };
 
-instance_material const instance_materials_node_geosphere_0[] = {
+instance_material const instance_geometry_instance_materials_node_geosphere_0[] = {
   {
     .element_index = 0, // an index into mesh.triangles
     .material = &material_coloreffectr198g224b87_material,
@@ -1620,9 +1654,13 @@ instance_material const instance_materials_node_geosphere_0[] = {
 instance_geometry const instance_geometries_node_geosphere[] = {
   {
     .geometry = &geometry_geom_geosphere,
-    .instance_materials = instance_materials_node_geosphere_0,
+
+    .instance_materials = instance_geometry_instance_materials_node_geosphere_0,
     .instance_materials_count = 1,
   },
+};
+
+instance_controller const instance_controllers_node_geosphere[] = {
 };
 
 instance_light const instance_lights_node_geosphere[] = {
@@ -1630,8 +1668,8 @@ instance_light const instance_lights_node_geosphere[] = {
 
 channel const * const node_channels_node_geosphere[] = {
   &node_channel_node_geosphere_inversescaleaxisrotation,
-  &node_channel_node_geosphere_scaleaxisrotation,
   &node_channel_node_geosphere_scale,
+  &node_channel_node_geosphere_scaleaxisrotation,
 };
 
 node const node_node_geosphere = {
@@ -1644,6 +1682,9 @@ node const node_node_geosphere = {
 
   .instance_geometries = instance_geometries_node_geosphere,
   .instance_geometries_count = 1,
+
+  .instance_controllers = instance_controllers_node_geosphere,
+  .instance_controllers_count = 0,
 
   .instance_lights = instance_lights_node_geosphere,
   .instance_lights_count = 0,
@@ -1662,6 +1703,9 @@ transform const transforms_node_light[] = {
 instance_geometry const instance_geometries_node_light[] = {
 };
 
+instance_controller const instance_controllers_node_light[] = {
+};
+
 instance_light const instance_lights_node_light[] = {
   {
     .light = &light_light_light,
@@ -1669,8 +1713,8 @@ instance_light const instance_lights_node_light[] = {
 };
 
 channel const * const node_channels_node_light[] = {
-  &node_channel_node_light_translation_z,
   &node_channel_node_light_translation_x,
+  &node_channel_node_light_translation_z,
   &node_channel_node_light_translation_y,
 };
 
@@ -1684,6 +1728,9 @@ node const node_node_light = {
 
   .instance_geometries = instance_geometries_node_light,
   .instance_geometries_count = 0,
+
+  .instance_controllers = instance_controllers_node_light,
+  .instance_controllers_count = 0,
 
   .instance_lights = instance_lights_node_light,
   .instance_lights_count = 1,
@@ -1699,7 +1746,7 @@ transform const transforms_node_lightindicator[] = {
   },
 };
 
-instance_material const instance_materials_node_lightindicator_0[] = {
+instance_material const instance_geometry_instance_materials_node_lightindicator_0[] = {
   {
     .element_index = 0, // an index into mesh.triangles
     .material = &material_lightemit_material,
@@ -1714,9 +1761,13 @@ instance_material const instance_materials_node_lightindicator_0[] = {
 instance_geometry const instance_geometries_node_lightindicator[] = {
   {
     .geometry = &geometry_geom_lightindicator,
-    .instance_materials = instance_materials_node_lightindicator_0,
+
+    .instance_materials = instance_geometry_instance_materials_node_lightindicator_0,
     .instance_materials_count = 1,
   },
+};
+
+instance_controller const instance_controllers_node_lightindicator[] = {
 };
 
 instance_light const instance_lights_node_lightindicator[] = {
@@ -1735,6 +1786,9 @@ node const node_node_lightindicator = {
 
   .instance_geometries = instance_geometries_node_lightindicator,
   .instance_geometries_count = 1,
+
+  .instance_controllers = instance_controllers_node_lightindicator,
+  .instance_controllers_count = 0,
 
   .instance_lights = instance_lights_node_lightindicator,
   .instance_lights_count = 0,

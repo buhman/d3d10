@@ -7,7 +7,7 @@ from collada import header
 def usage():
     name = sys.argv[0]
     print("usage (source):")
-    print(f"  {name} [input_collada.dae] [output_source.cpp] [output_vertex.vtx] [output_vertex.idx] [output_resource.rc]")
+    print(f"  {name} [input_collada.dae] [output_source.cpp] [output_vertex.vtx] [output_vertex.idx] [output_resource.rc] [output_makefile.mk]")
     print("usage (header):")
     print(f"  {name} [output_header.hpp]")
     sys.exit(1)

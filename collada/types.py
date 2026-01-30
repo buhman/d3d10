@@ -413,6 +413,15 @@ class NodeType(Enum):
 TransformationElements = Union[Lookat, Matrix, Rotate, Scale, Skew, Translate]
 
 @dataclass(frozen=True)
+class InstanceController:
+    sid: Optional[str]
+    name: Optional[str]
+    url: URI # controller id
+
+    skeleton: URI # node id
+    bind_material: Optional[BindMaterial]
+
+@dataclass(frozen=True)
 class Node:
     id: Optional[ID]
     name: Optional[str]
@@ -423,6 +432,7 @@ class Node:
     transformation_elements: List[TransformationElements]
     instance_geometries: List[InstanceGeometry]
     instance_lights: List[InstanceLight]
+    instance_controllers: List[InstanceController]
     nodes: List['Node']
 
     sid_lookup: dict = field(repr=False)
@@ -461,7 +471,7 @@ class VertexWeights:
 
 @dataclass(frozen=True)
 class Skin:
-    source: URI # required
+    source: URI # required, geometry ID
 
     bind_shape_matrix: Optional[BindShapeMatrix]
     sources: List[SourceCore] # 3 or more

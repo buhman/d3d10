@@ -141,14 +141,16 @@ def skin_vertex_buffer(collada, skin, vertex_index_table):
     # vertex_index_table: input/collada vertex indices in the order written to the index buffer
     for vertex_index in vertex_index_table:
         influences = vertex_influences[vertex_index]
-        def emit(column):
+        def emit(column, cls):
             for i in range(4):
                 if i >= len(influences):
-                    vertex_buffer.append(0)
+                    vertex_buffer.append(cls(0))
                 else:
-                    vertex_buffer.append(influences[i][column])
-        emit(0) # emit joint int4
-        emit(1) # emit weight float4
+                    value = cls(influences[i][column])
+                    assert type(influences[i][column])(value) == influences[i][column]
+                    vertex_buffer.append(value)
+        emit(0, int) # emit joint int4
+        emit(1, float) # emit weight float4
     return vertex_buffer
 
 if __name__ == "__main__":
