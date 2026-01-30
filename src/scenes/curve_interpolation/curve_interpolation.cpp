@@ -1592,6 +1592,8 @@ matrix const inverse_bind_matrices_geom_box001_skin1[] = {
 
 controller const controller_geom_box001_skin1 = {
   .skin = {
+    .geometry = &geometry_geom_box001,
+
     .inverse_bind_matrices = inverse_bind_matrices_geom_box001_skin1,
 
     .vertex_buffer_offset = 0,
@@ -1993,8 +1995,8 @@ instance_light const instance_lights_node_geosphere[] = {
 
 channel const * const node_channels_node_geosphere[] = {
   &node_channel_node_geosphere_scale,
-  &node_channel_node_geosphere_scaleaxisrotation,
   &node_channel_node_geosphere_inversescaleaxisrotation,
+  &node_channel_node_geosphere_scaleaxisrotation,
 };
 
 node const node_node_geosphere = {

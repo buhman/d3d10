@@ -14,4 +14,3 @@ RES_COLLADA_SCENE_FXO RCDATA "collada_scene.fxo"
 RES_MODELS_CURVE_INTERPOLATION_VTX RCDATA "scenes/curve_interpolation/curve_interpolation.vtx"
 RES_MODELS_CURVE_INTERPOLATION_IDX RCDATA "scenes/curve_interpolation/curve_interpolation.idx"
 RES_MODELS_CURVE_INTERPOLATION_VJW RCDATA "scenes/curve_interpolation/curve_interpolation.vjw"
- 

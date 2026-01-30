@@ -422,37 +422,61 @@ namespace collada_scene {
     }
   }
 
-  void scene_state::render_geometries(instance_geometry const * const instance_geometries,
-                                      int const instance_geometries_count)
+  void scene_state::render_geometry(geometry const& geometry,
+                                    instance_material const * const instance_materials,
+                                    int const instance_materials_count)
+  {
+    mesh const& mesh = geometry.mesh;
+
+    UINT strides[1] = { 3 * 3 * 4 };
+    UINT offsets[1] = { (UINT)mesh.vertex_buffer_offset };
+    g_pd3dDevice->IASetVertexBuffers(0, m_numBuffers, m_pVertexBuffers, strides, offsets);
+    g_pd3dDevice->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, mesh.index_buffer_offset);
+
+    D3D10_TECHNIQUE_DESC techDesc;
+    g_pTechniqueBlinn->GetDesc(&techDesc);
+
+    for (int j = 0; j < instance_materials_count; j++) {
+      instance_material const& instance_material = instance_materials[j];
+      triangles const& triangles = mesh.triangles[instance_material.element_index];
+      set_material(*instance_material.material->effect);
+      int texture_channels[4] = {
+        instance_material.emission.input_set,
+        instance_material.ambient.input_set,
+        instance_material.diffuse.input_set,
+        instance_material.specular.input_set,
+      };
+      g_pTextureChannelVariable->SetIntVector(texture_channels);
+
+      g_pTechniqueBlinn->GetPassByIndex(0)->Apply(0);
+      g_pd3dDevice->IASetInputLayout(m_pVertexLayouts[triangles.inputs_index]);
+      g_pd3dDevice->DrawIndexed(triangles.count * 3, triangles.index_offset, 0);
+    }
+  }
+
+  void scene_state::render_instance_geometries(instance_geometry const * const instance_geometries,
+                                               int const instance_geometries_count)
   {
     for (int i = 0; i < instance_geometries_count; i++) {
       instance_geometry const &instance_geometry = instance_geometries[i];
-      mesh const& mesh = instance_geometry.geometry->mesh;
+      geometry const& geometry = *instance_geometry.geometry;
 
-      UINT strides[1] = { 3 * 3 * 4 };
-      UINT offsets[1] = { (UINT)mesh.vertex_buffer_offset };
-      g_pd3dDevice->IASetVertexBuffers(0, m_numBuffers, m_pVertexBuffers, strides, offsets);
-      g_pd3dDevice->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, mesh.index_buffer_offset);
+      render_geometry(geometry,
+                      instance_geometry.instance_materials,
+                      instance_geometry.instance_materials_count);
+    }
+  }
 
-      D3D10_TECHNIQUE_DESC techDesc;
-      g_pTechniqueBlinn->GetDesc(&techDesc);
+  void scene_state::render_instance_controllers(instance_controller const * const instance_controllers,
+                                                int const instance_controllers_count)
+  {
+    for (int i = 0; i < instance_controllers_count; i++) {
+      instance_controller const &instance_controller = instance_controllers[i];
+      geometry const& geometry = *instance_controller.controller->skin.geometry;
 
-      for (int j = 0; j < instance_geometry.instance_materials_count; j++) {
-        instance_material const& instance_material = instance_geometry.instance_materials[j];
-        triangles const& triangles = mesh.triangles[instance_material.element_index];
-        set_material(*instance_material.material->effect);
-        int texture_channels[4] = {
-          instance_material.emission.input_set,
-          instance_material.ambient.input_set,
-          instance_material.diffuse.input_set,
-          instance_material.specular.input_set,
-        };
-        g_pTextureChannelVariable->SetIntVector(texture_channels);
-
-        g_pTechniqueBlinn->GetPassByIndex(0)->Apply(0);
-        g_pd3dDevice->IASetInputLayout(m_pVertexLayouts[triangles.inputs_index]);
-        g_pd3dDevice->DrawIndexed(triangles.count * 3, triangles.index_offset, 0);
-      }
+      render_geometry(geometry,
+                      instance_controller.instance_materials,
+                      instance_controller.instance_materials_count);
     }
   }
 
@@ -728,7 +752,8 @@ namespace collada_scene {
 
       g_pWorldVariable->SetMatrix((float *)&node_instance.world);
 
-      render_geometries(node.instance_geometries, node.instance_geometries_count);
+      render_instance_geometries(node.instance_geometries, node.instance_geometries_count);
+      render_instance_controllers(node.instance_controllers, node.instance_controllers_count);
     }
   }
 }

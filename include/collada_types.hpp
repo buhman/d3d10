@@ -258,6 +258,8 @@ namespace collada {
   };
 
   struct skin {
+    geometry const * const geometry; // source
+
     matrix const * const inverse_bind_matrices; // one per joint
 
     int const vertex_buffer_offset;
@@ -271,7 +273,7 @@ namespace collada {
   struct instance_controller {
     controller const * const controller;
 
-    //node const * const skeleton;
+    //node const * const skeleton; // a reference to the root of the joint heirarchy
 
     int const * const joint_node_indices; // one per joint
     int const joint_count;

@@ -65,8 +65,13 @@ namespace collada_scene {
                                        node_instance const& node_instance,
                                        int light_index);
 
-    void render_geometries(collada::instance_geometry const * const instance_geometries,
-                           int const instance_geometries_count);
+    void render_geometry(collada::geometry const& geometry,
+                         collada::instance_material const * const instance_materials,
+                         int const instance_materials_count);
+    void render_instance_geometries(collada::instance_geometry const * const instance_geometries,
+                                    int const instance_geometries_count);
+    void render_instance_controllers(collada::instance_controller const * const instance_controllers,
+                                     int const instance_controllers_count);
     void set_material(collada::effect const& effect);
     void set_color_or_texture(collada::color_or_texture const& color_or_texture,
                               ID3D10EffectVectorVariable * pVectorVariable,

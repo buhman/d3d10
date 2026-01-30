@@ -79,8 +79,6 @@ src/scenes/%.cpp: scenes/%.DAE include/scenes/%.hpp
 	@mkdir -p $(@D)
 	PYTHONPATH=. python -m collada.main $< $@ $(<:.DAE=.vtx) $(<:.DAE=.idx) $(<:.DAE=.vjw) rc/$(notdir $(<:.DAE=.rc)) $(notdir $(<:.DAE=.mk))
 
-#	$(BUILD_TYPE)/curve_interpolation.res \
-
 OBJS = \
 	$(BUILD_TYPE)/main.res \
 	$(BUILD_TYPE)/robot_player.obj \

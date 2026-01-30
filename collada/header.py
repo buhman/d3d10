@@ -933,6 +933,7 @@ def render_controller(state, collada, controller):
     assert type(controller.control_element) == types.Skin
     skin = controller.control_element
     geometry = collada.lookup(skin.source, types.Geometry)
+    geometry_name = sanitize_name(state, geometry.id, geometry)
     vertex_index_table = state.geometry__vertex_index_tables[geometry.id]
     # this is a special index buffer that contains mixed floats/ints,
     # and needs to be packed accordingly
@@ -948,6 +949,8 @@ def render_controller(state, collada, controller):
 
     yield f"controller const controller_{controller_name} = {{"
     yield ".skin = {"
+    yield f".geometry = &geometry_{geometry_name},"
+    yield ""
     yield f".inverse_bind_matrices = inverse_bind_matrices_{controller_name},"
     yield ""
     yield f".vertex_buffer_offset = {vertex_buffer_offset},"
