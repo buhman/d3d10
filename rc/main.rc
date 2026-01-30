@@ -12,9 +12,3 @@ RES_COLLADA_FXO RCDATA "collada.fxo"
 RES_COLLADA_SCENE_FXO RCDATA "collada_scene.fxo"
 RES_MODELS_CURVE_INTERPOLATION_VTX RCDATA "scenes/curve_interpolation/curve_interpolation.vtx"
 RES_MODELS_CURVE_INTERPOLATION_IDX RCDATA "scenes/curve_interpolation/curve_interpolation.idx"
-
-
-_AMERICAN_CHERRY_PNG RCDATA "image/american_cherry.DDS"
-_102_PNG RCDATA "image/102.DDS"
-_FINISHES_FLOORING_TILE_SQUARE_MEDIUM_BLUE_PNG RCDATA "image/Finishes.Flooring.Tile.Square.Medium Blue.DDS"
-_SITEWORK_PLANTING_GRASS_BERMUDA1_JPG RCDATA "image/SiteWork.Planting.Grass.Bermuda1.DDS"

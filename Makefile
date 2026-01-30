@@ -55,7 +55,12 @@ SCENES = \
 
 include curve_interpolation.mk
 
-$(BUILD_TYPE)/%.res: %.rc $(SHADERS) $(SCENES) $(IMAGES)
+RC_FILES = $(wildcard rc/*.rc)
+
+$(BUILD_TYPE)/main.rc: $(RC_FILES)
+	cat $^ > $@
+
+$(BUILD_TYPE)/%.res: $(BUILD_TYPE)/%.rc $(SHADERS) $(SCENES) $(IMAGES)
 	@mkdir -p $(@D)
 	$(WINDRES) -O coff -I$(BUILD_TYPE)/effect -o $@ $<
 
@@ -72,7 +77,7 @@ include/scenes/%.hpp: $(COLLADA_PY_SOURCE)
 
 src/scenes/%.cpp: scenes/%.DAE include/scenes/%.hpp
 	@mkdir -p $(@D)
-	PYTHONPATH=. python -m collada.main $< $@ $(<:.DAE=.vtx) $(<:.DAE=.idx) $(notdir $(<:.DAE=.rc)) $(notdir $(<:.DAE=.mk))
+	PYTHONPATH=. python -m collada.main $< $@ $(<:.DAE=.vtx) $(<:.DAE=.idx) rc/$(notdir $(<:.DAE=.rc)) $(notdir $(<:.DAE=.mk))
 
 #	$(BUILD_TYPE)/curve_interpolation.res \
 
