@@ -1398,8 +1398,8 @@ instance_light const instance_lights_node_cube[] = {
 };
 
 channel const * const node_channels_node_cube[] = {
-  &node_channel_node_cube_translation_x,
   &node_channel_node_cube_translation_y,
+  &node_channel_node_cube_translation_x,
 };
 
 node const node_node_cube = {
@@ -1629,9 +1629,9 @@ instance_light const instance_lights_node_geosphere[] = {
 };
 
 channel const * const node_channels_node_geosphere[] = {
+  &node_channel_node_geosphere_scale,
   &node_channel_node_geosphere_inversescaleaxisrotation,
   &node_channel_node_geosphere_scaleaxisrotation,
-  &node_channel_node_geosphere_scale,
 };
 
 node const node_node_geosphere = {
@@ -1669,9 +1669,9 @@ instance_light const instance_lights_node_light[] = {
 };
 
 channel const * const node_channels_node_light[] = {
-  &node_channel_node_light_translation_z,
   &node_channel_node_light_translation_y,
   &node_channel_node_light_translation_x,
+  &node_channel_node_light_translation_z,
 };
 
 node const node_node_light = {

@@ -7,6 +7,7 @@
 #include "print.hpp"
 #include "collada_scene.hpp"
 #include "new.hpp"
+#include "render_state.hpp"
 
 extern ID3D10Device * g_pd3dDevice;
 extern XMVECTOR g_Eye;
@@ -33,6 +34,13 @@ namespace collada_scene {
   ID3D10EffectVectorVariable * g_pDiffuseVariable = NULL;
   ID3D10EffectVectorVariable * g_pSpecularVariable = NULL;
   ID3D10EffectScalarVariable * g_pShininessVariable = NULL;
+
+  ID3D10EffectVectorVariable * g_pTextureChannelVariable = NULL;
+
+  ID3D10EffectShaderResourceVariable * g_pTexEmissionVariable = NULL;
+  ID3D10EffectShaderResourceVariable * g_pTexAmbientVariable = NULL;
+  ID3D10EffectShaderResourceVariable * g_pTexDiffuseVariable = NULL;
+  ID3D10EffectShaderResourceVariable * g_pTexSpecularVariable = NULL;
 
   static inline DXGI_FORMAT dxgi_format(input_format format)
   {
@@ -163,6 +171,23 @@ namespace collada_scene {
     }
   }
 
+  HRESULT scene_state::allocate_images()
+  {
+    HRESULT hr;
+    m_pShaderResourceViews = New<ID3D10ShaderResourceView *>(m_descriptor->images_count);
+
+    for (int i = 0; i < m_descriptor->images_count; i++) {
+      image const * const image = m_descriptor->images[i];
+      hr = LoadDDSTexture2D(image->resource_name,
+                            &m_pShaderResourceViews[i]);
+      if (FAILED(hr)) {
+        return hr;
+      }
+    }
+
+    return S_OK;
+  }
+
   HRESULT scene_state::load_scene(collada::descriptor const * const descriptor)
   {
     HRESULT hr;
@@ -179,6 +204,10 @@ namespace collada_scene {
       return E_FAIL;
 
     hr = LoadIndexBuffer(L"RES_MODELS_CURVE_INTERPOLATION_IDX", &m_pIndexBuffer);
+    if (FAILED(hr))
+      return E_FAIL;
+
+    hr = allocate_images();
     if (FAILED(hr))
       return E_FAIL;
 
@@ -263,6 +292,13 @@ namespace collada_scene {
     g_pSpecularVariable = g_pEffect->GetVariableByName("Specular")->AsVector();
     g_pShininessVariable = g_pEffect->GetVariableByName("Shininess")->AsScalar();
 
+    g_pTextureChannelVariable = g_pEffect->GetVariableByName("TextureChannel")->AsVector();
+
+    g_pTexEmissionVariable = g_pEffect->GetVariableByName("TexEmission")->AsShaderResource();
+    g_pTexAmbientVariable = g_pEffect->GetVariableByName("TexAmbient")->AsShaderResource();
+    g_pTexDiffuseVariable = g_pEffect->GetVariableByName("TexDiffuse")->AsShaderResource();
+    g_pTexSpecularVariable = g_pEffect->GetVariableByName("TexSpecular")->AsShaderResource();
+
     return S_OK;
   }
 
@@ -340,26 +376,42 @@ namespace collada_scene {
     }
   }
 
-  static inline void SetMaterial(effect const& effect)
+  void scene_state::set_color_or_texture(color_or_texture const& color_or_texture,
+                                         ID3D10EffectVectorVariable * pVectorVariable,
+                                         ID3D10EffectShaderResourceVariable * pShaderResourceVariable)
+  {
+    switch (color_or_texture.type) {
+    case color_or_texture_type::COLOR:
+      pVectorVariable->SetFloatVector((float *)&color_or_texture.color);
+      break;
+    case color_or_texture_type::TEXTURE:
+      pShaderResourceVariable->SetResource(m_pShaderResourceViews[color_or_texture.texture.image_index]);
+      break;
+    default:
+      assert(false);
+    }
+  }
+
+  void scene_state::set_material(effect const& effect)
   {
     switch (effect.type) {
     case effect_type::BLINN:
-      g_pEmissionVariable->SetFloatVector((float *)&effect.blinn.emission.color);
-      g_pAmbientVariable->SetFloatVector((float *)&effect.blinn.ambient.color);
-      g_pDiffuseVariable->SetFloatVector((float *)&effect.blinn.diffuse.color);
-      g_pSpecularVariable->SetFloatVector((float *)&effect.blinn.specular.color);
+      set_color_or_texture(effect.blinn.emission, g_pEmissionVariable, g_pTexEmissionVariable);
+      set_color_or_texture(effect.blinn.ambient, g_pAmbientVariable, g_pTexAmbientVariable);
+      set_color_or_texture(effect.blinn.diffuse, g_pDiffuseVariable, g_pTexDiffuseVariable);
+      set_color_or_texture(effect.blinn.specular, g_pSpecularVariable, g_pTexSpecularVariable);
       g_pShininessVariable->SetFloat(effect.blinn.shininess);
       break;
     case effect_type::LAMBERT:
-      g_pEmissionVariable->SetFloatVector((float *)&effect.lambert.emission.color);
-      g_pAmbientVariable->SetFloatVector((float *)&effect.lambert.ambient.color);
-      g_pDiffuseVariable->SetFloatVector((float *)&effect.lambert.diffuse.color);
+      set_color_or_texture(effect.lambert.emission, g_pEmissionVariable, g_pTexEmissionVariable);
+      set_color_or_texture(effect.lambert.ambient, g_pAmbientVariable, g_pTexAmbientVariable);
+      set_color_or_texture(effect.lambert.diffuse, g_pDiffuseVariable, g_pTexDiffuseVariable);
       break;
     case effect_type::PHONG:
-      g_pEmissionVariable->SetFloatVector((float *)&effect.phong.emission.color);
-      g_pAmbientVariable->SetFloatVector((float *)&effect.phong.ambient.color);
-      g_pDiffuseVariable->SetFloatVector((float *)&effect.phong.diffuse.color);
-      g_pSpecularVariable->SetFloatVector((float *)&effect.phong.specular.color);
+      set_color_or_texture(effect.phong.emission, g_pEmissionVariable, g_pTexEmissionVariable);
+      set_color_or_texture(effect.phong.ambient, g_pAmbientVariable, g_pTexAmbientVariable);
+      set_color_or_texture(effect.phong.diffuse, g_pDiffuseVariable, g_pTexDiffuseVariable);
+      set_color_or_texture(effect.phong.specular, g_pSpecularVariable, g_pTexSpecularVariable);
       g_pShininessVariable->SetFloat(effect.phong.shininess);
       break;
     case effect_type::CONSTANT:
@@ -388,7 +440,14 @@ namespace collada_scene {
       for (int j = 0; j < instance_geometry.instance_materials_count; j++) {
         instance_material const& instance_material = instance_geometry.instance_materials[j];
         triangles const& triangles = mesh.triangles[instance_material.element_index];
-        SetMaterial(*instance_material.material->effect);
+        set_material(*instance_material.material->effect);
+        int texture_channels[4] = {
+          instance_material.emission.input_set,
+          instance_material.ambient.input_set,
+          instance_material.diffuse.input_set,
+          instance_material.specular.input_set,
+        };
+        g_pTextureChannelVariable->SetIntVector(texture_channels);
 
         g_pTechniqueBlinn->GetPassByIndex(0)->Apply(0);
         g_pd3dDevice->IASetInputLayout(m_pVertexLayouts[triangles.inputs_index]);

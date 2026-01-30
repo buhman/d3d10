@@ -41,7 +41,7 @@ def render_makefile(state, f):
 
         f.write(f"IMAGES += image/{filename}.DDS\r\n".encode('ascii'))
         f.write(f"image/{filename}.DDS: {escaped}\r\n".encode('ascii'))
-        f.write('\ttexconv10.exe -nologo "$<"\r\n'.encode('ascii'))
+        f.write('\ttexconv10.exe -f BC1_UNORM -nologo "$<"\r\n'.encode('ascii'))
         f.write(f'\tmv "$(<:.{ext[1:]}=.DDS)" "$@"\r\n\r\n'.encode('ascii'))
 
 def main():

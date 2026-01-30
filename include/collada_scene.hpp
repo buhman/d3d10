@@ -37,6 +37,8 @@ namespace collada_scene {
 
     node_instance * m_nodeInstances = NULL;
 
+    ID3D10ShaderResourceView ** m_pShaderResourceViews = NULL;
+
     XMFLOAT4 * m_lightPositions = NULL;
     XMFLOAT4 * m_lightDirections = NULL;
     XMFLOAT4 * m_lightColors = NULL;
@@ -51,6 +53,7 @@ namespace collada_scene {
 
   private:
     HRESULT load_layouts();
+    HRESULT allocate_images();
     void allocate_node_instances();
     void allocate_node_instance(collada::node const * const node,
                                 node_instance * node_instance);
@@ -64,6 +67,10 @@ namespace collada_scene {
 
     void render_geometries(collada::instance_geometry const * const instance_geometries,
                            int const instance_geometries_count);
+    void set_material(collada::effect const& effect);
+    void set_color_or_texture(collada::color_or_texture const& color_or_texture,
+                              ID3D10EffectVectorVariable * pVectorVariable,
+                              ID3D10EffectShaderResourceVariable * pShaderResourceVariable);
   };
 
   HRESULT LoadEffect();

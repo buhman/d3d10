@@ -20,7 +20,7 @@ HRESULT LoadTexture2D(const wchar_t * resourceName,
   // texture
   HRSRC hRes = FindResource(NULL, resourceName, RT_RCDATA);
   if (hRes == NULL) {
-    print("FindResource %s\n", resourceName);
+    printW(L"FindResource %s\n", resourceName);
     return -1;
   }
   DWORD dwResourceSize = SizeofResource(NULL, hRes);

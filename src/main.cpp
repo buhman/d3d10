@@ -521,6 +521,7 @@ HRESULT LoadMesh()
     return hr;
   }
 
+  /*
   hr = LoadTexture3D(L"RES_PERLIN",
                      256, // width
                      256, // height
@@ -533,6 +534,7 @@ HRESULT LoadMesh()
     print("LoadTexture2D\n");
     return hr;
   }
+  */
 
   return S_OK;
 }
@@ -716,7 +718,7 @@ HRESULT InitBloomBuffers()
 
   HRSRC hRes = FindResource(NULL, L"RES_BLOOM_FXO", RT_RCDATA);
   if (hRes == NULL) {
-    print("FindResource RES_BLOOM_FXO\n");
+    print("FindResource RES_BLOOM_FXO %d\n", hRes);
     return E_FAIL;
   }
   DWORD dwResSize = SizeofResource(NULL, hRes);
@@ -1749,7 +1751,7 @@ void RenderVolume(float t)
   g_pd3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
   g_pLayerVariableVolume->SetFloat(t * 0.1f);
-  g_pDiffuseVariableVolume->SetResource(g_pTextureShaderResourceViewPerlin);
+  //g_pDiffuseVariableVolume->SetResource(g_pTextureShaderResourceViewPerlin);
 
   D3D10_TECHNIQUE_DESC techDescVolume;
   g_pTechniqueVolume->GetDesc(&techDescVolume);
@@ -1769,7 +1771,7 @@ void RenderVolumeMesh()
   g_pViewVariableStatic->SetMatrix((float *)&g_View);
   g_pProjectionVariableStatic->SetMatrix((float *)&g_Projection);
 
-  g_pDiffuseVariableStatic->SetResource(g_pTextureShaderResourceViewPerlin);
+  //g_pDiffuseVariableStatic->SetResource(g_pTextureShaderResourceViewPerlin);
 
   ID3D10Buffer * pVB[4] = {
     g_pVertexBufferCube[0],
@@ -1822,7 +1824,7 @@ void Render(float t, float dt)
   g_pd3dDevice->ClearDepthStencilView(g_pDepthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
 
   // render
-  RenderModel(t);
+  //RenderModel(t);
 
   const float ClearColorZero[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
   ID3D10RenderTargetView * RenderTargets[] = {

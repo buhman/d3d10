@@ -75,6 +75,13 @@ float4 PS(PS_INPUT input) : SV_Target
 
   float3 color = Emission.xyz;
 
+  float3 diffuseColor;
+  if (TextureChannel.z >= 0) {
+    diffuseColor = TexDiffuse.Sample(samLinear, input.Tex).xyz;
+  } else {
+    diffuseColor = Diffuse.xyz;
+  }
+
   for (int i = 0; i < 2; i++) {
     float3 light_dir = normalize(-LightDir[i].xyz);
     float diffuse_intensity = max(dot(normal, light_dir), 0.0);
@@ -82,7 +89,7 @@ float4 PS(PS_INPUT input) : SV_Target
     float distance = length(LightPos[i].xyz - input.WPos.xyz);
     float attenuation = 1.0 / (0.02 * distance * distance);
 
-    color += Diffuse.xyz * diffuse_intensity * LightColor[i].xyz * attenuation;
+    color += diffuseColor * diffuse_intensity * LightColor[i].xyz * attenuation;
   }
 
   return float4(color.xyz, 1);
