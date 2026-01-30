@@ -6,8 +6,8 @@
       <authoring_tool>OpenCOLLADA for 3ds Max;  Version: 1.6;  Revision: 68</authoring_tool>
       <source_data>file:///C:/cygwin/home/bilbo/d3d10/scenes/curve_interpolation/curve_interpolation.max</source_data>
     </contributor>
-    <created>2026-01-30T09:40:47</created>
-    <modified>2026-01-30T09:40:47</modified>
+    <created>2026-01-30T14:43:57</created>
+    <modified>2026-01-30T14:43:57</modified>
     <unit name="inch" meter="0.0254"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -1513,12 +1513,12 @@
         <instance_geometry url="#geom-Cube">
           <bind_material>
             <technique_common>
+              <instance_material symbol="Material__15_1" target="#Material__15-material"/>
               <instance_material symbol="Material__17_1" target="#Material__17-material"/>
+              <instance_material symbol="Material__16_1" target="#Material__16-material"/>
               <instance_material symbol="Material__18_1" target="#Material__18-material"/>
               <instance_material symbol="Material__19_1" target="#Material__19-material"/>
               <instance_material symbol="Material__20_1" target="#Material__20-material"/>
-              <instance_material symbol="Material__15_1" target="#Material__15-material"/>
-              <instance_material symbol="Material__16_1" target="#Material__16-material"/>
             </technique_common>
           </bind_material>
         </instance_geometry>
@@ -1655,8 +1655,8 @@
           <bind_material>
             <technique_common>
               <instance_material symbol="Material__13_1" target="#Material__13-material"/>
-              <instance_material symbol="Material__14_1" target="#Material__14-material"/>
               <instance_material symbol="Material__15" target="#Material__15_1-material"/>
+              <instance_material symbol="Material__14_1" target="#Material__14-material"/>
               <instance_material symbol="Material__16" target="#Material__16_1-material"/>
               <instance_material symbol="Material__17" target="#Material__17_1-material"/>
               <instance_material symbol="Material__18" target="#Material__18_1-material"/>

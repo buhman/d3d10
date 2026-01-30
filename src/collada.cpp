@@ -314,7 +314,7 @@ namespace collada {
     XMVECTOR axis = XMVectorSet(0, 1, 0, 0);
     XMVECTOR axisZ = XMVectorSet(0, 0, 1, 0);
     XMMATRIX joint0 = XMMatrixScaling(1, 1, 1);
-    joint0 = XMMatrixTranslation(10, 0, 0) * joint0;
+    //joint0 = XMMatrixTranslation(10, 0, 0) * joint0;
     joint0 = XMMatrixRotationNormal(axis, XMConvertToRadians(-90)) * joint0;
 
     XMMATRIX joint1 = XMMatrixScaling(1, 1, 1);
@@ -332,9 +332,26 @@ namespace collada {
       = XMMatrixRotationNormal(axisZ, sin(t)) * XMMatrixTranslation(10, 0, 0) * joint0
       ;
     */
-
     XMMATRIX joint0ibm = XMLoadFloat4x4((XMFLOAT4X4*)&inverse_bind_matrices[0 * 16]);
     XMMATRIX joint1ibm = XMLoadFloat4x4((XMFLOAT4X4*)&inverse_bind_matrices[1 * 16]);
+
+    XMFLOAT4X4 foo;
+    XMStoreFloat4x4(&foo, joint0);
+    print("  %.1f %.1f %.1f %.1f\n", foo._11, foo._12, foo._13, foo._14);
+    print("  %.1f %.1f %.1f %.1f\n", foo._21, foo._22, foo._23, foo._24);
+    print("  %.1f %.1f %.1f %.1f\n", foo._31, foo._32, foo._33, foo._34);
+    print("  %.1f %.1f %.1f %.1f\n", foo._41, foo._42, foo._43, foo._44);
+    print("\n");
+
+    XMStoreFloat4x4(&foo, joint1);
+    print("joint1ibm:\n");
+    print("  %.1f %.1f %.1f %.1f\n", foo._11, foo._12, foo._13, foo._14);
+    print("  %.1f %.1f %.1f %.1f\n", foo._21, foo._22, foo._23, foo._24);
+    print("  %.1f %.1f %.1f %.1f\n", foo._31, foo._32, foo._33, foo._34);
+    print("  %.1f %.1f %.1f %.1f\n", foo._41, foo._42, foo._43, foo._44);
+    print("\n");
+    exit(0);
+
     XMMATRIX mJoints[2] = {
       joint0ibm * joint0,
       joint1ibm * joint1,

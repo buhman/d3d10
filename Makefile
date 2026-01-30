@@ -21,6 +21,7 @@ CFLAGS += -march=core2
 CFLAGS += -Wall -Werror -Wfatal-errors
 CFLAGS += -Wno-unused-but-set-variable
 CFLAGS += -Wno-unknown-pragmas
+CFLAGS += -Wno-error=unused-variable
 CFLAGS += -I./include
 CFLAGS += -municode
 LDFLAGS += -municode

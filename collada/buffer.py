@@ -144,7 +144,8 @@ def skin_vertex_buffer(collada, skin, vertex_index_table):
         def emit(column, cls):
             for i in range(4):
                 if i >= len(influences):
-                    vertex_buffer.append(cls(0))
+                    value = cls(0)
+                    vertex_buffer.append(value)
                 else:
                     value = cls(influences[i][column])
                     assert type(influences[i][column])(value) == influences[i][column]

@@ -19,10 +19,13 @@ namespace collada_scene {
 
   ID3D10Effect * g_pEffect = NULL;
   ID3D10EffectTechnique * g_pTechniqueBlinn = NULL;
+  ID3D10EffectTechnique * g_pTechniqueBlinnSkin = NULL;
 
   ID3D10EffectMatrixVariable * g_pWorldVariable = NULL;
   ID3D10EffectMatrixVariable * g_pViewVariable = NULL;
   ID3D10EffectMatrixVariable * g_pProjectionVariable = NULL;
+
+  ID3D10EffectMatrixVariable * g_pJointsVariable = NULL;
 
   ID3D10EffectVectorVariable * g_pViewEyeVariable = NULL;
   ID3D10EffectVectorVariable * g_pLightPosVariable = NULL;
@@ -253,7 +256,7 @@ namespace collada_scene {
   {
     HRESULT hr;
 
-    D3D10_INPUT_ELEMENT_DESC layout[inputs.elements_count + 2];
+    D3D10_INPUT_ELEMENT_DESC layout[inputs.elements_count + skin_inputs.elements_count];
 
     UINT byte_offset = 0;
     for (int i = 0; i < inputs.elements_count; i++) {
@@ -291,13 +294,15 @@ namespace collada_scene {
       layout[ix].SemanticName = skin_inputs.elements[i].semantic;
       layout[ix].SemanticIndex = skin_inputs.elements[i].semantic_index;
       layout[ix].Format = dxgi_format(skin_inputs.elements[i].format);
-      layout[ix].InputSlot = 0;
+      layout[ix].InputSlot = 1;
       layout[ix].AlignedByteOffset = skin_byte_offset;
       layout[ix].InputSlotClass = D3D10_INPUT_PER_VERTEX_DATA;
       layout[ix].InstanceDataStepRate = 0;
 
       skin_byte_offset += format_size(skin_inputs.elements[i].format);
     }
+
+    g_pTechniqueBlinnSkin->GetPassByIndex(0)->GetDesc(&passDesc);
 
     hr = g_pd3dDevice->CreateInputLayout(layout, inputs.elements_count + skin_inputs.elements_count,
                                          passDesc.pIAInputSignature,
@@ -335,10 +340,13 @@ namespace collada_scene {
     }
 
     g_pTechniqueBlinn = g_pEffect->GetTechniqueByName("Blinn");
+    g_pTechniqueBlinnSkin = g_pEffect->GetTechniqueByName("BlinnSkin");
 
     g_pWorldVariable = g_pEffect->GetVariableByName("World")->AsMatrix();
     g_pViewVariable = g_pEffect->GetVariableByName("View")->AsMatrix();
     g_pProjectionVariable = g_pEffect->GetVariableByName("Projection")->AsMatrix();
+
+    g_pJointsVariable = g_pEffect->GetVariableByName("Joints")->AsMatrix();
 
     g_pViewEyeVariable = g_pEffect->GetVariableByName("ViewEye")->AsVector();
     g_pLightPosVariable = g_pEffect->GetVariableByName("LightPos")->AsVector();
@@ -497,9 +505,6 @@ namespace collada_scene {
     mesh const& mesh = geometry.mesh;
     g_pd3dDevice->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, mesh.index_buffer_offset);
 
-    D3D10_TECHNIQUE_DESC techDesc;
-    g_pTechniqueBlinn->GetDesc(&techDesc);
-
     for (int j = 0; j < instance_materials_count; j++) {
       instance_material const& instance_material = instance_materials[j];
       triangles const& triangles = mesh.triangles[instance_material.element_index];
@@ -524,9 +529,6 @@ namespace collada_scene {
     mesh const& mesh = skin.geometry->mesh;
     g_pd3dDevice->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, mesh.index_buffer_offset);
 
-    D3D10_TECHNIQUE_DESC techDesc;
-    g_pTechniqueBlinn->GetDesc(&techDesc);
-
     for (int j = 0; j < instance_materials_count; j++) {
       instance_material const& instance_material = instance_materials[j];
       triangles const& triangles = mesh.triangles[instance_material.element_index];
@@ -539,7 +541,7 @@ namespace collada_scene {
       g_pd3dDevice->IASetVertexBuffers(0, numBuffers, m_pVertexBuffers, strides, offsets);
       g_pd3dDevice->IASetInputLayout(m_pSkinnedVertexLayouts[triangles.inputs_index]);
 
-      g_pTechniqueBlinn->GetPassByIndex(0)->Apply(0);
+      g_pTechniqueBlinnSkin->GetPassByIndex(0)->Apply(0);
       g_pd3dDevice->DrawIndexed(triangles.count * 3, triangles.index_offset, 0);
     }
   }
@@ -560,6 +562,34 @@ namespace collada_scene {
   {
     for (int i = 0; i < instance_controllers_count; i++) {
       instance_controller const &instance_controller = instance_controllers[i];
+      skin const &skin = instance_controller.controller->skin;
+
+#if 0
+      float Joints[] = {
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        -0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0,
+
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 0.7, -0.7, 0.0,
+        -0.0, 0.7, 0.7, 0.0,
+        -0.0, -7.5, 3.3, 1.0,
+      };
+#else
+      XMFLOAT4X4 Joints[instance_controller.joint_count];
+
+      for (int joint_index = 0; joint_index < instance_controller.joint_count; joint_index++) {
+        XMMATRIX ibm = XMLoadFloat4x4((XMFLOAT4X4*)&skin.inverse_bind_matrices[joint_index]);
+        int node_index = instance_controller.joint_node_indices[joint_index];
+        node_instance& node_instance = m_nodeInstances[node_index];
+
+        XMStoreFloat4x4(&Joints[joint_index], ibm * node_instance.world);
+      }
+#endif
+
+      g_pJointsVariable->SetMatrixArray((float *)Joints, 0, instance_controller.joint_count);
+
       render_skin(instance_controller.controller->skin,
                   instance_controller.instance_materials,
                   instance_controller.instance_materials_count);
