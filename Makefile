@@ -53,7 +53,9 @@ SHADERS = \
 SCENES = \
 	src/scenes/curve_interpolation/curve_interpolation.cpp
 
-$(BUILD_TYPE)/%.res: %.rc $(SHADERS) $(SCENES)
+include curve_interpolation.mk
+
+$(BUILD_TYPE)/%.res: %.rc $(SHADERS) $(SCENES) $(IMAGES)
 	@mkdir -p $(@D)
 	$(WINDRES) -O coff -I$(BUILD_TYPE)/effect -o $@ $<
 
@@ -70,10 +72,11 @@ include/scenes/%.hpp: $(COLLADA_PY_SOURCE)
 
 src/scenes/%.cpp: scenes/%.DAE include/scenes/%.hpp
 	@mkdir -p $(@D)
-	PYTHONPATH=. python -m collada.main $< $@ $(<:.DAE=.vtx) $(<:.DAE=.idx)
+	PYTHONPATH=. python -m collada.main $< $@ $(<:.DAE=.vtx) $(<:.DAE=.idx) $(notdir $(<:.DAE=.rc)) $(notdir $(<:.DAE=.mk))
 
 OBJS = \
 	$(BUILD_TYPE)/main.res \
+	$(BUILD_TYPE)/curve_interpolation.res \
 	$(BUILD_TYPE)/robot_player.obj \
 	$(BUILD_TYPE)/cube.obj \
 	$(BUILD_TYPE)/main.obj \

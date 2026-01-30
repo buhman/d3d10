@@ -1,5 +1,5 @@
 import sys
-from os import path
+import os.path
 
 from collada import parse
 from collada import header
@@ -7,14 +7,42 @@ from collada import header
 def usage():
     name = sys.argv[0]
     print("usage (source):")
-    print(f"  {name} [input_collada.dae] [output_source.cpp] [output_vertex.vtx] [output_vertex.idx]")
+    print(f"  {name} [input_collada.dae] [output_source.cpp] [output_vertex.vtx] [output_vertex.idx] [output_resource.rc]")
     print("usage (header):")
     print(f"  {name} [output_header.hpp]")
     sys.exit(1)
 
 def parse_namespace(filename):
-    namespace = path.splitext(path.split(filename)[1])[0]
+    namespace = os.path.splitext(os.path.split(filename)[1])[0]
     return namespace
+
+def render_resource_file(state, f):
+    for resource_name, path in state.resource_names.items():
+        filename = os.path.split(path)[1]
+        filename = os.path.splitext(filename)[0]
+        f.write(f'{resource_name} RCDATA "image/{filename}.DDS"\r\n'.encode('ascii'))
+
+def escape_space(s):
+    def _escape_space(s):
+        for c in s:
+            if c == ' ':
+                yield '\\'
+            yield c
+    return "".join(_escape_space(s))
+
+def render_makefile(state, f):
+    for _, path in state.resource_names.items():
+        filename = os.path.split(path)[1]
+        filename, ext = os.path.splitext(filename)
+        filename = escape_space(filename)
+
+        escaped = escape_space(path)
+        escaped_dds = os.path.splitext(filename)
+
+        f.write(f"IMAGES += image/{filename}.DDS\r\n".encode('ascii'))
+        f.write(f"image/{filename}.DDS: {escaped}\r\n".encode('ascii'))
+        f.write('\ttexconv10.exe -nologo "$<"\r\n'.encode('ascii'))
+        f.write(f'\tmv "$(<:.{ext[1:]}=.DDS)" "$@"\r\n\r\n'.encode('ascii'))
 
 def main():
     try:
@@ -22,10 +50,14 @@ def main():
         output_source = sys.argv[2]
         output_vertex = sys.argv[3]
         output_index  = sys.argv[4]
+        output_resource = sys.argv[5]
+        output_makefile = sys.argv[6]
         assert input_collada.lower().endswith(".dae")
         assert output_source.lower().endswith(".cpp")
         assert output_vertex.lower().endswith(".vtx")
         assert output_index.lower().endswith(".idx")
+        assert output_resource.lower().endswith(".rc")
+        assert output_makefile.lower().endswith(".mk")
     except Exception as e:
         usage()
 
@@ -43,6 +75,12 @@ def main():
 
     with open(output_index, 'wb') as f:
         f.write(state.index_buffer.getvalue())
+
+    with open(output_resource, 'wb') as f:
+        render_resource_file(state, f)
+
+    with open(output_makefile, 'wb') as f:
+        render_makefile(state, f)
 
 def main_header():
     try:

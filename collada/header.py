@@ -87,7 +87,8 @@ def _validate_name_value(name, value):
 def sanitize_resource_name(state, name, value):
     _validate_name_value(name, value)
     assert '/' not in name, name
-    resource_name = _sanitize(name).upper()
+    resource_name = f'_{_sanitize(name).upper()}'
+
     assert resource_name not in state.resource_names or state.resource_names[resource_name] is value
     state.resource_names[resource_name] = value
     return resource_name
@@ -480,7 +481,7 @@ def render_opt_texture(state, profile_common, field_name, texture):
     image_id = surface.parameter_type.init_from.uri
     image_index = state.image_indices[image_id]
 
-    yield f".{field_name} = {{ .image_index = {image_index} }},"
+    yield f".{field_name} = {{ .image_index = {image_index} }}, // {image_id}"
 
 def render_opt_color_or_texture(state, profile_common, field_name, color_or_texture):
     if color_or_texture is None:
@@ -796,14 +797,6 @@ def render_library_lights(state, collada):
         for light in library_lights.lights:
             yield from render_light(state, collada, light)
 
-def escape_space(s):
-    def _escape_space(s):
-        for c in s:
-            if c == ' ':
-                yield '\\'
-            yield c
-    return str(_escape_space(s))
-
 def image_resource_name(state, uri):
     uri = unquote(uri)
     prefix = "file:///"
@@ -816,7 +809,7 @@ def image_resource_name(state, uri):
     filename = os.path.split(path)[1]
     assert filename not in state.image_paths, filename
     state.image_paths[filename] = path
-    return sanitize_resource_name(state, filename, path.lower())
+    return sanitize_resource_name(state, filename, path)
 
 def render_image(state, collada, image, image_index):
     assert image.id is not None
@@ -827,7 +820,7 @@ def render_image(state, collada, image, image_index):
     resource_name = image_resource_name(state, image.image_source.uri)
     image_name = sanitize_name(state, image.id, image)
 
-    yield f"// image_index: {image_index}"
+    yield f"// {image.id}"
     yield f"image const image_{image_name} = {{"
     yield f'.resource_name = L"{resource_name}",'
     yield "};"

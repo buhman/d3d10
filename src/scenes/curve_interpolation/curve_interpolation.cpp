@@ -667,24 +667,24 @@ channel const node_channel_node_light_translation_z = {
   .target_attribute = target_attribute::Z,
 };
 
-// image_index: 0
+// american_cherry_png
 image const image_american_cherry_png = {
-  .resource_name = L"AMERICAN_CHERRY_PNG",
+  .resource_name = L"_AMERICAN_CHERRY_PNG",
 };
 
-// image_index: 1
+// _02_png
 image const image__02_png = {
-  .resource_name = L"102_PNG",
+  .resource_name = L"_102_PNG",
 };
 
-// image_index: 2
+// Finishes_Flooring_Tile_Square_Medium_Blue_png
 image const image_finishes_flooring_tile_square_medium_blue_png = {
-  .resource_name = L"FINISHES_FLOORING_TILE_SQUARE_MEDIUM_BLUE_PNG",
+  .resource_name = L"_FINISHES_FLOORING_TILE_SQUARE_MEDIUM_BLUE_PNG",
 };
 
-// image_index: 3
+// SiteWork_Planting_Grass_Bermuda1_jpg
 image const image_sitework_planting_grass_bermuda1_jpg = {
-  .resource_name = L"SITEWORK_PLANTING_GRASS_BERMUDA1_JPG",
+  .resource_name = L"_SITEWORK_PLANTING_GRASS_BERMUDA1_JPG",
 };
 
 image const * const images[] = {
@@ -945,7 +945,7 @@ effect const effect_grass = {
     },
     .diffuse = {
       .type = color_or_texture_type::TEXTURE,
-      .texture = { .image_index = 3 },
+      .texture = { .image_index = 3 }, // SiteWork_Planting_Grass_Bermuda1_jpg
     },
     .specular = {
       .type = color_or_texture_type::COLOR,
@@ -979,11 +979,11 @@ effect const effect_wood = {
     },
     .diffuse = {
       .type = color_or_texture_type::TEXTURE,
-      .texture = { .image_index = 0 },
+      .texture = { .image_index = 0 }, // american_cherry_png
     },
     .specular = {
       .type = color_or_texture_type::TEXTURE,
-      .texture = { .image_index = 2 },
+      .texture = { .image_index = 2 }, // Finishes_Flooring_Tile_Square_Medium_Blue_png
     },
     .shininess = 10.0f,
     .reflective = {
@@ -1629,9 +1629,9 @@ instance_light const instance_lights_node_geosphere[] = {
 };
 
 channel const * const node_channels_node_geosphere[] = {
-  &node_channel_node_geosphere_scale,
   &node_channel_node_geosphere_inversescaleaxisrotation,
   &node_channel_node_geosphere_scaleaxisrotation,
+  &node_channel_node_geosphere_scale,
 };
 
 node const node_node_geosphere = {
@@ -1670,8 +1670,8 @@ instance_light const instance_lights_node_light[] = {
 
 channel const * const node_channels_node_light[] = {
   &node_channel_node_light_translation_z,
-  &node_channel_node_light_translation_x,
   &node_channel_node_light_translation_y,
+  &node_channel_node_light_translation_x,
 };
 
 node const node_node_light = {
