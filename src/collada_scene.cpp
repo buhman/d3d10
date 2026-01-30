@@ -49,18 +49,20 @@ namespace collada_scene {
     case input_format::FLOAT2: return DXGI_FORMAT_R32G32_FLOAT;
     case input_format::FLOAT3: return DXGI_FORMAT_R32G32B32_FLOAT;
     case input_format::FLOAT4: return DXGI_FORMAT_R32G32B32A32_FLOAT;
+    case input_format::INT4: return DXGI_FORMAT_R32G32B32A32_SINT;
     default:
       assert(false);
     }
   }
 
-  static inline int format_size(input_format format)
+  static inline UINT format_size(input_format format)
   {
     switch (format) {
     case input_format::FLOAT1: return 1 * 4;
     case input_format::FLOAT2: return 2 * 4;
     case input_format::FLOAT3: return 3 * 4;
     case input_format::FLOAT4: return 4 * 4;
+    case input_format::INT4: return 4 * 4;
     default:
       assert(false);
     }
@@ -71,9 +73,14 @@ namespace collada_scene {
     HRESULT hr;
 
     m_pVertexLayouts = New<ID3D10InputLayout *>(m_descriptor->inputs_list_count);
+    m_pSkinnedVertexLayouts = New<ID3D10InputLayout *>(m_descriptor->inputs_list_count);
+    m_iVertexLayoutStrides = New<UINT>(m_descriptor->inputs_list_count);
 
     for (int i = 0; i < m_descriptor->inputs_list_count; i++) {
-      hr = LoadLayout(m_descriptor->inputs_list[i], &m_pVertexLayouts[i]);
+      hr = LoadLayout(m_descriptor->inputs_list[i],
+                      &m_pVertexLayouts[i],
+                      &m_pSkinnedVertexLayouts[i],
+                      &m_iVertexLayoutStrides[i]);
       if (FAILED(hr))
         return hr;
     }
@@ -203,6 +210,10 @@ namespace collada_scene {
     if (FAILED(hr))
       return E_FAIL;
 
+    hr = LoadVertexBuffer(L"RES_MODELS_CURVE_INTERPOLATION_VJW", &m_pVertexBuffers[1]);
+    if (FAILED(hr))
+      return E_FAIL;
+
     hr = LoadIndexBuffer(L"RES_MODELS_CURVE_INTERPOLATION_IDX", &m_pIndexBuffer);
     if (FAILED(hr))
       return E_FAIL;
@@ -217,14 +228,34 @@ namespace collada_scene {
     return S_OK;
   }
 
-  HRESULT LoadLayout(inputs const& inputs, ID3D10InputLayout ** ppVertexLayout)
+  input_element const input_elements_blendindices_0_4_blendweight_0_4[] = {
+    {
+      .semantic = "BLENDINDICES",
+      .semantic_index = 0,
+      .format = input_format::INT4,
+    },
+    {
+      .semantic = "BLENDWEIGHT",
+      .semantic_index = 0,
+      .format = input_format::FLOAT4,
+    },
+  };
+
+  inputs const skin_inputs = {
+    .elements = input_elements_blendindices_0_4_blendweight_0_4,
+    .elements_count = 2,
+  };
+
+  HRESULT LoadLayout(inputs const& inputs,
+                     ID3D10InputLayout ** ppVertexLayout,
+                     ID3D10InputLayout ** ppSkinnedVertexLayout,
+                     UINT * iVertexLayoutStride)
   {
     HRESULT hr;
 
-    D3D10_INPUT_ELEMENT_DESC layout[inputs.elements_count];
+    D3D10_INPUT_ELEMENT_DESC layout[inputs.elements_count + 2];
 
-    assert(inputs.elements_count == 3);
-    int byte_offset = 0;
+    UINT byte_offset = 0;
     for (int i = 0; i < inputs.elements_count; i++) {
       layout[i].SemanticName = inputs.elements[i].semantic;
       layout[i].SemanticIndex = inputs.elements[i].semantic_index;
@@ -236,6 +267,7 @@ namespace collada_scene {
 
       byte_offset += format_size(inputs.elements[i].format);
     }
+    *iVertexLayoutStride = byte_offset;
 
     D3D10_PASS_DESC passDesc;
     g_pTechniqueBlinn->GetPassByIndex(0)->GetDesc(&passDesc);
@@ -244,6 +276,33 @@ namespace collada_scene {
                                          passDesc.pIAInputSignature,
                                          passDesc.IAInputSignatureSize,
                                          ppVertexLayout);
+    if (FAILED(hr)) {
+      print("CreateInputLayout\n");
+      return hr;
+    }
+
+    //////////////////////////////////////////////////////////////////////
+    // skinned layout
+    //////////////////////////////////////////////////////////////////////
+
+    UINT skin_byte_offset = 0;
+    for (int i = 0; i < skin_inputs.elements_count; i++) {
+      int ix = inputs.elements_count + i;
+      layout[ix].SemanticName = skin_inputs.elements[i].semantic;
+      layout[ix].SemanticIndex = skin_inputs.elements[i].semantic_index;
+      layout[ix].Format = dxgi_format(skin_inputs.elements[i].format);
+      layout[ix].InputSlot = 0;
+      layout[ix].AlignedByteOffset = skin_byte_offset;
+      layout[ix].InputSlotClass = D3D10_INPUT_PER_VERTEX_DATA;
+      layout[ix].InstanceDataStepRate = 0;
+
+      skin_byte_offset += format_size(skin_inputs.elements[i].format);
+    }
+
+    hr = g_pd3dDevice->CreateInputLayout(layout, inputs.elements_count + skin_inputs.elements_count,
+                                         passDesc.pIAInputSignature,
+                                         passDesc.IAInputSignatureSize,
+                                         ppSkinnedVertexLayout);
     if (FAILED(hr)) {
       print("CreateInputLayout\n");
       return hr;
@@ -392,8 +451,9 @@ namespace collada_scene {
     }
   }
 
-  void scene_state::set_material(effect const& effect)
+  void scene_state::set_instance_material(instance_material const& instance_material)
   {
+    effect const& effect = *instance_material.material->effect;
     switch (effect.type) {
     case effect_type::BLINN:
       set_color_or_texture(effect.blinn.emission, g_pEmissionVariable, g_pTexEmissionVariable);
@@ -420,6 +480,14 @@ namespace collada_scene {
     default:
       break;
     }
+
+    int texture_channels[4] = {
+      instance_material.emission.input_set,
+      instance_material.ambient.input_set,
+      instance_material.diffuse.input_set,
+      instance_material.specular.input_set,
+    };
+    g_pTextureChannelVariable->SetIntVector(texture_channels);
   }
 
   void scene_state::render_geometry(geometry const& geometry,
@@ -427,10 +495,6 @@ namespace collada_scene {
                                     int const instance_materials_count)
   {
     mesh const& mesh = geometry.mesh;
-
-    UINT strides[1] = { 3 * 3 * 4 };
-    UINT offsets[1] = { (UINT)mesh.vertex_buffer_offset };
-    g_pd3dDevice->IASetVertexBuffers(0, m_numBuffers, m_pVertexBuffers, strides, offsets);
     g_pd3dDevice->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, mesh.index_buffer_offset);
 
     D3D10_TECHNIQUE_DESC techDesc;
@@ -439,17 +503,43 @@ namespace collada_scene {
     for (int j = 0; j < instance_materials_count; j++) {
       instance_material const& instance_material = instance_materials[j];
       triangles const& triangles = mesh.triangles[instance_material.element_index];
-      set_material(*instance_material.material->effect);
-      int texture_channels[4] = {
-        instance_material.emission.input_set,
-        instance_material.ambient.input_set,
-        instance_material.diffuse.input_set,
-        instance_material.specular.input_set,
-      };
-      g_pTextureChannelVariable->SetIntVector(texture_channels);
+
+      set_instance_material(instance_material);
+
+      UINT numBuffers = 1;
+      UINT offsets[1] = { (UINT)mesh.vertex_buffer_offset };
+      UINT strides[1] = { m_iVertexLayoutStrides[triangles.inputs_index] };
+      g_pd3dDevice->IASetVertexBuffers(0, numBuffers, m_pVertexBuffers, strides, offsets);
+      g_pd3dDevice->IASetInputLayout(m_pVertexLayouts[triangles.inputs_index]);
 
       g_pTechniqueBlinn->GetPassByIndex(0)->Apply(0);
-      g_pd3dDevice->IASetInputLayout(m_pVertexLayouts[triangles.inputs_index]);
+      g_pd3dDevice->DrawIndexed(triangles.count * 3, triangles.index_offset, 0);
+    }
+  }
+
+  void scene_state::render_skin(skin const& skin,
+                                instance_material const * const instance_materials,
+                                int const instance_materials_count)
+  {
+    mesh const& mesh = skin.geometry->mesh;
+    g_pd3dDevice->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, mesh.index_buffer_offset);
+
+    D3D10_TECHNIQUE_DESC techDesc;
+    g_pTechniqueBlinn->GetDesc(&techDesc);
+
+    for (int j = 0; j < instance_materials_count; j++) {
+      instance_material const& instance_material = instance_materials[j];
+      triangles const& triangles = mesh.triangles[instance_material.element_index];
+
+      set_instance_material(instance_material);
+
+      UINT numBuffers = 2;
+      UINT offsets[2] = { (UINT)mesh.vertex_buffer_offset, (UINT)skin.vertex_buffer_offset };
+      UINT strides[2] = { m_iVertexLayoutStrides[triangles.inputs_index], 2 * 4 * 4 };
+      g_pd3dDevice->IASetVertexBuffers(0, numBuffers, m_pVertexBuffers, strides, offsets);
+      g_pd3dDevice->IASetInputLayout(m_pSkinnedVertexLayouts[triangles.inputs_index]);
+
+      g_pTechniqueBlinn->GetPassByIndex(0)->Apply(0);
       g_pd3dDevice->DrawIndexed(triangles.count * 3, triangles.index_offset, 0);
     }
   }
@@ -459,9 +549,7 @@ namespace collada_scene {
   {
     for (int i = 0; i < instance_geometries_count; i++) {
       instance_geometry const &instance_geometry = instance_geometries[i];
-      geometry const& geometry = *instance_geometry.geometry;
-
-      render_geometry(geometry,
+      render_geometry(*instance_geometry.geometry,
                       instance_geometry.instance_materials,
                       instance_geometry.instance_materials_count);
     }
@@ -472,11 +560,9 @@ namespace collada_scene {
   {
     for (int i = 0; i < instance_controllers_count; i++) {
       instance_controller const &instance_controller = instance_controllers[i];
-      geometry const& geometry = *instance_controller.controller->skin.geometry;
-
-      render_geometry(geometry,
-                      instance_controller.instance_materials,
-                      instance_controller.instance_materials_count);
+      render_skin(instance_controller.controller->skin,
+                  instance_controller.instance_materials,
+                  instance_controller.instance_materials_count);
     }
   }
 
