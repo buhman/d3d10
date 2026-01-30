@@ -22,24 +22,24 @@ float const array_node_cube_translation_x_input_array[] = {
 };
 
 float const array_node_cube_translation_x_output_array[] = {
-  10.0f,
-  -10.0f,
-  10.0f,
-  -10.0f,
+  34.88703f,
+  -34.88703f,
+  34.88703f,
+  -34.88703f,
 };
 
 float const array_node_cube_translation_x_intangent_array[] = {
-  -0.3332306f, 10.0f,
-  1.111167f, -10.0f,
-  2.778333f, 10.0f,
-  4.4445f, -9.219337f,
+  -0.3332306f, 34.88703f,
+  1.111167f, -34.88703f,
+  2.778333f, 34.88703f,
+  4.4323f, -34.88086f,
 };
 
 float const array_node_cube_translation_x_outtangent_array[] = {
-  0.5555f, 10.0f,
-  2.222167f, -10.0f,
-  3.888333f, 10.0f,
-  4.000208f, -8.594958f,
+  0.5555f, 34.88703f,
+  2.222167f, -34.88703f,
+  3.888333f, 34.88703f,
+  4.000208f, -29.96252f,
 };
 
 enum interpolation const array_node_cube_translation_x_interpolation_array[] = {
@@ -90,24 +90,24 @@ float const array_node_cube_translation_y_input_array[] = {
 };
 
 float const array_node_cube_translation_y_output_array[] = {
-  -10.05776f,
-  10.05852f,
-  -9.941484f,
-  10.05852f,
+  -35.08854f,
+  35.09117f,
+  -34.68288f,
+  35.09117f,
 };
 
 float const array_node_cube_translation_y_intangent_array[] = {
-  -1.166264f, -10.05776f,
-  0.2778334f, 10.05852f,
-  1.9445f, -9.941484f,
-  3.611667f, 10.05852f,
+  -1.166264f, -35.08854f,
+  0.2778334f, 35.09117f,
+  1.9445f, -34.68288f,
+  3.611667f, 35.09117f,
 };
 
 float const array_node_cube_translation_y_outtangent_array[] = {
-  -0.2783333f, -10.05776f,
-  1.388833f, 10.05852f,
-  3.0555f, -9.941484f,
-  4.499598f, 10.05852f,
+  -0.2783333f, -35.08854f,
+  1.388833f, 35.09117f,
+  3.0555f, -34.68288f,
+  4.499598f, 35.09117f,
 };
 
 enum interpolation const array_node_cube_translation_y_interpolation_array[] = {
@@ -230,21 +230,21 @@ float const array_node_geosphere_scale_input_array[] = {
 };
 
 float const array_node_geosphere_scale_output_array[] = {
-  1.0f, 1.0f, 1.0f,
-  1.996525f, 1.996525f, 1.996525f,
-  1.0f, 1.0f, 1.0f,
+  3.523671f, 3.523671f, 3.523671f,
+  7.035098f, 7.035098f, 7.035098f,
+  3.523671f, 3.523671f, 3.523671f,
 };
 
 float const array_node_geosphere_scale_intangent_array[] = {
-  0.9997917f, 1.0f, 0.9997917f, 1.0f, 0.9997917f, 1.0f,
-  1.111167f, 1.996525f, 1.111167f, 1.996525f, 1.111167f, 1.996525f,
-  2.777833f, 1.0f, 2.777833f, 1.0f, 2.777833f, 1.0f,
+  0.9997917f, 3.523671f, 0.9997917f, 3.523671f, 0.9997917f, 3.523671f,
+  1.111167f, 7.035098f, 1.111167f, 7.035098f, 1.111167f, 7.035098f,
+  2.777833f, 3.523671f, 2.777833f, 3.523671f, 2.777833f, 3.523671f,
 };
 
 float const array_node_geosphere_scale_outtangent_array[] = {
-  0.5555f, 1.0f, 0.5555f, 1.0f, 0.5555f, 1.0f,
-  2.222167f, 1.996525f, 2.222167f, 1.996525f, 2.222167f, 1.996525f,
-  2.333542f, 1.0f, 2.333542f, 1.0f, 2.333542f, 1.0f,
+  0.5555f, 3.523671f, 0.5555f, 3.523671f, 0.5555f, 3.523671f,
+  2.222167f, 7.035098f, 2.222167f, 7.035098f, 2.222167f, 7.035098f,
+  2.333542f, 3.523671f, 2.333542f, 3.523671f, 2.333542f, 3.523671f,
 };
 
 enum interpolation const array_node_geosphere_scale_interpolation_array[] = {
@@ -375,33 +375,33 @@ float const array_node_light_translation_x_input_array[] = {
 };
 
 float const array_node_light_translation_x_output_array[] = {
-  2.124535f,
-  -5.611371f,
-  -5.611371f,
-  0.04967833f,
-  0.04967833f,
-  2.124535f,
-  2.124535f,
+  24.0f,
+  -35.0f,
+  -35.0f,
+  5.0f,
+  5.0f,
+  24.0f,
+  24.0f,
 };
 
 float const array_node_light_translation_x_intangent_array[] = {
-  0.9997917f, 2.124535f,
-  0.33335f, -5.611371f,
-  0.83335f, -5.611371f,
-  1.33335f, 0.04967833f,
-  1.83335f, 0.04967833f,
-  2.555583f, 2.124535f,
-  3.166683f, 2.124535f,
+  0.9997917f, 24.0f,
+  0.33335f, -35.0f,
+  0.83335f, -35.0f,
+  1.33335f, 5.0f,
+  1.83335f, 5.0f,
+  2.555583f, 24.0f,
+  3.166683f, 24.0f,
 };
 
 float const array_node_light_translation_x_outtangent_array[] = {
-  0.16665f, 2.124535f,
-  0.66665f, -5.611371f,
-  1.16665f, -5.611371f,
-  1.66665f, 0.04967833f,
-  2.27775f, 0.04967833f,
-  2.999983f, 2.124535f,
-  3.666564f, 2.124535f,
+  0.16665f, 24.0f,
+  0.66665f, -35.0f,
+  1.16665f, -35.0f,
+  1.66665f, 5.0f,
+  2.27775f, 5.0f,
+  2.999983f, 24.0f,
+  3.666564f, 24.0f,
 };
 
 enum interpolation const array_node_light_translation_x_interpolation_array[] = {
@@ -458,33 +458,33 @@ float const array_node_light_translation_y_input_array[] = {
 };
 
 float const array_node_light_translation_y_output_array[] = {
-  8.291501f,
-  0.2940993f,
-  0.2940993f,
-  -3.820096f,
-  -3.820096f,
-  8.291501f,
-  8.291501f,
+  25.52443f,
+  2.0f,
+  2.0f,
+  -20.0f,
+  -20.0f,
+  25.52443f,
+  25.52443f,
 };
 
 float const array_node_light_translation_y_intangent_array[] = {
-  0.9997917f, 8.291501f,
-  0.33335f, 0.2940993f,
-  0.83335f, 0.2940993f,
-  1.33335f, -3.820096f,
-  1.83335f, -3.820096f,
-  2.555583f, 8.291501f,
-  3.166683f, 8.291501f,
+  0.9997917f, 25.52443f,
+  0.33335f, 2.0f,
+  0.83335f, 2.0f,
+  1.33335f, -20.0f,
+  1.83335f, -20.0f,
+  2.555583f, 25.52443f,
+  3.166683f, 25.52443f,
 };
 
 float const array_node_light_translation_y_outtangent_array[] = {
-  0.16665f, 8.291501f,
-  0.66665f, 0.2940993f,
-  1.16665f, 0.2940993f,
-  1.66665f, -3.820096f,
-  2.27775f, -3.820096f,
-  2.999983f, 8.291501f,
-  3.666564f, 8.291501f,
+  0.16665f, 25.52443f,
+  0.66665f, 2.0f,
+  1.16665f, 2.0f,
+  1.66665f, -20.0f,
+  2.27775f, -20.0f,
+  2.999983f, 25.52443f,
+  3.666564f, 25.52443f,
 };
 
 enum interpolation const array_node_light_translation_y_interpolation_array[] = {
@@ -530,85 +530,95 @@ sampler const sampler_node_light_translation_y_sampler = {
   },
 };
 
-float const array_node_light_translation_z_input_array[] = {
+float const array_node_bone002_rotationz_angle_input_array[] = {
   0.0f,
-  0.5f,
-  1.0f,
-  1.5f,
-  2.0f,
-  2.833333f,
+  0.4333333f,
+  0.8333334f,
+  1.266667f,
+  1.666667f,
+  2.1f,
+  2.5f,
+  2.933333f,
   3.333333f,
 };
 
-float const array_node_light_translation_z_output_array[] = {
-  6.185831f,
-  6.185831f,
-  6.185831f,
-  6.185831f,
-  6.185831f,
-  6.185831f,
-  6.185831f,
+float const array_node_bone002_rotationz_angle_output_array[] = {
+  180.0f,
+  230.0f,
+  180.0f,
+  130.0f,
+  180.0f,
+  230.0f,
+  180.0f,
+  130.0f,
+  180.0f,
 };
 
-float const array_node_light_translation_z_intangent_array[] = {
-  0.9997917f, 6.185831f,
-  0.33335f, 6.185831f,
-  0.83335f, 6.185831f,
-  1.33335f, 6.185831f,
-  1.83335f, 6.185831f,
-  2.555583f, 6.185831f,
-  3.166683f, 6.185831f,
+float const array_node_bone002_rotationz_angle_intangent_array[] = {
+  -0.3332639f, 180.0f,
+  0.2888889f, 213.3333f,
+  0.7f, 196.6667f,
+  1.122222f, 146.6667f,
+  1.533333f, 163.3333f,
+  1.955556f, 213.3333f,
+  2.366667f, 196.6667f,
+  2.788889f, 146.6667f,
+  3.2f, 163.3333f,
 };
 
-float const array_node_light_translation_z_outtangent_array[] = {
-  0.16665f, 6.185831f,
-  0.66665f, 6.185831f,
-  1.16665f, 6.185831f,
-  1.66665f, 6.185831f,
-  2.27775f, 6.185831f,
-  2.999983f, 6.185831f,
-  3.666564f, 6.185831f,
+float const array_node_bone002_rotationz_angle_outtangent_array[] = {
+  0.1444445f, 196.6667f,
+  0.5666667f, 213.3333f,
+  0.9777778f, 163.3333f,
+  1.4f, 146.6667f,
+  1.811111f, 196.6667f,
+  2.233333f, 213.3333f,
+  2.644444f, 163.3333f,
+  3.066667f, 146.6667f,
+  3.666597f, 180.0f,
 };
 
-enum interpolation const array_node_light_translation_z_interpolation_array[] = {
-  interpolation::BEZIER,
-  interpolation::BEZIER,
-  interpolation::BEZIER,
-  interpolation::BEZIER,
-  interpolation::BEZIER,
-  interpolation::BEZIER,
-  interpolation::BEZIER,
+enum interpolation const array_node_bone002_rotationz_angle_interpolation_array[] = {
+  interpolation::LINEAR,
+  interpolation::LINEAR,
+  interpolation::LINEAR,
+  interpolation::LINEAR,
+  interpolation::LINEAR,
+  interpolation::LINEAR,
+  interpolation::LINEAR,
+  interpolation::LINEAR,
+  interpolation::LINEAR,
 };
 
-sampler const sampler_node_light_translation_z_sampler = {
-  // node_light_translation_z_input
+sampler const sampler_node_bone002_rotationz_angle_sampler = {
+  // node_bone002_rotationz_angle_input
   .input = {
-    .float_array = array_node_light_translation_z_input_array,
-    .count = 7,
+    .float_array = array_node_bone002_rotationz_angle_input_array,
+    .count = 9,
     .stride = 1,
   },
-  // node_light_translation_z_output
+  // node_bone002_rotationz_angle_output
   .output = {
-    .float_array = array_node_light_translation_z_output_array,
-    .count = 7,
+    .float_array = array_node_bone002_rotationz_angle_output_array,
+    .count = 9,
     .stride = 1,
   },
-  // node_light_translation_z_intangent
+  // node_bone002_rotationz_angle_intangent
   .in_tangent = {
-    .float_array = array_node_light_translation_z_intangent_array,
-    .count = 7,
+    .float_array = array_node_bone002_rotationz_angle_intangent_array,
+    .count = 9,
     .stride = 2,
   },
-  // node_light_translation_z_outtangent
+  // node_bone002_rotationz_angle_outtangent
   .out_tangent = {
-    .float_array = array_node_light_translation_z_outtangent_array,
-    .count = 7,
+    .float_array = array_node_bone002_rotationz_angle_outtangent_array,
+    .count = 9,
     .stride = 2,
   },
-  // node_light_translation_z_interpolation
+  // node_bone002_rotationz_angle_interpolation
   .interpolation = {
-    .interpolation_array = array_node_light_translation_z_interpolation_array,
-    .count = 7,
+    .interpolation_array = array_node_bone002_rotationz_angle_interpolation_array,
+    .count = 9,
     .stride = 1,
   },
 };
@@ -633,19 +643,19 @@ channel const node_channel_node_torus_rotationx_angle = {
 
 channel const node_channel_node_geosphere_scale = {
   .source_sampler = &sampler_node_geosphere_scale_sampler,
-  .target_transform_index = 1,
+  .target_transform_index = 2,
   .target_attribute = target_attribute::ALL,
 };
 
 channel const node_channel_node_geosphere_inversescaleaxisrotation = {
   .source_sampler = &sampler_node_geosphere_inversescaleaxisrotation_sampler,
-  .target_transform_index = 0,
+  .target_transform_index = 1,
   .target_attribute = target_attribute::ALL,
 };
 
 channel const node_channel_node_geosphere_scaleaxisrotation = {
   .source_sampler = &sampler_node_geosphere_scaleaxisrotation_sampler,
-  .target_transform_index = 2,
+  .target_transform_index = 3,
   .target_attribute = target_attribute::ALL,
 };
 
@@ -661,10 +671,10 @@ channel const node_channel_node_light_translation_y = {
   .target_attribute = target_attribute::Y,
 };
 
-channel const node_channel_node_light_translation_z = {
-  .source_sampler = &sampler_node_light_translation_z_sampler,
-  .target_transform_index = 0,
-  .target_attribute = target_attribute::Z,
+channel const node_channel_node_bone002_rotationz_angle = {
+  .source_sampler = &sampler_node_bone002_rotationz_angle_sampler,
+  .target_transform_index = 1,
+  .target_attribute = target_attribute::ANGLE,
 };
 
 // american_cherry_png
@@ -1068,6 +1078,210 @@ effect const effect_lightemit = {
   }
 };
 
+effect const effect_material__13 = {
+  .type = effect_type::BLINN,
+  .blinn = {
+    .emission = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .ambient = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.5882353f, 0.5882353f, 1.0f, 1.0f},
+    },
+    .diffuse = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.5882353f, 0.5882353f, 1.0f, 1.0f},
+    },
+    .specular = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .shininess = 10.0f,
+    .reflective = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .reflectivity = 0.0f,
+    .transparent = {
+      .type = color_or_texture_type::COLOR,
+      .color = {1.0f, 1.0f, 1.0f, 1.0f},
+    },
+    .transparency = 1.0f,
+    .index_of_refraction = 0.0f,
+  }
+};
+
+effect const effect_material__14 = {
+  .type = effect_type::BLINN,
+  .blinn = {
+    .emission = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .ambient = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.5882353f, 0.9450981f, 1.0f, 1.0f},
+    },
+    .diffuse = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.5882353f, 0.9450981f, 1.0f, 1.0f},
+    },
+    .specular = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .shininess = 10.0f,
+    .reflective = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .reflectivity = 0.0f,
+    .transparent = {
+      .type = color_or_texture_type::COLOR,
+      .color = {1.0f, 1.0f, 1.0f, 1.0f},
+    },
+    .transparency = 1.0f,
+    .index_of_refraction = 0.0f,
+  }
+};
+
+effect const effect_material__15_1 = {
+  .type = effect_type::BLINN,
+  .blinn = {
+    .emission = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .ambient = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.5882353f, 1.0f, 0.6156863f, 1.0f},
+    },
+    .diffuse = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.5882353f, 1.0f, 0.6156863f, 1.0f},
+    },
+    .specular = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .shininess = 10.0f,
+    .reflective = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .reflectivity = 0.0f,
+    .transparent = {
+      .type = color_or_texture_type::COLOR,
+      .color = {1.0f, 1.0f, 1.0f, 1.0f},
+    },
+    .transparency = 1.0f,
+    .index_of_refraction = 0.0f,
+  }
+};
+
+effect const effect_material__16_1 = {
+  .type = effect_type::BLINN,
+  .blinn = {
+    .emission = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .ambient = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.9960785f, 1.0f, 0.5882353f, 1.0f},
+    },
+    .diffuse = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.9960785f, 1.0f, 0.5882353f, 1.0f},
+    },
+    .specular = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .shininess = 10.0f,
+    .reflective = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .reflectivity = 0.0f,
+    .transparent = {
+      .type = color_or_texture_type::COLOR,
+      .color = {1.0f, 1.0f, 1.0f, 1.0f},
+    },
+    .transparency = 1.0f,
+    .index_of_refraction = 0.0f,
+  }
+};
+
+effect const effect_material__17_1 = {
+  .type = effect_type::BLINN,
+  .blinn = {
+    .emission = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .ambient = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.9960785f, 0.8196079f, 0.5882353f, 1.0f},
+    },
+    .diffuse = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.9960785f, 0.8196079f, 0.5882353f, 1.0f},
+    },
+    .specular = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .shininess = 10.0f,
+    .reflective = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .reflectivity = 0.0f,
+    .transparent = {
+      .type = color_or_texture_type::COLOR,
+      .color = {1.0f, 1.0f, 1.0f, 1.0f},
+    },
+    .transparency = 1.0f,
+    .index_of_refraction = 0.0f,
+  }
+};
+
+effect const effect_material__18_1 = {
+  .type = effect_type::BLINN,
+  .blinn = {
+    .emission = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .ambient = {
+      .type = color_or_texture_type::COLOR,
+      .color = {1.0f, 0.5882353f, 0.5882353f, 1.0f},
+    },
+    .diffuse = {
+      .type = color_or_texture_type::COLOR,
+      .color = {1.0f, 0.5882353f, 0.5882353f, 1.0f},
+    },
+    .specular = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .shininess = 10.0f,
+    .reflective = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .reflectivity = 0.0f,
+    .transparent = {
+      .type = color_or_texture_type::COLOR,
+      .color = {1.0f, 1.0f, 1.0f, 1.0f},
+    },
+    .transparency = 1.0f,
+    .index_of_refraction = 0.0f,
+  }
+};
+
 material const material_coloreffectr26g177b26_material = {
   .effect = &effect_coloreffectr26g177b26,
 };
@@ -1110,6 +1324,30 @@ material const material_wood_material = {
 
 material const material_lightemit_material = {
   .effect = &effect_lightemit,
+};
+
+material const material_material__13_material = {
+  .effect = &effect_material__13,
+};
+
+material const material_material__14_material = {
+  .effect = &effect_material__14,
+};
+
+material const material_material__15_1_material = {
+  .effect = &effect_material__15_1,
+};
+
+material const material_material__16_1_material = {
+  .effect = &effect_material__16_1,
+};
+
+material const material_material__17_1_material = {
+  .effect = &effect_material__17_1,
+};
+
+material const material_material__18_1_material = {
+  .effect = &effect_material__18_1,
 };
 
 input_element const input_elements_position_0_3_normal_0_3_texcoord_0_3[] = {
@@ -1281,6 +1519,52 @@ geometry const geometry_geom_lightindicator = {
   }
 };
 
+triangles const triangles_geom_box001[] = {
+  {
+    .count = 2, // triangles
+    .index_offset = 0, // indices
+    .inputs_index = 0, // index into inputs_list
+  },
+  {
+    .count = 2, // triangles
+    .index_offset = 6, // indices
+    .inputs_index = 0, // index into inputs_list
+  },
+  {
+    .count = 10, // triangles
+    .index_offset = 12, // indices
+    .inputs_index = 0, // index into inputs_list
+  },
+  {
+    .count = 10, // triangles
+    .index_offset = 42, // indices
+    .inputs_index = 0, // index into inputs_list
+  },
+  {
+    .count = 10, // triangles
+    .index_offset = 72, // indices
+    .inputs_index = 0, // index into inputs_list
+  },
+  {
+    .count = 10, // triangles
+    .index_offset = 102, // indices
+    .inputs_index = 0, // index into inputs_list
+  },
+};
+
+geometry const geometry_geom_box001 = {
+  .mesh = {
+    .triangles = triangles_geom_box001,
+    .triangles_count = 6,
+
+    .vertex_buffer_offset = 12492,
+    .vertex_buffer_size = 2016,
+
+    .index_buffer_offset = 3984,
+    .index_buffer_size = 528,
+  }
+};
+
 geometry const * const geometries[] = {
   &geometry_geom_cube,
   &geometry_geom_torus,
@@ -1288,6 +1572,31 @@ geometry const * const geometries[] = {
   &geometry_geom_plane,
   &geometry_geom_geosphere,
   &geometry_geom_lightindicator,
+  &geometry_geom_box001,
+};
+
+matrix const inverse_bind_matrices_geom_box001_skin1[] = {
+  {
+    -5.11435e-14f, -1.74846e-07f, -1.0f, 0.0f,
+    3.13916e-07f, 1.0f, -1.74846e-07f, 0.0f,
+    1.0f, -3.13916e-07f, 3.74342e-15f, 0.0f,
+    0.0f, 0.0f, 0.0f, 1.0f,
+  },
+  {
+    -8.74227e-08f, -8.74228e-08f, -1.0f, 0.0f,
+    -5.52335e-07f, 1.0f, -8.74227e-08f, 0.0f,
+    1.0f, 5.52335e-07f, -8.74227e-08f, 0.0f,
+    -10.0f, -9.85461e-06f, 8.74227e-07f, 1.0f,
+  },
+};
+
+controller const controller_geom_box001_skin1 = {
+  .skin = {
+    .inverse_bind_matrices = inverse_bind_matrices_geom_box001_skin1,
+
+    .vertex_buffer_offset = 0,
+    .vertex_buffer_size = 1792,
+  }
 };
 
 transform const transforms_node_environmentambientlight[] = {
@@ -1331,41 +1640,18 @@ node const node_node_environmentambientlight = {
 transform const transforms_node_cube[] = {
   {
     .type = transform_type::TRANSLATE,
-    .translate = {10.0f, -1.14258e-07f, 0.0f},
+    .translate = {34.88703f, -1.85427e-06f, 0.0f},
+  },
+  {
+    .type = transform_type::SCALE,
+    .scale = {3.523671f, 3.523671f, 3.523671f},
   },
 };
 
 instance_material const instance_geometry_instance_materials_node_cube_0[] = {
   {
-    .element_index = 1, // an index into mesh.triangles
-    .material = &material_material__15_material,
-
-    .emission = { .input_set = -1 },
-    .ambient = { .input_set = -1 },
-    .diffuse = { .input_set = -1 },
-    .specular = { .input_set = -1 },
-  },
-  {
-    .element_index = 0, // an index into mesh.triangles
-    .material = &material_material__16_material,
-
-    .emission = { .input_set = -1 },
-    .ambient = { .input_set = -1 },
-    .diffuse = { .input_set = -1 },
-    .specular = { .input_set = -1 },
-  },
-  {
     .element_index = 5, // an index into mesh.triangles
     .material = &material_material__17_material,
-
-    .emission = { .input_set = -1 },
-    .ambient = { .input_set = -1 },
-    .diffuse = { .input_set = -1 },
-    .specular = { .input_set = -1 },
-  },
-  {
-    .element_index = 4, // an index into mesh.triangles
-    .material = &material_material__20_material,
 
     .emission = { .input_set = -1 },
     .ambient = { .input_set = -1 },
@@ -1390,6 +1676,33 @@ instance_material const instance_geometry_instance_materials_node_cube_0[] = {
     .diffuse = { .input_set = -1 },
     .specular = { .input_set = -1 },
   },
+  {
+    .element_index = 4, // an index into mesh.triangles
+    .material = &material_material__20_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
+  },
+  {
+    .element_index = 1, // an index into mesh.triangles
+    .material = &material_material__15_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
+  },
+  {
+    .element_index = 0, // an index into mesh.triangles
+    .material = &material_material__16_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
+  },
 };
 
 instance_geometry const instance_geometries_node_cube[] = {
@@ -1408,8 +1721,8 @@ instance_light const instance_lights_node_cube[] = {
 };
 
 channel const * const node_channels_node_cube[] = {
-  &node_channel_node_cube_translation_x,
   &node_channel_node_cube_translation_y,
+  &node_channel_node_cube_translation_x,
 };
 
 node const node_node_cube = {
@@ -1418,7 +1731,7 @@ node const node_node_cube = {
   .type = node_type::NODE,
 
   .transforms = transforms_node_cube,
-  .transforms_count = 1,
+  .transforms_count = 2,
 
   .instance_geometries = instance_geometries_node_cube,
   .instance_geometries_count = 1,
@@ -1436,7 +1749,7 @@ node const node_node_cube = {
 transform const transforms_node_torus[] = {
   {
     .type = transform_type::TRANSLATE,
-    .translate = {5.0f, 1.14258e-07f, 2.0f},
+    .translate = {5.000001f, 1.14258e-07f, 2.0f},
   },
   {
     .type = transform_type::ROTATE,
@@ -1509,6 +1822,10 @@ node const node_node_torus = {
 };
 
 transform const transforms_node_cylinder[] = {
+  {
+    .type = transform_type::SCALE,
+    .scale = {3.523671f, 3.523671f, 3.523671f},
+  },
 };
 
 instance_material const instance_geometry_instance_materials_node_cylinder_0[] = {
@@ -1547,7 +1864,7 @@ node const node_node_cylinder = {
   .type = node_type::NODE,
 
   .transforms = transforms_node_cylinder,
-  .transforms_count = 0,
+  .transforms_count = 1,
 
   .instance_geometries = instance_geometries_node_cylinder,
   .instance_geometries_count = 1,
@@ -1570,6 +1887,10 @@ transform const transforms_node_plane[] = {
   {
     .type = transform_type::ROTATE,
     .rotate = {0.0f, 0.0f, -1.0f, -44.99999f},
+  },
+  {
+    .type = transform_type::SCALE,
+    .scale = {3.523672f, 3.523672f, 3.523671f},
   },
 };
 
@@ -1609,7 +1930,7 @@ node const node_node_plane = {
   .type = node_type::NODE,
 
   .transforms = transforms_node_plane,
-  .transforms_count = 2,
+  .transforms_count = 3,
 
   .instance_geometries = instance_geometries_node_plane,
   .instance_geometries_count = 1,
@@ -1626,12 +1947,16 @@ node const node_node_plane = {
 
 transform const transforms_node_geosphere[] = {
   {
+    .type = transform_type::TRANSLATE,
+    .translate = {-18.87136f, 14.31975f, 0.0f},
+  },
+  {
     .type = transform_type::ROTATE,
     .rotate = {0.0f, 0.0f, 0.0f, 0.0f},
   },
   {
     .type = transform_type::SCALE,
-    .scale = {1.0f, 1.0f, 1.0f},
+    .scale = {3.523671f, 3.523671f, 3.523671f},
   },
   {
     .type = transform_type::ROTATE,
@@ -1667,9 +1992,9 @@ instance_light const instance_lights_node_geosphere[] = {
 };
 
 channel const * const node_channels_node_geosphere[] = {
-  &node_channel_node_geosphere_inversescaleaxisrotation,
   &node_channel_node_geosphere_scale,
   &node_channel_node_geosphere_scaleaxisrotation,
+  &node_channel_node_geosphere_inversescaleaxisrotation,
 };
 
 node const node_node_geosphere = {
@@ -1678,7 +2003,7 @@ node const node_node_geosphere = {
   .type = node_type::NODE,
 
   .transforms = transforms_node_geosphere,
-  .transforms_count = 3,
+  .transforms_count = 4,
 
   .instance_geometries = instance_geometries_node_geosphere,
   .instance_geometries_count = 1,
@@ -1696,7 +2021,11 @@ node const node_node_geosphere = {
 transform const transforms_node_light[] = {
   {
     .type = transform_type::TRANSLATE,
-    .translate = {2.124535f, 8.291501f, 6.185831f},
+    .translate = {24.0f, 25.52443f, 19.04236f},
+  },
+  {
+    .type = transform_type::SCALE,
+    .scale = {3.523671f, 3.523671f, 3.523671f},
   },
 };
 
@@ -1713,9 +2042,8 @@ instance_light const instance_lights_node_light[] = {
 };
 
 channel const * const node_channels_node_light[] = {
-  &node_channel_node_light_translation_x,
-  &node_channel_node_light_translation_z,
   &node_channel_node_light_translation_y,
+  &node_channel_node_light_translation_x,
 };
 
 node const node_node_light = {
@@ -1724,7 +2052,7 @@ node const node_node_light = {
   .type = node_type::NODE,
 
   .transforms = transforms_node_light,
-  .transforms_count = 1,
+  .transforms_count = 2,
 
   .instance_geometries = instance_geometries_node_light,
   .instance_geometries_count = 0,
@@ -1736,7 +2064,7 @@ node const node_node_light = {
   .instance_lights_count = 1,
 
   .channels = node_channels_node_light,
-  .channels_count = 3,
+  .channels_count = 2,
 };
 
 transform const transforms_node_lightindicator[] = {
@@ -1797,6 +2125,206 @@ node const node_node_lightindicator = {
   .channels_count = 0,
 };
 
+transform const transforms_node_box001[] = {
+};
+
+instance_geometry const instance_geometries_node_box001[] = {
+};
+
+int const joint_node_indices_node_box001_geom_box001_skin1[] = {
+  9, // joint0 node_bone001
+  10, // joint1 node_bone002
+};
+
+instance_material const instance_controller_instance_materials_node_box001_0[] = {
+  {
+    .element_index = 1, // an index into mesh.triangles
+    .material = &material_material__13_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
+  },
+  {
+    .element_index = 0, // an index into mesh.triangles
+    .material = &material_material__14_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
+  },
+  {
+    .element_index = 5, // an index into mesh.triangles
+    .material = &material_material__15_1_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
+  },
+  {
+    .element_index = 3, // an index into mesh.triangles
+    .material = &material_material__16_1_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
+  },
+  {
+    .element_index = 2, // an index into mesh.triangles
+    .material = &material_material__17_1_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
+  },
+  {
+    .element_index = 4, // an index into mesh.triangles
+    .material = &material_material__18_1_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
+  },
+};
+
+instance_controller const instance_controllers_node_box001[] = {
+  {
+    .controller = &controller_geom_box001_skin1,
+
+    .joint_node_indices = joint_node_indices_node_box001_geom_box001_skin1,
+    .joint_count = (sizeof (joint_node_indices_node_box001_geom_box001_skin1)) / (sizeof (int)),
+
+    .instance_materials = instance_controller_instance_materials_node_box001_0,
+    .instance_materials_count = 6,
+  },
+};
+
+instance_light const instance_lights_node_box001[] = {
+};
+
+channel const * const node_channels_node_box001[] = {
+};
+
+node const node_node_box001 = {
+  .parent_index = -1,
+
+  .type = node_type::NODE,
+
+  .transforms = transforms_node_box001,
+  .transforms_count = 0,
+
+  .instance_geometries = instance_geometries_node_box001,
+  .instance_geometries_count = 0,
+
+  .instance_controllers = instance_controllers_node_box001,
+  .instance_controllers_count = 1,
+
+  .instance_lights = instance_lights_node_box001,
+  .instance_lights_count = 0,
+
+  .channels = node_channels_node_box001,
+  .channels_count = 0,
+};
+
+transform const transforms_node_bone001[] = {
+  {
+    .type = transform_type::ROTATE,
+    .rotate = {1.32123e-06f, 1.0f, -1.49608e-06f, -90.0f},
+  },
+};
+
+instance_geometry const instance_geometries_node_bone001[] = {
+};
+
+instance_controller const instance_controllers_node_bone001[] = {
+};
+
+instance_light const instance_lights_node_bone001[] = {
+};
+
+channel const * const node_channels_node_bone001[] = {
+};
+
+node const node_node_bone001 = {
+  .parent_index = -1,
+
+  .type = node_type::JOINT,
+
+  .transforms = transforms_node_bone001,
+  .transforms_count = 1,
+
+  .instance_geometries = instance_geometries_node_bone001,
+  .instance_geometries_count = 0,
+
+  .instance_controllers = instance_controllers_node_bone001,
+  .instance_controllers_count = 0,
+
+  .instance_lights = instance_lights_node_bone001,
+  .instance_lights_count = 0,
+
+  .channels = node_channels_node_bone001,
+  .channels_count = 0,
+};
+
+transform const transforms_node_bone002[] = {
+  {
+    .type = transform_type::TRANSLATE,
+    .translate = {10.0f, 1.19209e-06f, 5.69993e-14f},
+  },
+  {
+    .type = transform_type::ROTATE,
+    .rotate = {0.0f, 0.0f, 1.0f, 5.00896e-06f},
+  },
+  {
+    .type = transform_type::ROTATE,
+    .rotate = {0.0f, 1.0f, 0.0f, -5.00896e-06f},
+  },
+  {
+    .type = transform_type::ROTATE,
+    .rotate = {1.0f, 0.0f, 0.0f, -5.00896e-06f},
+  },
+};
+
+instance_geometry const instance_geometries_node_bone002[] = {
+};
+
+instance_controller const instance_controllers_node_bone002[] = {
+};
+
+instance_light const instance_lights_node_bone002[] = {
+};
+
+channel const * const node_channels_node_bone002[] = {
+  &node_channel_node_bone002_rotationz_angle,
+};
+
+node const node_node_bone002 = {
+  .parent_index = 9,
+
+  .type = node_type::JOINT,
+
+  .transforms = transforms_node_bone002,
+  .transforms_count = 4,
+
+  .instance_geometries = instance_geometries_node_bone002,
+  .instance_geometries_count = 0,
+
+  .instance_controllers = instance_controllers_node_bone002,
+  .instance_controllers_count = 0,
+
+  .instance_lights = instance_lights_node_bone002,
+  .instance_lights_count = 0,
+
+  .channels = node_channels_node_bone002,
+  .channels_count = 1,
+};
+
 node const * const nodes[] = {
   &node_node_environmentambientlight,
   &node_node_cube,
@@ -1806,6 +2334,9 @@ node const * const nodes[] = {
   &node_node_geosphere,
   &node_node_light,
   &node_node_lightindicator,
+  &node_node_box001,
+  &node_node_bone001,
+  &node_node_bone002,
 };
 
 inputs const inputs_list[] = {

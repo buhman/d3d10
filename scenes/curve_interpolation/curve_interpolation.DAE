@@ -6,8 +6,8 @@
       <authoring_tool>OpenCOLLADA for 3ds Max;  Version: 1.6;  Revision: 68</authoring_tool>
       <source_data>file:///C:/cygwin/home/bilbo/d3d10/scenes/curve_interpolation/curve_interpolation.max</source_data>
     </contributor>
-    <created>2026-01-29T17:33:59</created>
-    <modified>2026-01-29T17:33:59</modified>
+    <created>2026-01-30T09:40:47</created>
+    <modified>2026-01-30T09:40:47</modified>
     <unit name="inch" meter="0.0254"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -621,6 +621,342 @@
         </technique>
       </extra>
     </effect>
+    <effect id="Material__13">
+      <profile_COMMON>
+        <technique sid="common">
+          <blinn>
+            <emission>
+              <color>0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color>0.5882353 0.5882353 1 1</color>
+            </ambient>
+            <diffuse>
+              <color>0.5882353 0.5882353 1 1</color>
+            </diffuse>
+            <specular>
+              <color>0 0 0 1</color>
+            </specular>
+            <shininess>
+              <float>10</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <transparent opaque="A_ONE">
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </blinn>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="OpenCOLLADA3dsMax">
+          <extended_shader>
+            <opacity_type sid="opacity_type" type="int">0</opacity_type>
+            <falloff_type sid="falloff_type" type="int">0</falloff_type>
+            <falloff sid="falloff" type="float">0</falloff>
+            <index_of_refraction sid="index_of_refraction" type="float">1.5</index_of_refraction>
+            <wire_size sid="wire_size" type="float">1</wire_size>
+            <wire_units sid="wire_units" type="int">0</wire_units>
+            <apply_reflection_dimming sid="apply_reflection_dimming" type="bool">0</apply_reflection_dimming>
+            <dim_level sid="dim_level" type="float">0</dim_level>
+            <reflection_level sid="reflection_level" type="float">3</reflection_level>
+          </extended_shader>
+          <shader>
+            <ambient_diffuse_texture_lock sid="ambient_diffuse_texture_lock" type="bool">1</ambient_diffuse_texture_lock>
+            <ambient_diffuse_lock sid="ambient_diffuse_lock" type="bool">1</ambient_diffuse_lock>
+            <diffuse_specular_lock sid="diffuse_specular_lock" type="bool">0</diffuse_specular_lock>
+            <use_self_illum_color sid="use_self_illum_color" type="bool">0</use_self_illum_color>
+            <self_illumination sid="self_illumination" type="float">0</self_illumination>
+            <specular_level sid="specular_level" type="float">0</specular_level>
+            <soften sid="soften" type="float">0.1</soften>
+          </shader>
+        </technique>
+      </extra>
+    </effect>
+    <effect id="Material__14">
+      <profile_COMMON>
+        <technique sid="common">
+          <blinn>
+            <emission>
+              <color>0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color>0.5882353 0.9450981 1 1</color>
+            </ambient>
+            <diffuse>
+              <color>0.5882353 0.9450981 1 1</color>
+            </diffuse>
+            <specular>
+              <color>0 0 0 1</color>
+            </specular>
+            <shininess>
+              <float>10</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <transparent opaque="A_ONE">
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </blinn>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="OpenCOLLADA3dsMax">
+          <extended_shader>
+            <opacity_type sid="opacity_type" type="int">0</opacity_type>
+            <falloff_type sid="falloff_type" type="int">0</falloff_type>
+            <falloff sid="falloff" type="float">0</falloff>
+            <index_of_refraction sid="index_of_refraction" type="float">1.5</index_of_refraction>
+            <wire_size sid="wire_size" type="float">1</wire_size>
+            <wire_units sid="wire_units" type="int">0</wire_units>
+            <apply_reflection_dimming sid="apply_reflection_dimming" type="bool">0</apply_reflection_dimming>
+            <dim_level sid="dim_level" type="float">0</dim_level>
+            <reflection_level sid="reflection_level" type="float">3</reflection_level>
+          </extended_shader>
+          <shader>
+            <ambient_diffuse_texture_lock sid="ambient_diffuse_texture_lock" type="bool">1</ambient_diffuse_texture_lock>
+            <ambient_diffuse_lock sid="ambient_diffuse_lock" type="bool">1</ambient_diffuse_lock>
+            <diffuse_specular_lock sid="diffuse_specular_lock" type="bool">0</diffuse_specular_lock>
+            <use_self_illum_color sid="use_self_illum_color" type="bool">0</use_self_illum_color>
+            <self_illumination sid="self_illumination" type="float">0</self_illumination>
+            <specular_level sid="specular_level" type="float">0</specular_level>
+            <soften sid="soften" type="float">0.1</soften>
+          </shader>
+        </technique>
+      </extra>
+    </effect>
+    <effect id="Material__15_1">
+      <profile_COMMON>
+        <technique sid="common">
+          <blinn>
+            <emission>
+              <color>0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color>0.5882353 1 0.6156863 1</color>
+            </ambient>
+            <diffuse>
+              <color>0.5882353 1 0.6156863 1</color>
+            </diffuse>
+            <specular>
+              <color>0 0 0 1</color>
+            </specular>
+            <shininess>
+              <float>10</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <transparent opaque="A_ONE">
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </blinn>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="OpenCOLLADA3dsMax">
+          <extended_shader>
+            <opacity_type sid="opacity_type" type="int">0</opacity_type>
+            <falloff_type sid="falloff_type" type="int">0</falloff_type>
+            <falloff sid="falloff" type="float">0</falloff>
+            <index_of_refraction sid="index_of_refraction" type="float">1.5</index_of_refraction>
+            <wire_size sid="wire_size" type="float">1</wire_size>
+            <wire_units sid="wire_units" type="int">0</wire_units>
+            <apply_reflection_dimming sid="apply_reflection_dimming" type="bool">0</apply_reflection_dimming>
+            <dim_level sid="dim_level" type="float">0</dim_level>
+            <reflection_level sid="reflection_level" type="float">3</reflection_level>
+          </extended_shader>
+          <shader>
+            <ambient_diffuse_texture_lock sid="ambient_diffuse_texture_lock" type="bool">1</ambient_diffuse_texture_lock>
+            <ambient_diffuse_lock sid="ambient_diffuse_lock" type="bool">1</ambient_diffuse_lock>
+            <diffuse_specular_lock sid="diffuse_specular_lock" type="bool">0</diffuse_specular_lock>
+            <use_self_illum_color sid="use_self_illum_color" type="bool">0</use_self_illum_color>
+            <self_illumination sid="self_illumination" type="float">0</self_illumination>
+            <specular_level sid="specular_level" type="float">0</specular_level>
+            <soften sid="soften" type="float">0.1</soften>
+          </shader>
+        </technique>
+      </extra>
+    </effect>
+    <effect id="Material__16_1">
+      <profile_COMMON>
+        <technique sid="common">
+          <blinn>
+            <emission>
+              <color>0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color>0.9960785 1 0.5882353 1</color>
+            </ambient>
+            <diffuse>
+              <color>0.9960785 1 0.5882353 1</color>
+            </diffuse>
+            <specular>
+              <color>0 0 0 1</color>
+            </specular>
+            <shininess>
+              <float>10</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <transparent opaque="A_ONE">
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </blinn>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="OpenCOLLADA3dsMax">
+          <extended_shader>
+            <opacity_type sid="opacity_type" type="int">0</opacity_type>
+            <falloff_type sid="falloff_type" type="int">0</falloff_type>
+            <falloff sid="falloff" type="float">0</falloff>
+            <index_of_refraction sid="index_of_refraction" type="float">1.5</index_of_refraction>
+            <wire_size sid="wire_size" type="float">1</wire_size>
+            <wire_units sid="wire_units" type="int">0</wire_units>
+            <apply_reflection_dimming sid="apply_reflection_dimming" type="bool">0</apply_reflection_dimming>
+            <dim_level sid="dim_level" type="float">0</dim_level>
+            <reflection_level sid="reflection_level" type="float">3</reflection_level>
+          </extended_shader>
+          <shader>
+            <ambient_diffuse_texture_lock sid="ambient_diffuse_texture_lock" type="bool">1</ambient_diffuse_texture_lock>
+            <ambient_diffuse_lock sid="ambient_diffuse_lock" type="bool">1</ambient_diffuse_lock>
+            <diffuse_specular_lock sid="diffuse_specular_lock" type="bool">0</diffuse_specular_lock>
+            <use_self_illum_color sid="use_self_illum_color" type="bool">0</use_self_illum_color>
+            <self_illumination sid="self_illumination" type="float">0</self_illumination>
+            <specular_level sid="specular_level" type="float">0</specular_level>
+            <soften sid="soften" type="float">0.1</soften>
+          </shader>
+        </technique>
+      </extra>
+    </effect>
+    <effect id="Material__17_1">
+      <profile_COMMON>
+        <technique sid="common">
+          <blinn>
+            <emission>
+              <color>0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color>0.9960785 0.8196079 0.5882353 1</color>
+            </ambient>
+            <diffuse>
+              <color>0.9960785 0.8196079 0.5882353 1</color>
+            </diffuse>
+            <specular>
+              <color>0 0 0 1</color>
+            </specular>
+            <shininess>
+              <float>10</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <transparent opaque="A_ONE">
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </blinn>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="OpenCOLLADA3dsMax">
+          <extended_shader>
+            <opacity_type sid="opacity_type" type="int">0</opacity_type>
+            <falloff_type sid="falloff_type" type="int">0</falloff_type>
+            <falloff sid="falloff" type="float">0</falloff>
+            <index_of_refraction sid="index_of_refraction" type="float">1.5</index_of_refraction>
+            <wire_size sid="wire_size" type="float">1</wire_size>
+            <wire_units sid="wire_units" type="int">0</wire_units>
+            <apply_reflection_dimming sid="apply_reflection_dimming" type="bool">0</apply_reflection_dimming>
+            <dim_level sid="dim_level" type="float">0</dim_level>
+            <reflection_level sid="reflection_level" type="float">3</reflection_level>
+          </extended_shader>
+          <shader>
+            <ambient_diffuse_texture_lock sid="ambient_diffuse_texture_lock" type="bool">1</ambient_diffuse_texture_lock>
+            <ambient_diffuse_lock sid="ambient_diffuse_lock" type="bool">1</ambient_diffuse_lock>
+            <diffuse_specular_lock sid="diffuse_specular_lock" type="bool">0</diffuse_specular_lock>
+            <use_self_illum_color sid="use_self_illum_color" type="bool">0</use_self_illum_color>
+            <self_illumination sid="self_illumination" type="float">0</self_illumination>
+            <specular_level sid="specular_level" type="float">0</specular_level>
+            <soften sid="soften" type="float">0.1</soften>
+          </shader>
+        </technique>
+      </extra>
+    </effect>
+    <effect id="Material__18_1">
+      <profile_COMMON>
+        <technique sid="common">
+          <blinn>
+            <emission>
+              <color>0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color>1 0.5882353 0.5882353 1</color>
+            </ambient>
+            <diffuse>
+              <color>1 0.5882353 0.5882353 1</color>
+            </diffuse>
+            <specular>
+              <color>0 0 0 1</color>
+            </specular>
+            <shininess>
+              <float>10</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <transparent opaque="A_ONE">
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </blinn>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="OpenCOLLADA3dsMax">
+          <extended_shader>
+            <opacity_type sid="opacity_type" type="int">0</opacity_type>
+            <falloff_type sid="falloff_type" type="int">0</falloff_type>
+            <falloff sid="falloff" type="float">0</falloff>
+            <index_of_refraction sid="index_of_refraction" type="float">1.5</index_of_refraction>
+            <wire_size sid="wire_size" type="float">1</wire_size>
+            <wire_units sid="wire_units" type="int">0</wire_units>
+            <apply_reflection_dimming sid="apply_reflection_dimming" type="bool">0</apply_reflection_dimming>
+            <dim_level sid="dim_level" type="float">0</dim_level>
+            <reflection_level sid="reflection_level" type="float">3</reflection_level>
+          </extended_shader>
+          <shader>
+            <ambient_diffuse_texture_lock sid="ambient_diffuse_texture_lock" type="bool">1</ambient_diffuse_texture_lock>
+            <ambient_diffuse_lock sid="ambient_diffuse_lock" type="bool">1</ambient_diffuse_lock>
+            <diffuse_specular_lock sid="diffuse_specular_lock" type="bool">0</diffuse_specular_lock>
+            <use_self_illum_color sid="use_self_illum_color" type="bool">0</use_self_illum_color>
+            <self_illumination sid="self_illumination" type="float">0</self_illumination>
+            <specular_level sid="specular_level" type="float">0</specular_level>
+            <soften sid="soften" type="float">0.1</soften>
+          </shader>
+        </technique>
+      </extra>
+    </effect>
   </library_effects>
   <library_materials>
     <material id="ColorEffectR26G177B26-material" name="ColorEffectR26G177B26-material">
@@ -655,6 +991,24 @@
     </material>
     <material id="LightEmit-material" name="LightEmit">
       <instance_effect url="#LightEmit"/>
+    </material>
+    <material id="Material__13-material" name="Material__13">
+      <instance_effect url="#Material__13"/>
+    </material>
+    <material id="Material__14-material" name="Material__14">
+      <instance_effect url="#Material__14"/>
+    </material>
+    <material id="Material__15_1-material" name="Material__15">
+      <instance_effect url="#Material__15_1"/>
+    </material>
+    <material id="Material__16_1-material" name="Material__16">
+      <instance_effect url="#Material__16_1"/>
+    </material>
+    <material id="Material__17_1-material" name="Material__17">
+      <instance_effect url="#Material__17_1"/>
+    </material>
+    <material id="Material__18_1-material" name="Material__18">
+      <instance_effect url="#Material__18_1"/>
     </material>
   </library_materials>
   <library_geometries>
@@ -979,7 +1333,121 @@
         </technique>
       </extra>
     </geometry>
+    <geometry id="geom-Box001" name="Box001">
+      <mesh>
+        <source id="geom-Box001-positions">
+          <float_array id="geom-Box001-positions-array" count="72">-5 -5 0 5 -5 0 -5 5 0 5 5 0 -5 -5 20 5 -5 20 -5 5 20 5 5 20 -5 -5 4 5 -5 4 5 5 4 -5 5 4 -5 -5 8 5 -5 8 5 5 8 -5 5 8 -5 -5 12 5 -5 12 5 5 12 -5 5 12 -5 -5 16 5 -5 16 5 5 16 -5 5 16</float_array>
+          <technique_common>
+            <accessor source="#geom-Box001-positions-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Box001-normals">
+          <float_array id="geom-Box001-normals-array" count="168">0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 1 0 0 1 0 0 1 0 0 1 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Box001-normals-array" count="56" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Box001-map1">
+          <float_array id="geom-Box001-map1-array" count="168">1 0 0 0 0 0 1 1 0 0 1 0 0 0 0 1 0 0 0 1 0 1 1 0 0 0 0 1 0 0 0 0.2 0 1 0.2 0 0 0.4 0 1 0.4 0 0 0.6 0 1 0.6 0 0 0.8 0 1 0.8 0 0 1 0 1 1 0 0 0 0 1 0 0 0 0.2 0 1 0.2 0 0 0.4 0 1 0.4 0 0 0.6 0 1 0.6 0 0 0.8 0 1 0.8 0 0 1 0 1 1 0 0 0 0 1 0 0 0 0.2 0 1 0.2 0 0 0.4 0 1 0.4 0 0 0.6 0 1 0.6 0 0 0.8 0 1 0.8 0 0 1 0 1 1 0 0 0 0 1 0 0 0 0.2 0 1 0.2 0 0 0.4 0 1 0.4 0 0 0.6 0 1 0.6 0 0 0.8 0 1 0.8 0 0 1 0 1 1 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Box001-map1-array" count="56" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="geom-Box001-vertices">
+          <input semantic="POSITION" source="#geom-Box001-positions"/>
+        </vertices>
+        <triangles material="Material__14_1" count="2">
+          <input semantic="VERTEX" source="#geom-Box001-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Box001-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Box001-map1" offset="2" set="0"/>
+          <p>0 0 0 2 1 2 3 2 3 3 2 3 1 3 1 0 0 0</p>
+        </triangles>
+        <triangles material="Material__13_1" count="2">
+          <input semantic="VERTEX" source="#geom-Box001-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Box001-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Box001-map1" offset="2" set="0"/>
+          <p>4 4 4 5 5 5 7 6 7 7 6 7 6 7 6 4 4 4</p>
+        </triangles>
+        <triangles material="Material__17" count="10">
+          <input semantic="VERTEX" source="#geom-Box001-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Box001-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Box001-map1" offset="2" set="0"/>
+          <p>0 8 8 1 9 9 9 10 11 9 10 11 8 11 10 0 8 8 8 11 10 9 10 11 13 12 13 13 12 13 12 13 12 8 11 10 12 13 12 13 12 13 17 14 15 17 14 15 16 15 14 12 13 12 16 15 14 17 14 15 21 16 17 21 16 17 20 17 16 16 15 14 20 17 16 21 16 17 5 18 19 5 18 19 4 19 18 20 17 16</p>
+        </triangles>
+        <triangles material="Material__16" count="10">
+          <input semantic="VERTEX" source="#geom-Box001-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Box001-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Box001-map1" offset="2" set="0"/>
+          <p>1 20 20 3 21 21 10 22 23 10 22 23 9 23 22 1 20 20 9 23 22 10 22 23 14 24 25 14 24 25 13 25 24 9 23 22 13 25 24 14 24 25 18 26 27 18 26 27 17 27 26 13 25 24 17 27 26 18 26 27 22 28 29 22 28 29 21 29 28 17 27 26 21 29 28 22 28 29 7 30 31 7 30 31 5 31 30 21 29 28</p>
+        </triangles>
+        <triangles material="Material__18" count="10">
+          <input semantic="VERTEX" source="#geom-Box001-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Box001-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Box001-map1" offset="2" set="0"/>
+          <p>3 32 32 2 33 33 11 34 35 11 34 35 10 35 34 3 32 32 10 35 34 11 34 35 15 36 37 15 36 37 14 37 36 10 35 34 14 37 36 15 36 37 19 38 39 19 38 39 18 39 38 14 37 36 18 39 38 19 38 39 23 40 41 23 40 41 22 41 40 18 39 38 22 41 40 23 40 41 6 42 43 6 42 43 7 43 42 22 41 40</p>
+        </triangles>
+        <triangles material="Material__15" count="10">
+          <input semantic="VERTEX" source="#geom-Box001-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Box001-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Box001-map1" offset="2" set="0"/>
+          <p>2 44 44 0 45 45 8 46 47 8 46 47 11 47 46 2 44 44 11 47 46 8 46 47 12 48 49 12 48 49 15 49 48 11 47 46 15 49 48 12 48 49 16 50 51 16 50 51 19 51 50 15 49 48 19 51 50 16 50 51 20 52 53 20 52 53 23 53 52 19 51 50 23 53 52 20 52 53 4 54 55 4 54 55 6 55 54 23 53 52</p>
+        </triangles>
+      </mesh>
+    </geometry>
   </library_geometries>
+  <library_controllers>
+    <controller id="geom-Box001-skin1">
+      <skin source="#geom-Box001">
+        <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
+        <source id="geom-Box001-skin1-joints">
+          <Name_array id="geom-Box001-skin1-joints-array" count="2">joint0 joint1</Name_array>
+          <technique_common>
+            <accessor source="#geom-Box001-skin1-joints-array" count="2" stride="1">
+              <param name="JOINT" type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Box001-skin1-bind_poses">
+          <float_array id="geom-Box001-skin1-bind_poses-array" count="32">-5.11435e-14 3.13916e-7 1 0 -1.74846e-7 1 -3.13916e-7 0 -1 -1.74846e-7 3.74342e-15 0 0 0 0 1 -8.74227e-8 -5.52335e-7 1 -10 -8.74228e-8 1 5.52335e-7 -9.85461e-6 -1 -8.74227e-8 -8.74227e-8 8.74227e-7 0 0 0 1</float_array>
+          <technique_common>
+            <accessor source="#geom-Box001-skin1-bind_poses-array" count="2" stride="16">
+              <param name="TRANSFORM" type="float4x4"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Box001-skin1-weights">
+          <float_array id="geom-Box001-skin1-weights-array" count="33">1 0.2 0.8 0.2 0.8 0.2 0.8 0.2 0.8 0.4 0.6 0.4 0.6 0.4 0.6 0.4 0.6 0.6 0.4 0.6 0.4 0.6 0.4 0.6 0.4 0.8 0.2 0.8 0.2 0.8 0.2 0.8 0.2</float_array>
+          <technique_common>
+            <accessor source="#geom-Box001-skin1-weights-array" count="33" stride="1">
+              <param name="WEIGHT" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <joints>
+          <input semantic="JOINT" source="#geom-Box001-skin1-joints"/>
+          <input semantic="INV_BIND_MATRIX" source="#geom-Box001-skin1-bind_poses"/>
+        </joints>
+        <vertex_weights count="24">
+          <input semantic="JOINT" source="#geom-Box001-skin1-joints" offset="0"/>
+          <input semantic="WEIGHT" source="#geom-Box001-skin1-weights" offset="1"/>
+          <vcount>1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2</vcount>
+          <v>0 0 0 0 0 0 0 0 1 0 1 0 1 0 1 0 1 1 0 2 1 3 0 4 1 5 0 6 1 7 0 8 1 9 0 10 1 11 0 12 1 13 0 14 1 15 0 16 1 17 0 18 1 19 0 20 1 21 0 22 1 23 0 24 1 25 0 26 1 27 0 28 1 29 0 30 1 31 0 32</v>
+        </vertex_weights>
+      </skin>
+    </controller>
+  </library_controllers>
   <library_lights>
     <light id="EnvironmentAmbientLight" name="EnvironmentAmbientLight">
       <technique_common>
@@ -1004,7 +1472,7 @@
             <affect_diffuse sid="affect_diffuse" type="int">1</affect_diffuse>
             <decay_type sid="decay_type" type="int">2</decay_type>
             <multiplier sid="multiplier" type="float">1</multiplier>
-            <decay_radius sid="decay_radius" type="float">20</decay_radius>
+            <decay_radius sid="decay_radius" type="float">200</decay_radius>
             <use_near_attenuation sid="use_near_attenuation" type="bool">0</use_near_attenuation>
             <use_far_attenuation sid="use_far_attenuation" type="bool">0</use_far_attenuation>
             <attenuation_near_start sid="attenuation_near_start" type="float">7</attenuation_near_start>
@@ -1040,21 +1508,22 @@
         <instance_light url="#EnvironmentAmbientLight"/>
       </node>
       <node id="node-Cube" name="Cube">
-        <translate sid="translation">10 -1.14258e-7 0</translate>
+        <translate sid="translation">34.88703 -1.85427e-6 0</translate>
+        <scale>3.523671 3.523671 3.523671</scale>
         <instance_geometry url="#geom-Cube">
           <bind_material>
             <technique_common>
-              <instance_material symbol="Material__15_1" target="#Material__15-material"/>
-              <instance_material symbol="Material__16_1" target="#Material__16-material"/>
               <instance_material symbol="Material__17_1" target="#Material__17-material"/>
-              <instance_material symbol="Material__20_1" target="#Material__20-material"/>
               <instance_material symbol="Material__18_1" target="#Material__18-material"/>
               <instance_material symbol="Material__19_1" target="#Material__19-material"/>
+              <instance_material symbol="Material__20_1" target="#Material__20-material"/>
+              <instance_material symbol="Material__15_1" target="#Material__15-material"/>
+              <instance_material symbol="Material__16_1" target="#Material__16-material"/>
             </technique_common>
           </bind_material>
         </instance_geometry>
         <node id="node-Torus" name="Torus">
-          <translate>5 1.14258e-7 2</translate>
+          <translate>5.000001 1.14258e-7 2</translate>
           <rotate sid="rotationZ">0 0 1 0</rotate>
           <rotate sid="rotationY">0 1 0 2.00358e-5</rotate>
           <rotate sid="rotationX">1 0 0 0</rotate>
@@ -1085,6 +1554,7 @@
         </extra>
       </node>
       <node id="node-Cylinder" name="Cylinder">
+        <scale>3.523671 3.523671 3.523671</scale>
         <instance_geometry url="#geom-Cylinder">
           <bind_material>
             <technique_common>
@@ -1106,6 +1576,7 @@
       <node id="node-Plane" name="Plane">
         <translate>0 0 0.01</translate>
         <rotate>0 0 -1 -44.99999</rotate>
+        <scale>3.523672 3.523672 3.523671</scale>
         <instance_geometry url="#geom-Plane">
           <bind_material>
             <technique_common>
@@ -1127,8 +1598,9 @@
         </extra>
       </node>
       <node id="node-GeoSphere" name="GeoSphere">
+        <translate>-18.87136 14.31975 0</translate>
         <rotate sid="InverseScaleAxisRotation">0 0 0 0</rotate>
-        <scale sid="scale">1 1 1</scale>
+        <scale sid="scale">3.523671 3.523671 3.523671</scale>
         <rotate sid="ScaleAxisRotation">0 0 0 0</rotate>
         <instance_geometry url="#geom-GeoSphere">
           <bind_material>
@@ -1147,7 +1619,8 @@
         </extra>
       </node>
       <node id="node-Light" name="Light">
-        <translate sid="translation">2.124535 8.291501 6.185831</translate>
+        <translate sid="translation">24 25.52443 19.04236</translate>
+        <scale>3.523671 3.523671 3.523671</scale>
         <instance_light url="#Light-light"/>
         <node id="node-LightIndicator" name="LightIndicator">
           <rotate>0.5773504 -0.5773501 -0.5773504 -120</rotate>
@@ -1158,6 +1631,54 @@
               </technique_common>
             </bind_material>
           </instance_geometry>
+          <extra>
+            <technique profile="OpenCOLLADA">
+              <cast_shadows sid="cast_shadows" type="bool">1</cast_shadows>
+              <receive_shadows sid="receive_shadows" type="bool">1</receive_shadows>
+              <primary_visibility sid="primary_visibility" type="int">1</primary_visibility>
+              <secondary_visibility sid="secondary_visibility" type="int">1</secondary_visibility>
+            </technique>
+          </extra>
+        </node>
+        <extra>
+          <technique profile="OpenCOLLADA">
+            <cast_shadows sid="cast_shadows" type="bool">1</cast_shadows>
+            <receive_shadows sid="receive_shadows" type="bool">1</receive_shadows>
+            <primary_visibility sid="primary_visibility" type="int">1</primary_visibility>
+            <secondary_visibility sid="secondary_visibility" type="int">1</secondary_visibility>
+          </technique>
+        </extra>
+      </node>
+      <node id="node-Box001" name="Box001">
+        <instance_controller url="#geom-Box001-skin1">
+          <skeleton>#node-Bone001</skeleton>
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="Material__13_1" target="#Material__13-material"/>
+              <instance_material symbol="Material__14_1" target="#Material__14-material"/>
+              <instance_material symbol="Material__15" target="#Material__15_1-material"/>
+              <instance_material symbol="Material__16" target="#Material__16_1-material"/>
+              <instance_material symbol="Material__17" target="#Material__17_1-material"/>
+              <instance_material symbol="Material__18" target="#Material__18_1-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_controller>
+        <extra>
+          <technique profile="OpenCOLLADA">
+            <cast_shadows sid="cast_shadows" type="bool">1</cast_shadows>
+            <receive_shadows sid="receive_shadows" type="bool">1</receive_shadows>
+            <primary_visibility sid="primary_visibility" type="int">1</primary_visibility>
+            <secondary_visibility sid="secondary_visibility" type="int">1</secondary_visibility>
+          </technique>
+        </extra>
+      </node>
+      <node id="node-Bone001" name="Bone001" sid="joint0" type="JOINT">
+        <rotate>1.32123e-6 1 -1.49608e-6 -90</rotate>
+        <node id="node-Bone002" name="Bone002" sid="joint1" type="JOINT">
+          <translate>10 1.19209e-6 5.69993e-14</translate>
+          <rotate sid="rotationZ">0 0 1 5.00896e-6</rotate>
+          <rotate sid="rotationY">0 1 0 -5.00896e-6</rotate>
+          <rotate sid="rotationX">1 0 0 -5.00896e-6</rotate>
           <extra>
             <technique profile="OpenCOLLADA">
               <cast_shadows sid="cast_shadows" type="bool">1</cast_shadows>
@@ -1189,7 +1710,7 @@
         </technique_common>
       </source>
       <source id="node-Cube_translation.X-output">
-        <float_array id="node-Cube_translation.X-output-array" count="4">10 -10 10 -10</float_array>
+        <float_array id="node-Cube_translation.X-output-array" count="4">34.88703 -34.88703 34.88703 -34.88703</float_array>
         <technique_common>
           <accessor source="#node-Cube_translation.X-output-array" count="4" stride="1">
             <param name="X" type="float"/>
@@ -1197,7 +1718,7 @@
         </technique_common>
       </source>
       <source id="node-Cube_translation.X-intangent">
-        <float_array id="node-Cube_translation.X-intangent-array" count="8">-0.3332306 10 1.111167 -10 2.778333 10 4.4445 -9.219337</float_array>
+        <float_array id="node-Cube_translation.X-intangent-array" count="8">-0.3332306 34.88703 1.111167 -34.88703 2.778333 34.88703 4.4323 -34.88086</float_array>
         <technique_common>
           <accessor source="#node-Cube_translation.X-intangent-array" count="4" stride="2">
             <param name="X" type="float"/>
@@ -1206,7 +1727,7 @@
         </technique_common>
       </source>
       <source id="node-Cube_translation.X-outtangent">
-        <float_array id="node-Cube_translation.X-outtangent-array" count="8">0.5555 10 2.222167 -10 3.888333 10 4.000208 -8.594958</float_array>
+        <float_array id="node-Cube_translation.X-outtangent-array" count="8">0.5555 34.88703 2.222167 -34.88703 3.888333 34.88703 4.000208 -29.96252</float_array>
         <technique_common>
           <accessor source="#node-Cube_translation.X-outtangent-array" count="4" stride="2">
             <param name="X" type="float"/>
@@ -1231,7 +1752,7 @@
         </technique_common>
       </source>
       <source id="node-Cube_translation.Y-output">
-        <float_array id="node-Cube_translation.Y-output-array" count="4">-10.05776 10.05852 -9.941484 10.05852</float_array>
+        <float_array id="node-Cube_translation.Y-output-array" count="4">-35.08854 35.09117 -34.68288 35.09117</float_array>
         <technique_common>
           <accessor source="#node-Cube_translation.Y-output-array" count="4" stride="1">
             <param name="Y" type="float"/>
@@ -1239,7 +1760,7 @@
         </technique_common>
       </source>
       <source id="node-Cube_translation.Y-intangent">
-        <float_array id="node-Cube_translation.Y-intangent-array" count="8">-1.166264 -10.05776 0.2778334 10.05852 1.9445 -9.941484 3.611667 10.05852</float_array>
+        <float_array id="node-Cube_translation.Y-intangent-array" count="8">-1.166264 -35.08854 0.2778334 35.09117 1.9445 -34.68288 3.611667 35.09117</float_array>
         <technique_common>
           <accessor source="#node-Cube_translation.Y-intangent-array" count="4" stride="2">
             <param name="X" type="float"/>
@@ -1248,7 +1769,7 @@
         </technique_common>
       </source>
       <source id="node-Cube_translation.Y-outtangent">
-        <float_array id="node-Cube_translation.Y-outtangent-array" count="8">-0.2783333 -10.05776 1.388833 10.05852 3.0555 -9.941484 4.499598 10.05852</float_array>
+        <float_array id="node-Cube_translation.Y-outtangent-array" count="8">-0.2783333 -35.08854 1.388833 35.09117 3.0555 -34.68288 4.499598 35.09117</float_array>
         <technique_common>
           <accessor source="#node-Cube_translation.Y-outtangent-array" count="4" stride="2">
             <param name="X" type="float"/>
@@ -1315,7 +1836,7 @@
         </technique_common>
       </source>
       <source id="node-GeoSphere_scale-output">
-        <float_array id="node-GeoSphere_scale-output-array" count="9">1 1 1 1.996525 1.996525 1.996525 1 1 1</float_array>
+        <float_array id="node-GeoSphere_scale-output-array" count="9">3.523671 3.523671 3.523671 7.035098 7.035098 7.035098 3.523671 3.523671 3.523671</float_array>
         <technique_common>
           <accessor source="#node-GeoSphere_scale-output-array" count="3" stride="3">
             <param name="X" type="float"/>
@@ -1325,7 +1846,7 @@
         </technique_common>
       </source>
       <source id="node-GeoSphere_scale-intangent">
-        <float_array id="node-GeoSphere_scale-intangent-array" count="18">0.9997917 1 0.9997917 1 0.9997917 1 1.111167 1.996525 1.111167 1.996525 1.111167 1.996525 2.777833 1 2.777833 1 2.777833 1</float_array>
+        <float_array id="node-GeoSphere_scale-intangent-array" count="18">0.9997917 3.523671 0.9997917 3.523671 0.9997917 3.523671 1.111167 7.035098 1.111167 7.035098 1.111167 7.035098 2.777833 3.523671 2.777833 3.523671 2.777833 3.523671</float_array>
         <technique_common>
           <accessor source="#node-GeoSphere_scale-intangent-array" count="3" stride="6">
             <param name="X" type="float"/>
@@ -1338,7 +1859,7 @@
         </technique_common>
       </source>
       <source id="node-GeoSphere_scale-outtangent">
-        <float_array id="node-GeoSphere_scale-outtangent-array" count="18">0.5555 1 0.5555 1 0.5555 1 2.222167 1.996525 2.222167 1.996525 2.222167 1.996525 2.333542 1 2.333542 1 2.333542 1</float_array>
+        <float_array id="node-GeoSphere_scale-outtangent-array" count="18">0.5555 3.523671 0.5555 3.523671 0.5555 3.523671 2.222167 7.035098 2.222167 7.035098 2.222167 7.035098 2.333542 3.523671 2.333542 3.523671 2.333542 3.523671</float_array>
         <technique_common>
           <accessor source="#node-GeoSphere_scale-outtangent-array" count="3" stride="6">
             <param name="X" type="float"/>
@@ -1421,7 +1942,7 @@
         </technique_common>
       </source>
       <source id="node-Light_translation.X-output">
-        <float_array id="node-Light_translation.X-output-array" count="7">2.124535 -5.611371 -5.611371 0.04967833 0.04967833 2.124535 2.124535</float_array>
+        <float_array id="node-Light_translation.X-output-array" count="7">24 -35 -35 5 5 24 24</float_array>
         <technique_common>
           <accessor source="#node-Light_translation.X-output-array" count="7" stride="1">
             <param name="X" type="float"/>
@@ -1429,7 +1950,7 @@
         </technique_common>
       </source>
       <source id="node-Light_translation.X-intangent">
-        <float_array id="node-Light_translation.X-intangent-array" count="14">0.9997917 2.124535 0.33335 -5.611371 0.83335 -5.611371 1.33335 0.04967833 1.83335 0.04967833 2.555583 2.124535 3.166683 2.124535</float_array>
+        <float_array id="node-Light_translation.X-intangent-array" count="14">0.9997917 24 0.33335 -35 0.83335 -35 1.33335 5 1.83335 5 2.555583 24 3.166683 24</float_array>
         <technique_common>
           <accessor source="#node-Light_translation.X-intangent-array" count="7" stride="2">
             <param name="X" type="float"/>
@@ -1438,7 +1959,7 @@
         </technique_common>
       </source>
       <source id="node-Light_translation.X-outtangent">
-        <float_array id="node-Light_translation.X-outtangent-array" count="14">0.16665 2.124535 0.66665 -5.611371 1.16665 -5.611371 1.66665 0.04967833 2.27775 0.04967833 2.999983 2.124535 3.666564 2.124535</float_array>
+        <float_array id="node-Light_translation.X-outtangent-array" count="14">0.16665 24 0.66665 -35 1.16665 -35 1.66665 5 2.27775 5 2.999983 24 3.666564 24</float_array>
         <technique_common>
           <accessor source="#node-Light_translation.X-outtangent-array" count="7" stride="2">
             <param name="X" type="float"/>
@@ -1463,7 +1984,7 @@
         </technique_common>
       </source>
       <source id="node-Light_translation.Y-output">
-        <float_array id="node-Light_translation.Y-output-array" count="7">8.291501 0.2940993 0.2940993 -3.820096 -3.820096 8.291501 8.291501</float_array>
+        <float_array id="node-Light_translation.Y-output-array" count="7">25.52443 2 2 -20 -20 25.52443 25.52443</float_array>
         <technique_common>
           <accessor source="#node-Light_translation.Y-output-array" count="7" stride="1">
             <param name="Y" type="float"/>
@@ -1471,7 +1992,7 @@
         </technique_common>
       </source>
       <source id="node-Light_translation.Y-intangent">
-        <float_array id="node-Light_translation.Y-intangent-array" count="14">0.9997917 8.291501 0.33335 0.2940993 0.83335 0.2940993 1.33335 -3.820096 1.83335 -3.820096 2.555583 8.291501 3.166683 8.291501</float_array>
+        <float_array id="node-Light_translation.Y-intangent-array" count="14">0.9997917 25.52443 0.33335 2 0.83335 2 1.33335 -20 1.83335 -20 2.555583 25.52443 3.166683 25.52443</float_array>
         <technique_common>
           <accessor source="#node-Light_translation.Y-intangent-array" count="7" stride="2">
             <param name="X" type="float"/>
@@ -1480,7 +2001,7 @@
         </technique_common>
       </source>
       <source id="node-Light_translation.Y-outtangent">
-        <float_array id="node-Light_translation.Y-outtangent-array" count="14">0.16665 8.291501 0.66665 0.2940993 1.16665 0.2940993 1.66665 -3.820096 2.27775 -3.820096 2.999983 8.291501 3.666564 8.291501</float_array>
+        <float_array id="node-Light_translation.Y-outtangent-array" count="14">0.16665 25.52443 0.66665 2 1.16665 2 1.66665 -20 2.27775 -20 2.999983 25.52443 3.666564 25.52443</float_array>
         <technique_common>
           <accessor source="#node-Light_translation.Y-outtangent-array" count="7" stride="2">
             <param name="X" type="float"/>
@@ -1496,44 +2017,44 @@
           </accessor>
         </technique_common>
       </source>
-      <source id="node-Light_translation.Z-input">
-        <float_array id="node-Light_translation.Z-input-array" count="7">0 0.5 1 1.5 2 2.833333 3.333333</float_array>
+      <source id="node-Bone002_rotationZ.ANGLE-input">
+        <float_array id="node-Bone002_rotationZ.ANGLE-input-array" count="9">0 0.4333333 0.8333334 1.266667 1.666667 2.1 2.5 2.933333 3.333333</float_array>
         <technique_common>
-          <accessor source="#node-Light_translation.Z-input-array" count="7" stride="1">
+          <accessor source="#node-Bone002_rotationZ.ANGLE-input-array" count="9" stride="1">
             <param name="TIME" type="float"/>
           </accessor>
         </technique_common>
       </source>
-      <source id="node-Light_translation.Z-output">
-        <float_array id="node-Light_translation.Z-output-array" count="7">6.185831 6.185831 6.185831 6.185831 6.185831 6.185831 6.185831</float_array>
+      <source id="node-Bone002_rotationZ.ANGLE-output">
+        <float_array id="node-Bone002_rotationZ.ANGLE-output-array" count="9">180 230 180 130 180 230 180 130 180</float_array>
         <technique_common>
-          <accessor source="#node-Light_translation.Z-output-array" count="7" stride="1">
-            <param name="Z" type="float"/>
+          <accessor source="#node-Bone002_rotationZ.ANGLE-output-array" count="9" stride="1">
+            <param name="ANGLE" type="float"/>
           </accessor>
         </technique_common>
       </source>
-      <source id="node-Light_translation.Z-intangent">
-        <float_array id="node-Light_translation.Z-intangent-array" count="14">0.9997917 6.185831 0.33335 6.185831 0.83335 6.185831 1.33335 6.185831 1.83335 6.185831 2.555583 6.185831 3.166683 6.185831</float_array>
+      <source id="node-Bone002_rotationZ.ANGLE-intangent">
+        <float_array id="node-Bone002_rotationZ.ANGLE-intangent-array" count="18">-0.3332639 180 0.2888889 213.3333 0.7 196.6667 1.122222 146.6667 1.533333 163.3333 1.955556 213.3333 2.366667 196.6667 2.788889 146.6667 3.2 163.3333</float_array>
         <technique_common>
-          <accessor source="#node-Light_translation.Z-intangent-array" count="7" stride="2">
+          <accessor source="#node-Bone002_rotationZ.ANGLE-intangent-array" count="9" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
-      <source id="node-Light_translation.Z-outtangent">
-        <float_array id="node-Light_translation.Z-outtangent-array" count="14">0.16665 6.185831 0.66665 6.185831 1.16665 6.185831 1.66665 6.185831 2.27775 6.185831 2.999983 6.185831 3.666564 6.185831</float_array>
+      <source id="node-Bone002_rotationZ.ANGLE-outtangent">
+        <float_array id="node-Bone002_rotationZ.ANGLE-outtangent-array" count="18">0.1444445 196.6667 0.5666667 213.3333 0.9777778 163.3333 1.4 146.6667 1.811111 196.6667 2.233333 213.3333 2.644444 163.3333 3.066667 146.6667 3.666597 180</float_array>
         <technique_common>
-          <accessor source="#node-Light_translation.Z-outtangent-array" count="7" stride="2">
+          <accessor source="#node-Bone002_rotationZ.ANGLE-outtangent-array" count="9" stride="2">
             <param name="X" type="float"/>
             <param name="Y" type="float"/>
           </accessor>
         </technique_common>
       </source>
-      <source id="node-Light_translation.Z-interpolation">
-        <Name_array id="node-Light_translation.Z-interpolation-array" count="7">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER</Name_array>
+      <source id="node-Bone002_rotationZ.ANGLE-interpolation">
+        <Name_array id="node-Bone002_rotationZ.ANGLE-interpolation-array" count="9">LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR</Name_array>
         <technique_common>
-          <accessor source="#node-Light_translation.Z-interpolation-array" count="7" stride="1">
+          <accessor source="#node-Bone002_rotationZ.ANGLE-interpolation-array" count="9" stride="1">
             <param name="INTERPOLATION" type="name"/>
           </accessor>
         </technique_common>
@@ -1590,12 +2111,12 @@
         <input semantic="OUT_TANGENT" source="#node-Light_translation.Y-outtangent"/>
         <input semantic="INTERPOLATION" source="#node-Light_translation.Y-interpolation"/>
       </sampler>
-      <sampler id="node-Light_translation.Z-sampler">
-        <input semantic="INPUT" source="#node-Light_translation.Z-input"/>
-        <input semantic="OUTPUT" source="#node-Light_translation.Z-output"/>
-        <input semantic="IN_TANGENT" source="#node-Light_translation.Z-intangent"/>
-        <input semantic="OUT_TANGENT" source="#node-Light_translation.Z-outtangent"/>
-        <input semantic="INTERPOLATION" source="#node-Light_translation.Z-interpolation"/>
+      <sampler id="node-Bone002_rotationZ.ANGLE-sampler">
+        <input semantic="INPUT" source="#node-Bone002_rotationZ.ANGLE-input"/>
+        <input semantic="OUTPUT" source="#node-Bone002_rotationZ.ANGLE-output"/>
+        <input semantic="IN_TANGENT" source="#node-Bone002_rotationZ.ANGLE-intangent"/>
+        <input semantic="OUT_TANGENT" source="#node-Bone002_rotationZ.ANGLE-outtangent"/>
+        <input semantic="INTERPOLATION" source="#node-Bone002_rotationZ.ANGLE-interpolation"/>
       </sampler>
       <channel source="#node-Cube_translation.X-sampler" target="node-Cube/translation.X"/>
       <channel source="#node-Cube_translation.Y-sampler" target="node-Cube/translation.Y"/>
@@ -1605,7 +2126,7 @@
       <channel source="#node-GeoSphere_ScaleAxisRotation-sampler" target="node-GeoSphere/ScaleAxisRotation"/>
       <channel source="#node-Light_translation.X-sampler" target="node-Light/translation.X"/>
       <channel source="#node-Light_translation.Y-sampler" target="node-Light/translation.Y"/>
-      <channel source="#node-Light_translation.Z-sampler" target="node-Light/translation.Z"/>
+      <channel source="#node-Bone002_rotationZ.ANGLE-sampler" target="node-Bone002/rotationZ.ANGLE"/>
     </animation>
   </library_animations>
   <scene>

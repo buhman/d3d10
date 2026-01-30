@@ -259,6 +259,9 @@ namespace collada {
 
   struct skin {
     matrix const * const inverse_bind_matrices; // one per joint
+
+    int const vertex_buffer_offset;
+    int const vertex_buffer_size;
   };
 
   struct controller {

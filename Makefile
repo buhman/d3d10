@@ -77,7 +77,7 @@ include/scenes/%.hpp: $(COLLADA_PY_SOURCE)
 
 src/scenes/%.cpp: scenes/%.DAE include/scenes/%.hpp
 	@mkdir -p $(@D)
-	PYTHONPATH=. python -m collada.main $< $@ $(<:.DAE=.vtx) $(<:.DAE=.idx) rc/$(notdir $(<:.DAE=.rc)) $(notdir $(<:.DAE=.mk))
+	PYTHONPATH=. python -m collada.main $< $@ $(<:.DAE=.vtx) $(<:.DAE=.idx) $(<:.DAE=.vjw) rc/$(notdir $(<:.DAE=.rc)) $(notdir $(<:.DAE=.mk))
 
 #	$(BUILD_TYPE)/curve_interpolation.res \
 

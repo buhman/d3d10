@@ -13,3 +13,5 @@ __pycache__
 \#*
 *.gch
 image/*.DDS
+debug/*.rc
+release/*.rc

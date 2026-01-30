@@ -87,7 +87,7 @@ float4 PS(PS_INPUT input) : SV_Target
     float diffuse_intensity = max(dot(normal, light_dir), 0.0);
 
     float distance = length(LightPos[i].xyz - input.WPos.xyz);
-    float attenuation = 1.0 / (0.02 * distance * distance);
+    float attenuation = 1.0 / (0.002 * distance * distance);
 
     color += diffuseColor * diffuse_intensity * LightColor[i].xyz * attenuation;
   }

@@ -24,6 +24,7 @@ class State:
     # buffers
     vertex_buffer: BytesIO
     index_buffer: BytesIO
+    joints_weights_vertex_buffer: BytesIO
 
     # geometry__indices:
     #   keys: collada <geometry> id
@@ -63,6 +64,7 @@ class State:
     def __init__(self):
         self.vertex_buffer = BytesIO()
         self.index_buffer = BytesIO()
+        self.joints_weights_vertex_buffer = BytesIO()
         self.geometry__indices = {}
         self.geometry__vertex_index_tables = {}
         self.symbol_names = {}
@@ -106,7 +108,7 @@ def sanitize_name(state, name, value, *, allow_slash=False):
 def renderbin(f, elems, t):
     fmt = {
         float: '<f',
-        int: '<i',
+        int: '<I',
     }[t]
     for e in elems:
         assert type(e) is t, (e, elems)
@@ -917,6 +919,14 @@ def render_inverse_bind_matrices(collada, skin, controller_name):
         yield "},"
     yield "};"
 
+def renderbin_any(f, elems):
+    fmt = {
+        float: '<f',
+        int: '<I',
+    }
+    for e in elems:
+        f.write(struct.pack(fmt[type(e)], e))
+
 def render_controller(state, collada, controller):
     controller_name = sanitize_name(state, controller.id, controller)
 
@@ -930,14 +940,18 @@ def render_controller(state, collada, controller):
     # fixme: skin_vertex_buffer should multiply vertices by the bind shape matrix
     vertex_buffer = buffer.skin_vertex_buffer(collada, skin, vertex_index_table)
     # skin.vertex_weights and skin.source are entirely dealt with
-    FIXME emit vertex buffer
-    FIXME emit vertex buffer offset in controller struct
+    vertex_buffer_offset = state.joints_weights_vertex_buffer.tell()
+    renderbin_any(state.joints_weights_vertex_buffer, vertex_buffer)
+    vertex_buffer_size = state.joints_weights_vertex_buffer.tell() - vertex_buffer_offset
 
     yield from render_inverse_bind_matrices(collada, skin, controller_name)
 
     yield f"controller const controller_{controller_name} = {{"
     yield ".skin = {"
     yield f".inverse_bind_matrices = inverse_bind_matrices_{controller_name},"
+    yield ""
+    yield f".vertex_buffer_offset = {vertex_buffer_offset},"
+    yield f".vertex_buffer_size = {vertex_buffer_size},"
     yield "}"
     yield "};"
 

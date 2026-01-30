@@ -10,5 +10,8 @@ RES_FONT_TERMINUS_6X12 RCDATA "font/terminus_128x64_6x12.data"
 RES_COLLADA_FXO RCDATA "collada.fxo"
 
 RES_COLLADA_SCENE_FXO RCDATA "collada_scene.fxo"
+
 RES_MODELS_CURVE_INTERPOLATION_VTX RCDATA "scenes/curve_interpolation/curve_interpolation.vtx"
 RES_MODELS_CURVE_INTERPOLATION_IDX RCDATA "scenes/curve_interpolation/curve_interpolation.idx"
+RES_MODELS_CURVE_INTERPOLATION_VJW RCDATA "scenes/curve_interpolation/curve_interpolation.vjw"
+ 

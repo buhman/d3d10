@@ -7,7 +7,7 @@ from collada import header
 def usage():
     name = sys.argv[0]
     print("usage (source):")
-    print(f"  {name} [input_collada.dae] [output_source.cpp] [output_vertex.vtx] [output_vertex.idx] [output_resource.rc] [output_makefile.mk]")
+    print(f"  {name} [input_collada.dae] [output_source.cpp] [output_vertex.vtx] [output_vertex.idx] [output_joints_weights_vertex.vjw] [output_resource.rc] [output_makefile.mk]")
     print("usage (header):")
     print(f"  {name} [output_header.hpp]")
     sys.exit(1)
@@ -50,12 +50,14 @@ def main():
         output_source = sys.argv[2]
         output_vertex = sys.argv[3]
         output_index  = sys.argv[4]
-        output_resource = sys.argv[5]
-        output_makefile = sys.argv[6]
+        output_joints_weights_vertex = sys.argv[5]
+        output_resource = sys.argv[6]
+        output_makefile = sys.argv[7]
         assert input_collada.lower().endswith(".dae")
         assert output_source.lower().endswith(".cpp")
         assert output_vertex.lower().endswith(".vtx")
         assert output_index.lower().endswith(".idx")
+        assert output_joints_weights_vertex.lower().endswith(".vjw")
         assert output_resource.lower().endswith(".rc")
         assert output_makefile.lower().endswith(".mk")
     except Exception as e:
@@ -75,6 +77,9 @@ def main():
 
     with open(output_index, 'wb') as f:
         f.write(state.index_buffer.getvalue())
+
+    with open(output_joints_weights_vertex, 'wb') as f:
+        f.write(state.joints_weights_vertex_buffer.getvalue())
 
     with open(output_resource, 'wb') as f:
         render_resource_file(state, f)
