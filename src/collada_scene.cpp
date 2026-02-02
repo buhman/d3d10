@@ -209,15 +209,15 @@ namespace collada_scene {
     if (FAILED(hr))
       return E_FAIL;
 
-    hr = LoadVertexBuffer(L"RES_MODELS_CURVE_INTERPOLATION_VTX", &m_pVertexBuffers[0]);
+    hr = LoadVertexBuffer(L"RES_SCENES_SHIP20_VTX", &m_pVertexBuffers[0]);
     if (FAILED(hr))
       return E_FAIL;
 
-    hr = LoadVertexBuffer(L"RES_MODELS_CURVE_INTERPOLATION_VJW", &m_pVertexBuffers[1]);
+    hr = LoadVertexBuffer(L"RES_SCENES_SHIP20_VJW", &m_pVertexBuffers[1]);
     if (FAILED(hr))
       return E_FAIL;
 
-    hr = LoadIndexBuffer(L"RES_MODELS_CURVE_INTERPOLATION_IDX", &m_pIndexBuffer);
+    hr = LoadIndexBuffer(L"RES_SCENES_SHIP20_IDX", &m_pIndexBuffer);
     if (FAILED(hr))
       return E_FAIL;
 
@@ -378,6 +378,10 @@ namespace collada_scene {
       return E_FAIL;
     }
     DWORD dwResSize = SizeofResource(NULL, hRes);
+    if (dwResSize == 0) {
+      *ppVertexBuffer = NULL;
+      return S_OK;
+    }
     void * pData = LockResource(LoadResource(NULL, hRes));
 
     D3D10_BUFFER_DESC bd;
@@ -437,6 +441,8 @@ namespace collada_scene {
                                     XMConvertToRadians(XMVectorGetW(transform.vector)));
     case transform_type::SCALE:
       return XMMatrixScalingFromVector(transform.vector);
+    case transform_type::MATRIX:
+      return transform.matrix;
     default:
       assert(false);
       break;
@@ -851,7 +857,7 @@ namespace collada_scene {
 
     g_pViewEyeVariable->SetFloatVector((float *)&eye);
 
-    int lights = min(2, m_lightInstancesCount);
+    int lights = min(4, m_lightInstancesCount);
     g_pLightPosVariable->SetFloatVectorArray((float *)m_lightPositions, 0, lights);
     g_pLightDirVariable->SetFloatVectorArray((float *)m_lightDirections, 0, lights);
     g_pLightColorVariable->SetFloatVectorArray((float *)m_lightColors, 0, lights);

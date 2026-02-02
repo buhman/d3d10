@@ -55,6 +55,7 @@ SCENES = \
 	src/scenes/curve_interpolation/curve_interpolation.cpp
 
 include curve_interpolation.mk
+include ship20.mk
 
 RC_FILES = $(wildcard rc/*.rc)
 
@@ -91,7 +92,8 @@ OBJS = \
 	$(BUILD_TYPE)/dds_validate.obj \
 	$(BUILD_TYPE)/collada.obj \
 	$(BUILD_TYPE)/collada_scene.obj \
-	$(BUILD_TYPE)/scenes/curve_interpolation/curve_interpolation.obj
+	$(BUILD_TYPE)/scenes/curve_interpolation/curve_interpolation.obj \
+	$(BUILD_TYPE)/scenes/ship20/ship20.obj
 
 $(BUILD_TYPE)/d3d10.exe: $(OBJS)
 	@mkdir -p $(@D)

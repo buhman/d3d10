@@ -21,6 +21,7 @@
 #include "collada_scene.hpp"
 
 #include "scenes/curve_interpolation/curve_interpolation.hpp"
+#include "scenes/ship20/ship20.hpp"
 
 HINSTANCE g_hInstance = NULL;
 HWND g_hWnd = NULL;
@@ -129,7 +130,7 @@ XMFLOAT4 g_vLightColors[2] = {
 
 //
 
-XMVECTOR g_Eye = XMVectorSet(0.0f, -40.0f, 25.0f, 1.0f);
+XMVECTOR g_Eye = XMVectorSet(0.0f, -260.0f, 260.0f, 1.0f);
 XMVECTOR g_At = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 
 // collada scene state
@@ -208,7 +209,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     print("collada_scene::LoadEffect\n");
   }
 
-  if (FAILED(g_SceneState.load_scene(&curve_interpolation::descriptor))) {
+  if (FAILED(g_SceneState.load_scene(&ship20::descriptor))) {
     print("g_SceneState::load_scene\n");
     return 0;
   }
@@ -283,7 +284,8 @@ HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow)
     return E_FAIL;
 
   // create window
-  RECT rc = { 0, 0, 512, 512 };
+  //RECT rc = { 0, 0, 512, 512 };
+  RECT rc = { 0, 0, 1365, 1024 };
   AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
   UINT width = rc.right - rc.left;
   UINT height = rc.bottom - rc.top;
@@ -1020,6 +1022,18 @@ HRESULT LoadMeshStatic(const Mesh * mesh)
   return S_OK;
 }
 
+void SetProjection(float width, float height)
+{
+  float fFov = XM_PI * 0.5f;
+  float fAspect = width / height;
+  float fNear = 0.1f;
+  float fFar = 1000.0f;
+  g_Projection = XMMatrixPerspectiveFovRH(fFov,
+                                          fAspect,
+                                          fNear,
+                                          fFar);
+}
+
 HRESULT InitDirect3DDevice()
 {
   RECT rc;
@@ -1221,15 +1235,7 @@ HRESULT InitDirect3DDevice()
 
   g_World1 = XMMatrixIdentity();
   g_World2 = XMMatrixIdentity();
-
-  float fFov = XM_PI * 0.5f;
-  float fAspect = width / (float)height;
-  float fNear = 0.1f;
-  float fFar = 100.0f;
-  g_Projection = XMMatrixPerspectiveFovLH(fFov,
-                                          fAspect,
-                                          fNear,
-                                          fFar);
+  SetProjection(width, height);
 
   return S_OK;
 }
@@ -1260,15 +1266,7 @@ BOOL Resize()
                               0);
 
   InitDirect3DViews();
-
-  float fFov = XM_PI * 0.5f;
-  float fAspect = width / (float)height;
-  float fNear = 0.1f;
-  float fFar = 100.0f;
-  g_Projection = XMMatrixPerspectiveFovLH(fFov,
-                                          fAspect,
-                                          fNear,
-                                          fFar);
+  SetProjection(width, height);
 
   return true;
 }
@@ -1735,8 +1733,7 @@ void Update(float t, float dt)
   g_Eye = XMVector4Transform(g_Eye, mTranslateView * mRotateView);
   XMVECTOR Up = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
-  g_View = XMMatrixLookAtLH(g_Eye, g_At, Up);
-
+  g_View = XMMatrixLookAtRH(g_Eye, g_At, Up);
 }
 
 void RenderVolume(float t)
@@ -1818,7 +1815,7 @@ void Render(float t, float dt)
 {
   // clear
 
-  const float ClearColor[4] = { 0.2f, 0.125f, 0.2f, 1.0f };
+  const float ClearColor[4] = { 0.2f * 0.2f, 0.125f * 0.2f, 0.2f * 0.2f, 1.0f };
   g_pd3dDevice->OMSetRenderTargets(1, &g_pRenderTargetView, g_pDepthStencilView);
   g_pd3dDevice->ClearRenderTargetView(g_pRenderTargetView, ClearColor);
   g_pd3dDevice->ClearDepthStencilView(g_pDepthStencilView, D3D10_CLEAR_DEPTH, 1.0f, 0);
@@ -1844,6 +1841,8 @@ void Render(float t, float dt)
 
   g_SceneState.update(t);
   g_SceneState.render();
+
+  RenderBloom();
 
   RenderFont(dt);
 

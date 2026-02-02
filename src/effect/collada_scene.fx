@@ -5,9 +5,9 @@ cbuffer cbEveryFrame
 
   float4 ViewEye;
 
-  float4 LightPos[2];
-  float4 LightDir[2];
-  float4 LightColor[2];
+  float4 LightPos[4];
+  float4 LightDir[4];
+  float4 LightColor[4];
 };
 
 cbuffer cbMultiplePerFrame
@@ -66,6 +66,12 @@ struct PS_INPUT
   float4 WPos : POSITION;
 };
 
+struct PS_OUTPUT
+{
+  float4 color0 : SV_TARGET0;
+  float4 color1 : SV_TARGET1;
+};
+
 PS_INPUT VSSkin(VS_INPUT_SKINNED input)
 {
   PS_INPUT output;
@@ -99,38 +105,48 @@ PS_INPUT VS(VS_INPUT input)
   output.Pos = mul(output.Pos, Projection);
 
   output.Norm = mul(input.Norm, (float3x3)World);
-  output.Tex = input.Tex;
+  output.Tex = float2(input.Tex.x, 1 - input.Tex.y);
 
   output.WPos = world_pos;
 
   return output;
 }
 
-float4 PS(PS_INPUT input) : SV_Target
+PS_OUTPUT PS(PS_INPUT input)
 {
   float3 normal = normalize(input.Norm);
   float3 view_dir = normalize(ViewEye.xyz - input.WPos.xyz);
 
-  float3 color = Emission.xyz;
+  float3 emissionColor = float3(0, 0, 0);
+
+  if (TextureChannel.x >= 0) { // emission
+    emissionColor = TexEmission.Sample(samLinear, input.Tex).xyz;
+  } else {
+    emissionColor = Emission.xyz;
+  }
 
   float3 diffuseColor;
-  if (TextureChannel.z >= 0) {
+  if (TextureChannel.z >= 0) { // diffuse
     diffuseColor = TexDiffuse.Sample(samLinear, input.Tex).xyz;
   } else {
     diffuseColor = Diffuse.xyz;
   }
 
-  for (int i = 0; i < 2; i++) {
+  float3 color = emissionColor;
+  for (int i = 0; i < 4; i++) {
     float3 light_dir = normalize(-LightDir[i].xyz);
     float diffuse_intensity = max(dot(normal, light_dir), 0.0) + 0.2;
 
     float distance = length(LightPos[i].xyz - input.WPos.xyz);
-    float attenuation = 1.0 / (0.002 * distance * distance);
+    float attenuation = 1.0 / (0.00000006 * distance * distance * distance);
 
     color += diffuseColor * diffuse_intensity * LightColor[i].xyz * attenuation;
   }
 
-  return float4(color.xyz, 1);
+  PS_OUTPUT output;
+  output.color0 = float4(color, 1.0);
+  output.color1 = float4(emissionColor, 1.0);
+  return output;
 }
 
 BlendState DisableBlending

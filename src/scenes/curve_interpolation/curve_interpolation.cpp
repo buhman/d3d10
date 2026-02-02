@@ -623,6 +623,429 @@ sampler const sampler_node_bone002_rotationz_angle_sampler = {
   },
 };
 
+float const array_node_pyramid001_translation_x_input_array[] = {
+  0.0f,
+  0.6333333f,
+  1.466667f,
+  3.333333f,
+};
+
+float const array_node_pyramid001_translation_x_output_array[] = {
+  10.76371f,
+  10.76371f,
+  10.76371f,
+  10.76371f,
+};
+
+float const array_node_pyramid001_translation_x_intangent_array[] = {
+  0.9997917f, 10.76371f,
+  0.4222434f, 10.76371f,
+  1.188917f, 10.76371f,
+  2.711174f, 10.76371f,
+};
+
+float const array_node_pyramid001_translation_x_outtangent_array[] = {
+  0.21109f, 10.76371f,
+  0.9110833f, 10.76371f,
+  2.088827f, 10.76371f,
+  3.666564f, 10.76371f,
+};
+
+enum interpolation const array_node_pyramid001_translation_x_interpolation_array[] = {
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+};
+
+sampler const sampler_node_pyramid001_translation_x_sampler = {
+  // node_pyramid001_translation_x_input
+  .input = {
+    .float_array = array_node_pyramid001_translation_x_input_array,
+    .count = 4,
+    .stride = 1,
+  },
+  // node_pyramid001_translation_x_output
+  .output = {
+    .float_array = array_node_pyramid001_translation_x_output_array,
+    .count = 4,
+    .stride = 1,
+  },
+  // node_pyramid001_translation_x_intangent
+  .in_tangent = {
+    .float_array = array_node_pyramid001_translation_x_intangent_array,
+    .count = 4,
+    .stride = 2,
+  },
+  // node_pyramid001_translation_x_outtangent
+  .out_tangent = {
+    .float_array = array_node_pyramid001_translation_x_outtangent_array,
+    .count = 4,
+    .stride = 2,
+  },
+  // node_pyramid001_translation_x_interpolation
+  .interpolation = {
+    .interpolation_array = array_node_pyramid001_translation_x_interpolation_array,
+    .count = 4,
+    .stride = 1,
+  },
+};
+
+float const array_node_pyramid001_translation_y_input_array[] = {
+  0.0f,
+  0.6333333f,
+  1.466667f,
+  3.333333f,
+};
+
+float const array_node_pyramid001_translation_y_output_array[] = {
+  -13.71933f,
+  -13.71933f,
+  11.03402f,
+  -13.71933f,
+};
+
+float const array_node_pyramid001_translation_y_intangent_array[] = {
+  0.9997917f, -13.71933f,
+  0.4222434f, -13.71933f,
+  1.188917f, 11.03402f,
+  2.711174f, -13.71933f,
+};
+
+float const array_node_pyramid001_translation_y_outtangent_array[] = {
+  0.21109f, -13.71933f,
+  0.9110833f, -13.71933f,
+  2.088827f, 11.03402f,
+  3.666564f, -13.71933f,
+};
+
+enum interpolation const array_node_pyramid001_translation_y_interpolation_array[] = {
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+};
+
+sampler const sampler_node_pyramid001_translation_y_sampler = {
+  // node_pyramid001_translation_y_input
+  .input = {
+    .float_array = array_node_pyramid001_translation_y_input_array,
+    .count = 4,
+    .stride = 1,
+  },
+  // node_pyramid001_translation_y_output
+  .output = {
+    .float_array = array_node_pyramid001_translation_y_output_array,
+    .count = 4,
+    .stride = 1,
+  },
+  // node_pyramid001_translation_y_intangent
+  .in_tangent = {
+    .float_array = array_node_pyramid001_translation_y_intangent_array,
+    .count = 4,
+    .stride = 2,
+  },
+  // node_pyramid001_translation_y_outtangent
+  .out_tangent = {
+    .float_array = array_node_pyramid001_translation_y_outtangent_array,
+    .count = 4,
+    .stride = 2,
+  },
+  // node_pyramid001_translation_y_interpolation
+  .interpolation = {
+    .interpolation_array = array_node_pyramid001_translation_y_interpolation_array,
+    .count = 4,
+    .stride = 1,
+  },
+};
+
+float const array_node_pyramid001_translation_z_input_array[] = {
+  0.0f,
+  0.6333333f,
+  1.466667f,
+  3.333333f,
+};
+
+float const array_node_pyramid001_translation_z_output_array[] = {
+  0.01108826f,
+  17.80861f,
+  17.80861f,
+  0.01108826f,
+};
+
+float const array_node_pyramid001_translation_z_intangent_array[] = {
+  0.9997917f, 0.01108826f,
+  0.4222434f, 17.80861f,
+  1.188917f, 17.80861f,
+  2.711174f, 0.01108826f,
+};
+
+float const array_node_pyramid001_translation_z_outtangent_array[] = {
+  0.21109f, 0.01108826f,
+  0.9110833f, 17.80861f,
+  2.088827f, 17.80861f,
+  3.666564f, 0.01108826f,
+};
+
+enum interpolation const array_node_pyramid001_translation_z_interpolation_array[] = {
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+};
+
+sampler const sampler_node_pyramid001_translation_z_sampler = {
+  // node_pyramid001_translation_z_input
+  .input = {
+    .float_array = array_node_pyramid001_translation_z_input_array,
+    .count = 4,
+    .stride = 1,
+  },
+  // node_pyramid001_translation_z_output
+  .output = {
+    .float_array = array_node_pyramid001_translation_z_output_array,
+    .count = 4,
+    .stride = 1,
+  },
+  // node_pyramid001_translation_z_intangent
+  .in_tangent = {
+    .float_array = array_node_pyramid001_translation_z_intangent_array,
+    .count = 4,
+    .stride = 2,
+  },
+  // node_pyramid001_translation_z_outtangent
+  .out_tangent = {
+    .float_array = array_node_pyramid001_translation_z_outtangent_array,
+    .count = 4,
+    .stride = 2,
+  },
+  // node_pyramid001_translation_z_interpolation
+  .interpolation = {
+    .interpolation_array = array_node_pyramid001_translation_z_interpolation_array,
+    .count = 4,
+    .stride = 1,
+  },
+};
+
+float const array_node_pyramid001_rotationz_angle_input_array[] = {
+  0.0f,
+  1.466667f,
+  2.366667f,
+  2.8f,
+  3.333333f,
+};
+
+float const array_node_pyramid001_rotationz_angle_output_array[] = {
+  0.0f,
+  0.0f,
+  0.0f,
+  0.0f,
+  0.0f,
+};
+
+float const array_node_pyramid001_rotationz_angle_intangent_array[] = {
+  0.9997917f, 0.0f,
+  0.9778267f, 0.0f,
+  2.066697f, 0.0f,
+  2.65557f, 0.0f,
+  3.155573f, 0.0f,
+};
+
+float const array_node_pyramid001_rotationz_angle_outtangent_array[] = {
+  0.48884f, 0.0f,
+  1.766637f, 0.0f,
+  2.511097f, 0.0f,
+  2.97776f, 0.0f,
+  3.666564f, 0.0f,
+};
+
+enum interpolation const array_node_pyramid001_rotationz_angle_interpolation_array[] = {
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+};
+
+sampler const sampler_node_pyramid001_rotationz_angle_sampler = {
+  // node_pyramid001_rotationz_angle_input
+  .input = {
+    .float_array = array_node_pyramid001_rotationz_angle_input_array,
+    .count = 5,
+    .stride = 1,
+  },
+  // node_pyramid001_rotationz_angle_output
+  .output = {
+    .float_array = array_node_pyramid001_rotationz_angle_output_array,
+    .count = 5,
+    .stride = 1,
+  },
+  // node_pyramid001_rotationz_angle_intangent
+  .in_tangent = {
+    .float_array = array_node_pyramid001_rotationz_angle_intangent_array,
+    .count = 5,
+    .stride = 2,
+  },
+  // node_pyramid001_rotationz_angle_outtangent
+  .out_tangent = {
+    .float_array = array_node_pyramid001_rotationz_angle_outtangent_array,
+    .count = 5,
+    .stride = 2,
+  },
+  // node_pyramid001_rotationz_angle_interpolation
+  .interpolation = {
+    .interpolation_array = array_node_pyramid001_rotationz_angle_interpolation_array,
+    .count = 5,
+    .stride = 1,
+  },
+};
+
+float const array_node_pyramid001_rotationy_angle_input_array[] = {
+  0.0f,
+  1.466667f,
+  2.366667f,
+  2.8f,
+  3.333333f,
+};
+
+float const array_node_pyramid001_rotationy_angle_output_array[] = {
+  0.0f,
+  0.0f,
+  0.0f,
+  0.0f,
+  0.0f,
+};
+
+float const array_node_pyramid001_rotationy_angle_intangent_array[] = {
+  0.9997917f, 0.0f,
+  0.9778267f, 0.0f,
+  2.066697f, 0.0f,
+  2.65557f, 0.0f,
+  3.155573f, 0.0f,
+};
+
+float const array_node_pyramid001_rotationy_angle_outtangent_array[] = {
+  0.48884f, 0.0f,
+  1.766637f, 0.0f,
+  2.511097f, 0.0f,
+  2.97776f, 0.0f,
+  3.666564f, 0.0f,
+};
+
+enum interpolation const array_node_pyramid001_rotationy_angle_interpolation_array[] = {
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+};
+
+sampler const sampler_node_pyramid001_rotationy_angle_sampler = {
+  // node_pyramid001_rotationy_angle_input
+  .input = {
+    .float_array = array_node_pyramid001_rotationy_angle_input_array,
+    .count = 5,
+    .stride = 1,
+  },
+  // node_pyramid001_rotationy_angle_output
+  .output = {
+    .float_array = array_node_pyramid001_rotationy_angle_output_array,
+    .count = 5,
+    .stride = 1,
+  },
+  // node_pyramid001_rotationy_angle_intangent
+  .in_tangent = {
+    .float_array = array_node_pyramid001_rotationy_angle_intangent_array,
+    .count = 5,
+    .stride = 2,
+  },
+  // node_pyramid001_rotationy_angle_outtangent
+  .out_tangent = {
+    .float_array = array_node_pyramid001_rotationy_angle_outtangent_array,
+    .count = 5,
+    .stride = 2,
+  },
+  // node_pyramid001_rotationy_angle_interpolation
+  .interpolation = {
+    .interpolation_array = array_node_pyramid001_rotationy_angle_interpolation_array,
+    .count = 5,
+    .stride = 1,
+  },
+};
+
+float const array_node_pyramid001_rotationx_angle_input_array[] = {
+  0.0f,
+  1.466667f,
+  2.366667f,
+  2.8f,
+  3.333333f,
+};
+
+float const array_node_pyramid001_rotationx_angle_output_array[] = {
+  0.0f,
+  -69.99999f,
+  -175.0f,
+  -235.0f,
+  0.0f,
+};
+
+float const array_node_pyramid001_rotationx_angle_intangent_array[] = {
+  0.9997917f, 0.0f,
+  0.9778267f, -69.99999f,
+  2.066697f, -175.0f,
+  2.65557f, -235.0f,
+  3.155573f, 0.0f,
+};
+
+float const array_node_pyramid001_rotationx_angle_outtangent_array[] = {
+  0.48884f, 0.0f,
+  1.766637f, -69.99999f,
+  2.511097f, -175.0f,
+  2.97776f, -235.0f,
+  3.666564f, 0.0f,
+};
+
+enum interpolation const array_node_pyramid001_rotationx_angle_interpolation_array[] = {
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+  interpolation::BEZIER,
+};
+
+sampler const sampler_node_pyramid001_rotationx_angle_sampler = {
+  // node_pyramid001_rotationx_angle_input
+  .input = {
+    .float_array = array_node_pyramid001_rotationx_angle_input_array,
+    .count = 5,
+    .stride = 1,
+  },
+  // node_pyramid001_rotationx_angle_output
+  .output = {
+    .float_array = array_node_pyramid001_rotationx_angle_output_array,
+    .count = 5,
+    .stride = 1,
+  },
+  // node_pyramid001_rotationx_angle_intangent
+  .in_tangent = {
+    .float_array = array_node_pyramid001_rotationx_angle_intangent_array,
+    .count = 5,
+    .stride = 2,
+  },
+  // node_pyramid001_rotationx_angle_outtangent
+  .out_tangent = {
+    .float_array = array_node_pyramid001_rotationx_angle_outtangent_array,
+    .count = 5,
+    .stride = 2,
+  },
+  // node_pyramid001_rotationx_angle_interpolation
+  .interpolation = {
+    .interpolation_array = array_node_pyramid001_rotationx_angle_interpolation_array,
+    .count = 5,
+    .stride = 1,
+  },
+};
+
 channel const node_channel_node_cube_translation_x = {
   .source_sampler = &sampler_node_cube_translation_x_sampler,
   .target_transform_index = 0,
@@ -677,9 +1100,50 @@ channel const node_channel_node_bone002_rotationz_angle = {
   .target_attribute = target_attribute::ANGLE,
 };
 
+channel const node_channel_node_pyramid001_translation_x = {
+  .source_sampler = &sampler_node_pyramid001_translation_x_sampler,
+  .target_transform_index = 0,
+  .target_attribute = target_attribute::X,
+};
+
+channel const node_channel_node_pyramid001_translation_y = {
+  .source_sampler = &sampler_node_pyramid001_translation_y_sampler,
+  .target_transform_index = 0,
+  .target_attribute = target_attribute::Y,
+};
+
+channel const node_channel_node_pyramid001_translation_z = {
+  .source_sampler = &sampler_node_pyramid001_translation_z_sampler,
+  .target_transform_index = 0,
+  .target_attribute = target_attribute::Z,
+};
+
+channel const node_channel_node_pyramid001_rotationz_angle = {
+  .source_sampler = &sampler_node_pyramid001_rotationz_angle_sampler,
+  .target_transform_index = 1,
+  .target_attribute = target_attribute::ANGLE,
+};
+
+channel const node_channel_node_pyramid001_rotationy_angle = {
+  .source_sampler = &sampler_node_pyramid001_rotationy_angle_sampler,
+  .target_transform_index = 2,
+  .target_attribute = target_attribute::ANGLE,
+};
+
+channel const node_channel_node_pyramid001_rotationx_angle = {
+  .source_sampler = &sampler_node_pyramid001_rotationx_angle_sampler,
+  .target_transform_index = 3,
+  .target_attribute = target_attribute::ANGLE,
+};
+
 // american_cherry_png
 image const image_american_cherry_png = {
   .resource_name = L"_AMERICAN_CHERRY_PNG",
+};
+
+// Masonry_Unit_Masonry_Glass_Block_Square_Stack_jpg
+image const image_masonry_unit_masonry_glass_block_square_stack_jpg = {
+  .resource_name = L"_MASONRY_UNIT_MASONRY_GLASS_BLOCK_SQUARE_STACK_JPG",
 };
 
 // _02_png
@@ -699,6 +1163,7 @@ image const image_sitework_planting_grass_bermuda1_jpg = {
 
 image const * const images[] = {
   &image_american_cherry_png,
+  &image_masonry_unit_masonry_glass_block_square_stack_jpg,
   &image__02_png,
   &image_finishes_flooring_tile_square_medium_blue_png,
   &image_sitework_planting_grass_bermuda1_jpg,
@@ -955,7 +1420,7 @@ effect const effect_grass = {
     },
     .diffuse = {
       .type = color_or_texture_type::TEXTURE,
-      .texture = { .image_index = 3 }, // SiteWork_Planting_Grass_Bermuda1_jpg
+      .texture = { .image_index = 4 }, // SiteWork_Planting_Grass_Bermuda1_jpg
     },
     .specular = {
       .type = color_or_texture_type::COLOR,
@@ -993,7 +1458,7 @@ effect const effect_wood = {
     },
     .specular = {
       .type = color_or_texture_type::TEXTURE,
-      .texture = { .image_index = 2 }, // Finishes_Flooring_Tile_Square_Medium_Blue_png
+      .texture = { .image_index = 3 }, // Finishes_Flooring_Tile_Square_Medium_Blue_png
     },
     .shininess = 10.0f,
     .reflective = {
@@ -1282,6 +1747,40 @@ effect const effect_material__18_1 = {
   }
 };
 
+effect const effect_material__21 = {
+  .type = effect_type::BLINN,
+  .blinn = {
+    .emission = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .ambient = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.588f, 0.588f, 0.588f, 1.0f},
+    },
+    .diffuse = {
+      .type = color_or_texture_type::TEXTURE,
+      .texture = { .image_index = 1 }, // Masonry_Unit_Masonry_Glass_Block_Square_Stack_jpg
+    },
+    .specular = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .shininess = 10.0f,
+    .reflective = {
+      .type = color_or_texture_type::COLOR,
+      .color = {0.0f, 0.0f, 0.0f, 1.0f},
+    },
+    .reflectivity = 0.0f,
+    .transparent = {
+      .type = color_or_texture_type::COLOR,
+      .color = {1.0f, 1.0f, 1.0f, 1.0f},
+    },
+    .transparency = 1.0f,
+    .index_of_refraction = 0.0f,
+  }
+};
+
 material const material_coloreffectr26g177b26_material = {
   .effect = &effect_coloreffectr26g177b26,
 };
@@ -1348,6 +1847,10 @@ material const material_material__17_1_material = {
 
 material const material_material__18_1_material = {
   .effect = &effect_material__18_1,
+};
+
+material const material_material__21_material = {
+  .effect = &effect_material__21,
 };
 
 input_element const input_elements_position_0_3_normal_0_3_texcoord_0_3[] = {
@@ -1565,6 +2068,27 @@ geometry const geometry_geom_box001 = {
   }
 };
 
+triangles const triangles_geom_pyramid001[] = {
+  {
+    .count = 8, // triangles
+    .index_offset = 0, // indices
+    .inputs_index = 0, // index into inputs_list
+  },
+};
+
+geometry const geometry_geom_pyramid001 = {
+  .mesh = {
+    .triangles = triangles_geom_pyramid001,
+    .triangles_count = 1,
+
+    .vertex_buffer_offset = 14508,
+    .vertex_buffer_size = 612,
+
+    .index_buffer_offset = 4512,
+    .index_buffer_size = 96,
+  }
+};
+
 geometry const * const geometries[] = {
   &geometry_geom_cube,
   &geometry_geom_torus,
@@ -1573,6 +2097,7 @@ geometry const * const geometries[] = {
   &geometry_geom_geosphere,
   &geometry_geom_lightindicator,
   &geometry_geom_box001,
+  &geometry_geom_pyramid001,
 };
 
 matrix const inverse_bind_matrices_geom_box001_skin1[] = {
@@ -1661,15 +2186,6 @@ instance_material const instance_geometry_instance_materials_node_cube_0[] = {
     .specular = { .input_set = -1 },
   },
   {
-    .element_index = 5, // an index into mesh.triangles
-    .material = &material_material__17_material,
-
-    .emission = { .input_set = -1 },
-    .ambient = { .input_set = -1 },
-    .diffuse = { .input_set = -1 },
-    .specular = { .input_set = -1 },
-  },
-  {
     .element_index = 0, // an index into mesh.triangles
     .material = &material_material__16_material,
 
@@ -1681,6 +2197,15 @@ instance_material const instance_geometry_instance_materials_node_cube_0[] = {
   {
     .element_index = 3, // an index into mesh.triangles
     .material = &material_material__18_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
+  },
+  {
+    .element_index = 5, // an index into mesh.triangles
+    .material = &material_material__17_material,
 
     .emission = { .input_set = -1 },
     .ambient = { .input_set = -1 },
@@ -1994,9 +2519,9 @@ instance_light const instance_lights_node_geosphere[] = {
 };
 
 channel const * const node_channels_node_geosphere[] = {
+  &node_channel_node_geosphere_scaleaxisrotation,
   &node_channel_node_geosphere_inversescaleaxisrotation,
   &node_channel_node_geosphere_scale,
-  &node_channel_node_geosphere_scaleaxisrotation,
 };
 
 node const node_node_geosphere = {
@@ -2044,8 +2569,8 @@ instance_light const instance_lights_node_light[] = {
 };
 
 channel const * const node_channels_node_light[] = {
-  &node_channel_node_light_translation_x,
   &node_channel_node_light_translation_y,
+  &node_channel_node_light_translation_x,
 };
 
 node const node_node_light = {
@@ -2149,8 +2674,8 @@ instance_material const instance_controller_instance_materials_node_box001_0[] =
     .specular = { .input_set = -1 },
   },
   {
-    .element_index = 5, // an index into mesh.triangles
-    .material = &material_material__15_1_material,
+    .element_index = 0, // an index into mesh.triangles
+    .material = &material_material__14_material,
 
     .emission = { .input_set = -1 },
     .ambient = { .input_set = -1 },
@@ -2158,8 +2683,8 @@ instance_material const instance_controller_instance_materials_node_box001_0[] =
     .specular = { .input_set = -1 },
   },
   {
-    .element_index = 0, // an index into mesh.triangles
-    .material = &material_material__14_material,
+    .element_index = 5, // an index into mesh.triangles
+    .material = &material_material__15_1_material,
 
     .emission = { .input_set = -1 },
     .ambient = { .input_set = -1 },
@@ -2327,6 +2852,82 @@ node const node_node_bone002 = {
   .channels_count = 1,
 };
 
+transform const transforms_node_pyramid001[] = {
+  {
+    .type = transform_type::TRANSLATE,
+    .translate = {10.76371f, -13.71933f, 0.01108826f},
+  },
+  {
+    .type = transform_type::ROTATE,
+    .rotate = {0.0f, 0.0f, 1.0f, 0.0f},
+  },
+  {
+    .type = transform_type::ROTATE,
+    .rotate = {0.0f, 1.0f, 0.0f, 0.0f},
+  },
+  {
+    .type = transform_type::ROTATE,
+    .rotate = {1.0f, 0.0f, 0.0f, 0.0f},
+  },
+};
+
+instance_material const instance_geometry_instance_materials_node_pyramid001_0[] = {
+  {
+    .element_index = 0, // an index into mesh.triangles
+    .material = &material_material__21_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = 0 },
+    .specular = { .input_set = -1 },
+  },
+};
+
+instance_geometry const instance_geometries_node_pyramid001[] = {
+  {
+    .geometry = &geometry_geom_pyramid001,
+
+    .instance_materials = instance_geometry_instance_materials_node_pyramid001_0,
+    .instance_materials_count = 1,
+  },
+};
+
+instance_controller const instance_controllers_node_pyramid001[] = {
+};
+
+instance_light const instance_lights_node_pyramid001[] = {
+};
+
+channel const * const node_channels_node_pyramid001[] = {
+  &node_channel_node_pyramid001_rotationy_angle,
+  &node_channel_node_pyramid001_translation_z,
+  &node_channel_node_pyramid001_rotationx_angle,
+  &node_channel_node_pyramid001_translation_x,
+  &node_channel_node_pyramid001_rotationz_angle,
+  &node_channel_node_pyramid001_translation_y,
+};
+
+node const node_node_pyramid001 = {
+  .parent_index = -1,
+
+  .type = node_type::NODE,
+
+  .transforms = transforms_node_pyramid001,
+  .transforms_count = 4,
+
+  .instance_geometries = instance_geometries_node_pyramid001,
+  .instance_geometries_count = 1,
+
+  .instance_controllers = instance_controllers_node_pyramid001,
+  .instance_controllers_count = 0,
+
+  .instance_lights = instance_lights_node_pyramid001,
+  .instance_lights_count = 0,
+
+  .channels = node_channels_node_pyramid001,
+  .channels_count = 6,
+};
+
 node const * const nodes[] = {
   &node_node_environmentambientlight, // 0
   &node_node_cube, // 1
@@ -2339,6 +2940,7 @@ node const * const nodes[] = {
   &node_node_box001, // 8
   &node_node_bone001, // 9
   &node_node_bone002, // 10
+  &node_node_pyramid001, // 11
 };
 
 inputs const inputs_list[] = {

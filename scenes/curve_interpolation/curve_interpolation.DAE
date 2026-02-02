@@ -6,8 +6,8 @@
       <authoring_tool>OpenCOLLADA for 3ds Max;  Version: 1.6;  Revision: 68</authoring_tool>
       <source_data>file:///C:/cygwin/home/bilbo/d3d10/scenes/curve_interpolation/curve_interpolation.max</source_data>
     </contributor>
-    <created>2026-01-30T14:43:57</created>
-    <modified>2026-01-30T14:43:57</modified>
+    <created>2026-02-01T17:48:55</created>
+    <modified>2026-02-01T17:48:55</modified>
     <unit name="inch" meter="0.0254"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -957,6 +957,72 @@
         </technique>
       </extra>
     </effect>
+    <effect id="Material__21">
+      <profile_COMMON>
+        <newparam sid="Masonry_Unit_Masonry_Glass_Block_Square_Stack_jpg-surface">
+          <surface type="2D">
+            <init_from>Masonry_Unit_Masonry_Glass_Block_Square_Stack_jpg</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="Masonry_Unit_Masonry_Glass_Block_Square_Stack_jpg-sampler">
+          <sampler2D>
+            <source>Masonry_Unit_Masonry_Glass_Block_Square_Stack_jpg-surface</source>
+          </sampler2D>
+        </newparam>
+        <technique sid="common">
+          <blinn>
+            <emission>
+              <color>0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color>0.588 0.588 0.588 1</color>
+            </ambient>
+            <diffuse>
+              <texture texture="Masonry_Unit_Masonry_Glass_Block_Square_Stack_jpg-sampler" texcoord="CHANNEL1"/>
+            </diffuse>
+            <specular>
+              <color>0 0 0 1</color>
+            </specular>
+            <shininess>
+              <float>10</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <transparent opaque="A_ONE">
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </blinn>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="OpenCOLLADA3dsMax">
+          <extended_shader>
+            <opacity_type sid="opacity_type" type="int">0</opacity_type>
+            <falloff_type sid="falloff_type" type="int">0</falloff_type>
+            <falloff sid="falloff" type="float">0</falloff>
+            <index_of_refraction sid="index_of_refraction" type="float">1.5</index_of_refraction>
+            <wire_size sid="wire_size" type="float">1</wire_size>
+            <wire_units sid="wire_units" type="int">0</wire_units>
+            <apply_reflection_dimming sid="apply_reflection_dimming" type="bool">0</apply_reflection_dimming>
+            <dim_level sid="dim_level" type="float">0</dim_level>
+            <reflection_level sid="reflection_level" type="float">3</reflection_level>
+          </extended_shader>
+          <shader>
+            <ambient_diffuse_texture_lock sid="ambient_diffuse_texture_lock" type="bool">1</ambient_diffuse_texture_lock>
+            <ambient_diffuse_lock sid="ambient_diffuse_lock" type="bool">1</ambient_diffuse_lock>
+            <diffuse_specular_lock sid="diffuse_specular_lock" type="bool">0</diffuse_specular_lock>
+            <use_self_illum_color sid="use_self_illum_color" type="bool">0</use_self_illum_color>
+            <self_illumination sid="self_illumination" type="float">0</self_illumination>
+            <specular_level sid="specular_level" type="float">0</specular_level>
+            <soften sid="soften" type="float">0.1</soften>
+          </shader>
+        </technique>
+      </extra>
+    </effect>
   </library_effects>
   <library_materials>
     <material id="ColorEffectR26G177B26-material" name="ColorEffectR26G177B26-material">
@@ -1009,6 +1075,9 @@
     </material>
     <material id="Material__18_1-material" name="Material__18">
       <instance_effect url="#Material__18_1"/>
+    </material>
+    <material id="Material__21-material" name="Material__21">
+      <instance_effect url="#Material__21"/>
     </material>
   </library_materials>
   <library_geometries>
@@ -1406,6 +1475,62 @@
         </triangles>
       </mesh>
     </geometry>
+    <geometry id="geom-Pyramid001" name="Pyramid001">
+      <mesh>
+        <source id="geom-Pyramid001-positions">
+          <float_array id="geom-Pyramid001-positions-array" count="18">0 0 10.01329 -11.77238 -7.848255 0 11.77238 -7.848255 0 11.77238 7.848255 0 -11.77238 7.848255 0 0 0 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Pyramid001-positions-array" count="6" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Pyramid001-normals">
+          <float_array id="geom-Pyramid001-normals-array" count="51">0 -0.7870559 0.6168815 0 -0.7870559 0.6168816 0 -0.7870559 0.6168816 0.6479026 0 0.7617232 0.6479026 0 0.7617232 0.6479026 0 0.7617232 0 0.7870559 0.6168815 0 0.7870559 0.6168816 0 0.7870559 0.6168816 -0.6479026 0 0.7617232 -0.6479026 0 0.7617232 -0.6479026 0 0.7617232 0 0 -0.9999999 0 0 -1 0 0 -0.9999999 0 0 -0.9999999 0 0 -0.9999999</float_array>
+          <technique_common>
+            <accessor source="#geom-Pyramid001-normals-array" count="17" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Pyramid001-map1">
+          <float_array id="geom-Pyramid001-map1-array" count="33">0.5 1 0 0 0 0 1 0 0 -0.25 0 0 0.75 0 0 0 1 0 1 1 0 1 0 0 0 0 0 0.5 0.5 0 0.5 1 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Pyramid001-map1-array" count="11" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="geom-Pyramid001-vertices">
+          <input semantic="POSITION" source="#geom-Pyramid001-positions"/>
+        </vertices>
+        <triangles material="Material__21_1" count="8">
+          <input semantic="VERTEX" source="#geom-Pyramid001-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Pyramid001-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Pyramid001-map1" offset="2" set="0"/>
+          <p>0 0 0 1 1 1 2 2 2 0 3 10 2 4 3 3 5 4 0 6 0 3 7 1 4 8 2 0 9 10 4 10 3 1 11 4 1 12 5 5 13 9 2 14 6 2 14 6 5 13 9 3 15 7 3 15 7 5 13 9 4 16 8 4 16 8 5 13 9 1 12 5</p>
+        </triangles>
+      </mesh>
+      <extra>
+        <technique profile="OpenCOLLADA3dsMax">
+          <max_pyramid>
+            <width sid="width" type="float">23.54476</width>
+            <depth sid="depth" type="float">15.69651</depth>
+            <height sid="height" type="float">10.01329</height>
+            <widthsegments sid="widthsegments" type="int">1</widthsegments>
+            <depthsegments sid="depthsegments" type="int">1</depthsegments>
+            <heightsegments sid="heightsegments" type="int">1</heightsegments>
+            <generateuvs sid="generateuvs" type="int">1</generateuvs>
+          </max_pyramid>
+        </technique>
+      </extra>
+    </geometry>
   </library_geometries>
   <library_controllers>
     <controller id="geom-Box001-skin1">
@@ -1492,6 +1617,9 @@
     <image id="american_cherry_png">
       <init_from>file:///C:/Program%20Files/Common%20Files/Autodesk%20Shared/Materials/Textures/1/Mats/american_cherry.png</init_from>
     </image>
+    <image id="Masonry_Unit_Masonry_Glass_Block_Square_Stack_jpg">
+      <init_from>file:///C:/Program%20Files/Common%20Files/Autodesk%20Shared/Materials/Textures/2/Mats/Masonry.Unit%20Masonry.Glass%20Block.Square.Stack.jpg</init_from>
+    </image>
     <image id="_02_png">
       <init_from>file:///C:/Program%20Files/Common%20Files/Autodesk%20Shared/Materials/Textures/3/Mats/102.png</init_from>
     </image>
@@ -1514,9 +1642,9 @@
           <bind_material>
             <technique_common>
               <instance_material symbol="Material__15_1" target="#Material__15-material"/>
-              <instance_material symbol="Material__17_1" target="#Material__17-material"/>
               <instance_material symbol="Material__16_1" target="#Material__16-material"/>
               <instance_material symbol="Material__18_1" target="#Material__18-material"/>
+              <instance_material symbol="Material__17_1" target="#Material__17-material"/>
               <instance_material symbol="Material__19_1" target="#Material__19-material"/>
               <instance_material symbol="Material__20_1" target="#Material__20-material"/>
             </technique_common>
@@ -1655,8 +1783,8 @@
           <bind_material>
             <technique_common>
               <instance_material symbol="Material__13_1" target="#Material__13-material"/>
-              <instance_material symbol="Material__15" target="#Material__15_1-material"/>
               <instance_material symbol="Material__14_1" target="#Material__14-material"/>
+              <instance_material symbol="Material__15" target="#Material__15_1-material"/>
               <instance_material symbol="Material__16" target="#Material__16_1-material"/>
               <instance_material symbol="Material__17" target="#Material__17_1-material"/>
               <instance_material symbol="Material__18" target="#Material__18_1-material"/>
@@ -1688,6 +1816,29 @@
             </technique>
           </extra>
         </node>
+        <extra>
+          <technique profile="OpenCOLLADA">
+            <cast_shadows sid="cast_shadows" type="bool">1</cast_shadows>
+            <receive_shadows sid="receive_shadows" type="bool">1</receive_shadows>
+            <primary_visibility sid="primary_visibility" type="int">1</primary_visibility>
+            <secondary_visibility sid="secondary_visibility" type="int">1</secondary_visibility>
+          </technique>
+        </extra>
+      </node>
+      <node id="node-Pyramid001" name="Pyramid001">
+        <translate sid="translation">10.76371 -13.71933 0.01108826</translate>
+        <rotate sid="rotationZ">0 0 1 0</rotate>
+        <rotate sid="rotationY">0 1 0 0</rotate>
+        <rotate sid="rotationX">1 0 0 0</rotate>
+        <instance_geometry url="#geom-Pyramid001">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="Material__21_1" target="#Material__21-material">
+                <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="0"/>
+              </instance_material>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
         <extra>
           <technique profile="OpenCOLLADA">
             <cast_shadows sid="cast_shadows" type="bool">1</cast_shadows>
@@ -2059,6 +2210,258 @@
           </accessor>
         </technique_common>
       </source>
+      <source id="node-Pyramid001_translation.X-input">
+        <float_array id="node-Pyramid001_translation.X-input-array" count="4">0 0.6333333 1.466667 3.333333</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_translation.X-input-array" count="4" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_translation.X-output">
+        <float_array id="node-Pyramid001_translation.X-output-array" count="4">10.76371 10.76371 10.76371 10.76371</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_translation.X-output-array" count="4" stride="1">
+            <param name="X" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_translation.X-intangent">
+        <float_array id="node-Pyramid001_translation.X-intangent-array" count="8">0.9997917 10.76371 0.4222434 10.76371 1.188917 10.76371 2.711174 10.76371</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_translation.X-intangent-array" count="4" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_translation.X-outtangent">
+        <float_array id="node-Pyramid001_translation.X-outtangent-array" count="8">0.21109 10.76371 0.9110833 10.76371 2.088827 10.76371 3.666564 10.76371</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_translation.X-outtangent-array" count="4" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_translation.X-interpolation">
+        <Name_array id="node-Pyramid001_translation.X-interpolation-array" count="4">BEZIER BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_translation.X-interpolation-array" count="4" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_translation.Y-input">
+        <float_array id="node-Pyramid001_translation.Y-input-array" count="4">0 0.6333333 1.466667 3.333333</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_translation.Y-input-array" count="4" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_translation.Y-output">
+        <float_array id="node-Pyramid001_translation.Y-output-array" count="4">-13.71933 -13.71933 11.03402 -13.71933</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_translation.Y-output-array" count="4" stride="1">
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_translation.Y-intangent">
+        <float_array id="node-Pyramid001_translation.Y-intangent-array" count="8">0.9997917 -13.71933 0.4222434 -13.71933 1.188917 11.03402 2.711174 -13.71933</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_translation.Y-intangent-array" count="4" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_translation.Y-outtangent">
+        <float_array id="node-Pyramid001_translation.Y-outtangent-array" count="8">0.21109 -13.71933 0.9110833 -13.71933 2.088827 11.03402 3.666564 -13.71933</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_translation.Y-outtangent-array" count="4" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_translation.Y-interpolation">
+        <Name_array id="node-Pyramid001_translation.Y-interpolation-array" count="4">BEZIER BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_translation.Y-interpolation-array" count="4" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_translation.Z-input">
+        <float_array id="node-Pyramid001_translation.Z-input-array" count="4">0 0.6333333 1.466667 3.333333</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_translation.Z-input-array" count="4" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_translation.Z-output">
+        <float_array id="node-Pyramid001_translation.Z-output-array" count="4">0.01108826 17.80861 17.80861 0.01108826</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_translation.Z-output-array" count="4" stride="1">
+            <param name="Z" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_translation.Z-intangent">
+        <float_array id="node-Pyramid001_translation.Z-intangent-array" count="8">0.9997917 0.01108826 0.4222434 17.80861 1.188917 17.80861 2.711174 0.01108826</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_translation.Z-intangent-array" count="4" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_translation.Z-outtangent">
+        <float_array id="node-Pyramid001_translation.Z-outtangent-array" count="8">0.21109 0.01108826 0.9110833 17.80861 2.088827 17.80861 3.666564 0.01108826</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_translation.Z-outtangent-array" count="4" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_translation.Z-interpolation">
+        <Name_array id="node-Pyramid001_translation.Z-interpolation-array" count="4">BEZIER BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_translation.Z-interpolation-array" count="4" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_rotationZ.ANGLE-input">
+        <float_array id="node-Pyramid001_rotationZ.ANGLE-input-array" count="5">0 1.466667 2.366667 2.8 3.333333</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_rotationZ.ANGLE-input-array" count="5" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_rotationZ.ANGLE-output">
+        <float_array id="node-Pyramid001_rotationZ.ANGLE-output-array" count="5">0 0 0 0 0</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_rotationZ.ANGLE-output-array" count="5" stride="1">
+            <param name="ANGLE" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_rotationZ.ANGLE-intangent">
+        <float_array id="node-Pyramid001_rotationZ.ANGLE-intangent-array" count="10">0.9997917 0 0.9778267 0 2.066697 0 2.65557 0 3.155573 0</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_rotationZ.ANGLE-intangent-array" count="5" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_rotationZ.ANGLE-outtangent">
+        <float_array id="node-Pyramid001_rotationZ.ANGLE-outtangent-array" count="10">0.48884 0 1.766637 0 2.511097 0 2.97776 0 3.666564 0</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_rotationZ.ANGLE-outtangent-array" count="5" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_rotationZ.ANGLE-interpolation">
+        <Name_array id="node-Pyramid001_rotationZ.ANGLE-interpolation-array" count="5">BEZIER BEZIER BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_rotationZ.ANGLE-interpolation-array" count="5" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_rotationY.ANGLE-input">
+        <float_array id="node-Pyramid001_rotationY.ANGLE-input-array" count="5">0 1.466667 2.366667 2.8 3.333333</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_rotationY.ANGLE-input-array" count="5" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_rotationY.ANGLE-output">
+        <float_array id="node-Pyramid001_rotationY.ANGLE-output-array" count="5">0 0 0 0 0</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_rotationY.ANGLE-output-array" count="5" stride="1">
+            <param name="ANGLE" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_rotationY.ANGLE-intangent">
+        <float_array id="node-Pyramid001_rotationY.ANGLE-intangent-array" count="10">0.9997917 0 0.9778267 0 2.066697 0 2.65557 0 3.155573 0</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_rotationY.ANGLE-intangent-array" count="5" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_rotationY.ANGLE-outtangent">
+        <float_array id="node-Pyramid001_rotationY.ANGLE-outtangent-array" count="10">0.48884 0 1.766637 0 2.511097 0 2.97776 0 3.666564 0</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_rotationY.ANGLE-outtangent-array" count="5" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_rotationY.ANGLE-interpolation">
+        <Name_array id="node-Pyramid001_rotationY.ANGLE-interpolation-array" count="5">BEZIER BEZIER BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_rotationY.ANGLE-interpolation-array" count="5" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_rotationX.ANGLE-input">
+        <float_array id="node-Pyramid001_rotationX.ANGLE-input-array" count="5">0 1.466667 2.366667 2.8 3.333333</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_rotationX.ANGLE-input-array" count="5" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_rotationX.ANGLE-output">
+        <float_array id="node-Pyramid001_rotationX.ANGLE-output-array" count="5">0 -69.99999 -175 -235 0</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_rotationX.ANGLE-output-array" count="5" stride="1">
+            <param name="ANGLE" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_rotationX.ANGLE-intangent">
+        <float_array id="node-Pyramid001_rotationX.ANGLE-intangent-array" count="10">0.9997917 0 0.9778267 -69.99999 2.066697 -175 2.65557 -235 3.155573 0</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_rotationX.ANGLE-intangent-array" count="5" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_rotationX.ANGLE-outtangent">
+        <float_array id="node-Pyramid001_rotationX.ANGLE-outtangent-array" count="10">0.48884 0 1.766637 -69.99999 2.511097 -175 2.97776 -235 3.666564 0</float_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_rotationX.ANGLE-outtangent-array" count="5" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="node-Pyramid001_rotationX.ANGLE-interpolation">
+        <Name_array id="node-Pyramid001_rotationX.ANGLE-interpolation-array" count="5">BEZIER BEZIER BEZIER BEZIER BEZIER</Name_array>
+        <technique_common>
+          <accessor source="#node-Pyramid001_rotationX.ANGLE-interpolation-array" count="5" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
       <sampler id="node-Cube_translation.X-sampler">
         <input semantic="INPUT" source="#node-Cube_translation.X-input"/>
         <input semantic="OUTPUT" source="#node-Cube_translation.X-output"/>
@@ -2118,6 +2521,48 @@
         <input semantic="OUT_TANGENT" source="#node-Bone002_rotationZ.ANGLE-outtangent"/>
         <input semantic="INTERPOLATION" source="#node-Bone002_rotationZ.ANGLE-interpolation"/>
       </sampler>
+      <sampler id="node-Pyramid001_translation.X-sampler">
+        <input semantic="INPUT" source="#node-Pyramid001_translation.X-input"/>
+        <input semantic="OUTPUT" source="#node-Pyramid001_translation.X-output"/>
+        <input semantic="IN_TANGENT" source="#node-Pyramid001_translation.X-intangent"/>
+        <input semantic="OUT_TANGENT" source="#node-Pyramid001_translation.X-outtangent"/>
+        <input semantic="INTERPOLATION" source="#node-Pyramid001_translation.X-interpolation"/>
+      </sampler>
+      <sampler id="node-Pyramid001_translation.Y-sampler">
+        <input semantic="INPUT" source="#node-Pyramid001_translation.Y-input"/>
+        <input semantic="OUTPUT" source="#node-Pyramid001_translation.Y-output"/>
+        <input semantic="IN_TANGENT" source="#node-Pyramid001_translation.Y-intangent"/>
+        <input semantic="OUT_TANGENT" source="#node-Pyramid001_translation.Y-outtangent"/>
+        <input semantic="INTERPOLATION" source="#node-Pyramid001_translation.Y-interpolation"/>
+      </sampler>
+      <sampler id="node-Pyramid001_translation.Z-sampler">
+        <input semantic="INPUT" source="#node-Pyramid001_translation.Z-input"/>
+        <input semantic="OUTPUT" source="#node-Pyramid001_translation.Z-output"/>
+        <input semantic="IN_TANGENT" source="#node-Pyramid001_translation.Z-intangent"/>
+        <input semantic="OUT_TANGENT" source="#node-Pyramid001_translation.Z-outtangent"/>
+        <input semantic="INTERPOLATION" source="#node-Pyramid001_translation.Z-interpolation"/>
+      </sampler>
+      <sampler id="node-Pyramid001_rotationZ.ANGLE-sampler">
+        <input semantic="INPUT" source="#node-Pyramid001_rotationZ.ANGLE-input"/>
+        <input semantic="OUTPUT" source="#node-Pyramid001_rotationZ.ANGLE-output"/>
+        <input semantic="IN_TANGENT" source="#node-Pyramid001_rotationZ.ANGLE-intangent"/>
+        <input semantic="OUT_TANGENT" source="#node-Pyramid001_rotationZ.ANGLE-outtangent"/>
+        <input semantic="INTERPOLATION" source="#node-Pyramid001_rotationZ.ANGLE-interpolation"/>
+      </sampler>
+      <sampler id="node-Pyramid001_rotationY.ANGLE-sampler">
+        <input semantic="INPUT" source="#node-Pyramid001_rotationY.ANGLE-input"/>
+        <input semantic="OUTPUT" source="#node-Pyramid001_rotationY.ANGLE-output"/>
+        <input semantic="IN_TANGENT" source="#node-Pyramid001_rotationY.ANGLE-intangent"/>
+        <input semantic="OUT_TANGENT" source="#node-Pyramid001_rotationY.ANGLE-outtangent"/>
+        <input semantic="INTERPOLATION" source="#node-Pyramid001_rotationY.ANGLE-interpolation"/>
+      </sampler>
+      <sampler id="node-Pyramid001_rotationX.ANGLE-sampler">
+        <input semantic="INPUT" source="#node-Pyramid001_rotationX.ANGLE-input"/>
+        <input semantic="OUTPUT" source="#node-Pyramid001_rotationX.ANGLE-output"/>
+        <input semantic="IN_TANGENT" source="#node-Pyramid001_rotationX.ANGLE-intangent"/>
+        <input semantic="OUT_TANGENT" source="#node-Pyramid001_rotationX.ANGLE-outtangent"/>
+        <input semantic="INTERPOLATION" source="#node-Pyramid001_rotationX.ANGLE-interpolation"/>
+      </sampler>
       <channel source="#node-Cube_translation.X-sampler" target="node-Cube/translation.X"/>
       <channel source="#node-Cube_translation.Y-sampler" target="node-Cube/translation.Y"/>
       <channel source="#node-Torus_rotationX.ANGLE-sampler" target="node-Torus/rotationX.ANGLE"/>
@@ -2127,6 +2572,12 @@
       <channel source="#node-Light_translation.X-sampler" target="node-Light/translation.X"/>
       <channel source="#node-Light_translation.Y-sampler" target="node-Light/translation.Y"/>
       <channel source="#node-Bone002_rotationZ.ANGLE-sampler" target="node-Bone002/rotationZ.ANGLE"/>
+      <channel source="#node-Pyramid001_translation.X-sampler" target="node-Pyramid001/translation.X"/>
+      <channel source="#node-Pyramid001_translation.Y-sampler" target="node-Pyramid001/translation.Y"/>
+      <channel source="#node-Pyramid001_translation.Z-sampler" target="node-Pyramid001/translation.Z"/>
+      <channel source="#node-Pyramid001_rotationZ.ANGLE-sampler" target="node-Pyramid001/rotationZ.ANGLE"/>
+      <channel source="#node-Pyramid001_rotationY.ANGLE-sampler" target="node-Pyramid001/rotationY.ANGLE"/>
+      <channel source="#node-Pyramid001_rotationX.ANGLE-sampler" target="node-Pyramid001/rotationX.ANGLE"/>
     </animation>
   </library_animations>
   <scene>
