@@ -649,12 +649,7 @@ def parse_matrix(lookup, sid_lookup, root):
     values = [float(i) for i in root.text.strip().split()]
     assert len(values) == 16
 
-    r0 = tuple(values[0:4])
-    r1 = tuple(values[4:8])
-    r2 = tuple(values[8:12])
-    r3 = tuple(values[12:16])
-
-    matrix = types.Matrix(sid, tuple([r0, r1, r2, r3]))
+    matrix = types.Matrix(sid, values)
     lookup_add(sid_lookup, sid, matrix)
     return matrix
 
@@ -1022,6 +1017,85 @@ def parse_library_controllers(lookup, root):
     lookup_add(lookup, id, library_controllers)
     return library_controllers
 
+def parse_perspective(lookup, root):
+    xfov = None
+    yfov = None
+    znear = None
+    zfar = None
+    aspect_ratio = None
+    for child in root.getchildren():
+        assert len(child.getchildren()) == 0
+        if child.tag == tag("xfov"):
+            assert xfov is None
+            xfov = float(child.text.strip())
+        if child.tag == tag("yfov"):
+            assert yfov is None
+            yfov = float(child.text.strip())
+        if child.tag == tag("znear"):
+            assert znear is None
+            znear = float(child.text.strip())
+        if child.tag == tag("zfar"):
+            assert zfar is None
+            zfar = float(child.text.strip())
+        if child.tag == tag("aspect_ratio"):
+            assert aspect_ratio is None
+            aspect_ratio = float(child.text.strip())
+    perspective = types.Perspective(xfov, yfov, znear, zfar, aspect_ratio)
+    return perspective
+
+def parse_technique_common_optics(lookup, root):
+    projection_type = None
+    for child in root.getchildren():
+        if child.tag == tag("perspective"):
+            assert projection_type is None
+            projection_type = parse_perspective(lookup, child)
+        if child.tag == tag("orthographic"):
+            assert projection_type is None
+            assert False, child.tag
+    assert projection_type is not None
+    optics = types.TechniqueCommon_Optics(projection_type)
+    return optics
+
+def parse_optics(lookup, root):
+    technique_common = None
+    for child in root.getchildren():
+        if child.tag == tag("technique_common"):
+            assert technique_common is None
+            technique_common = parse_technique_common_optics(lookup, child)
+    assert technique_common is not None
+    optics = types.Optics(technique_common)
+    return optics
+
+def parse_camera(lookup, root):
+    id = root.attrib.get("id")
+    name = root.attrib.get("name")
+
+    optics = None
+    for child in root.getchildren():
+        if child.tag == tag("optics"):
+            assert optics is None
+            optics = parse_optics(lookup, child)
+
+    assert optics is not None
+    camera = types.Camera(id, name, optics)
+    lookup_add(lookup, id, camera)
+    return camera
+
+def parse_library_cameras(lookup, root):
+    id = root.attrib.get("id")
+    name = root.attrib.get("name")
+
+    cameras = []
+    for child in root.getchildren():
+        if child.tag == tag("camera"):
+            cameras.append(parse_camera(lookup, child))
+
+    assert len(cameras) >= 1
+
+    library_cameras = types.LibraryCameras(id, name, cameras)
+    lookup_add(lookup, id, library_cameras)
+    return library_cameras
+
 def parse_collada(tree):
     root = tree.getroot()
     assert root.tag == tag("COLLADA")
@@ -1030,6 +1104,8 @@ def parse_collada(tree):
     lookup = {}
 
     for child in root.getchildren():
+        if child.tag == tag("library_cameras"):
+            collada.library_cameras.append(parse_library_cameras(lookup, child))
         if child.tag == tag("library_animations"):
             collada.library_animations.append(parse_library_animations(lookup, child))
         if child.tag == tag("library_controllers"):

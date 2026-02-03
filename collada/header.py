@@ -61,7 +61,11 @@ class State:
     # effect_textures_by_texcoord: (effect_id, channel): [sampler_sid]
     effect_textures_by_texcoord: Dict[Tuple[str, str], list]
 
-    def __init__(self):
+    # input_filename
+    input_filename: str
+    relative_path: bool
+
+    def __init__(self, input_filename):
         self.vertex_buffer = BytesIO()
         self.index_buffer = BytesIO()
         self.joints_weights_vertex_buffer = BytesIO()
@@ -76,6 +80,8 @@ class State:
         self.image_indices = {}
         self.resource_names = {}
         self.effect_textures_by_texcoord = defaultdict(list)
+        self.input_filename = input_filename
+        self.relative_path = False
 
 def _sanitize(name):
     return name.replace(' ', '_').replace('-', '_').replace('.', '_').replace('/', '_')
@@ -228,7 +234,7 @@ def render_node_transforms(state, collada, node_name, transformation_elements):
             yield "},"
         elif type(transform) is types.Matrix:
             yield ".type = transform_type::MATRIX,"
-            yield f".matrix = {render_float_tuple(matrix_transpose(transform.matrix))},"
+            yield f".matrix = {render_float_tuple(matrix_transpose(transform.values))},"
         elif type(transform) is types.Rotate:
             yield ".type = transform_type::ROTATE,"
             yield f".rotate = {render_float_tuple(transform.rotate)},"
@@ -507,7 +513,7 @@ def render_library_visual_scenes(state, collada):
     for node_index, node in enumerate(state.linearized_nodes):
         node_name_id = get_node_name_id(node)
         node_name = sanitize_name(state, node_name_id, node)
-        yield f"&node_{node_name},"
+        yield f"&node_{node_name}, // {node_index}"
     yield "};"
 
 def render_header(namespace):
@@ -852,9 +858,11 @@ def render_library_lights(state, collada):
 
 def image_resource_name(state, uri):
     uri = unquote(uri)
-    prefix = "file:///"
-    assert uri.startswith(prefix), uri
-    path = uri[len(prefix):]
+    file_prefix = "file:///"
+    path = uri[len(file_prefix):] if uri.startswith(file_prefix) else uri
+    if not os.path.isabs(path) and not os.path.exists(path):
+        path = os.path.join(os.path.dirname(state.input_filename), path)
+        state.relative_path = True
     assert os.path.exists(path), path
     image_extensions = {".png", ".jpg", ".bmp", ".jpeg", ".tiff"}
     assert os.path.splitext(path)[1].lower() in image_extensions, path
@@ -959,14 +967,38 @@ def render_controller(state, collada, controller):
     yield "};"
 
 def render_library_controllers(state, collada):
-    for library_controller in collada.library_controllers:
-        for controller in library_controller.controllers:
+    for library_controllers in collada.library_controllers:
+        for controller in library_controllers.controllers:
             yield from render_controller(state, collada, controller)
 
-def render_all(collada, namespace):
-    state = State()
+def render_camera(state, collada, camera):
+    camera_name = sanitize_name(state, camera.id, camera)
+    perspective = camera.optics.technique_common.projection_type
+    assert type(perspective) is types.Perspective
+    def nf(f):
+        if f is None:
+            return float(0)
+        else:
+            return f
+
+    yield f"camera const camera_{camera_name} = {{"
+    yield f".xfov = {nf(perspective.xfov)}f,"
+    yield f".yfov = {nf(perspective.yfov)}f,"
+    yield f".znear = {nf(perspective.znear)}f,"
+    yield f".zfar = {nf(perspective.zfar)}f,"
+    yield f".aspect_ratio = {nf(perspective.aspect_ratio)}f,"
+    yield "};"
+
+def render_library_cameras(state, collada):
+    for library_cameras in collada.library_cameras:
+        for camera in library_cameras.cameras:
+            yield from render_camera(state, collada, camera)
+
+def render_all(collada, namespace, input_filename):
+    state = State(input_filename)
     render, out = renderer()
     render(render_header(namespace))
+    render(render_library_cameras(state, collada))
     render(render_library_lights(state, collada))
     render(render_library_animations(state, collada))
     render(render_library_images(state, collada))
@@ -996,5 +1028,5 @@ if __name__ == "__main__":
     import sys
     collada = parse.parse_collada_file(sys.argv[1])
 
-    state, out = render_all(collada, "test")
+    state, out = render_all(collada, "test", "./test.DAE")
     print(out.getvalue())

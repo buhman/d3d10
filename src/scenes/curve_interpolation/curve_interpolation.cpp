@@ -543,15 +543,15 @@ float const array_node_bone002_rotationz_angle_input_array[] = {
 };
 
 float const array_node_bone002_rotationz_angle_output_array[] = {
-  180.0f + 180.0f,
-  230.0f + 180.0f,
-  180.0f + 180.0f,
-  130.0f + 180.0f,
-  180.0f + 180.0f,
-  230.0f + 180.0f,
-  180.0f + 180.0f,
-  130.0f + 180.0f,
-  180.0f + 180.0f,
+  180.0f,
+  230.0f,
+  180.0f,
+  130.0f,
+  180.0f,
+  230.0f,
+  180.0f,
+  130.0f,
+  180.0f,
 };
 
 float const array_node_bone002_rotationz_angle_intangent_array[] = {
@@ -1661,6 +1661,15 @@ instance_material const instance_geometry_instance_materials_node_cube_0[] = {
     .specular = { .input_set = -1 },
   },
   {
+    .element_index = 5, // an index into mesh.triangles
+    .material = &material_material__17_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
+  },
+  {
     .element_index = 0, // an index into mesh.triangles
     .material = &material_material__16_material,
 
@@ -1672,15 +1681,6 @@ instance_material const instance_geometry_instance_materials_node_cube_0[] = {
   {
     .element_index = 3, // an index into mesh.triangles
     .material = &material_material__18_material,
-
-    .emission = { .input_set = -1 },
-    .ambient = { .input_set = -1 },
-    .diffuse = { .input_set = -1 },
-    .specular = { .input_set = -1 },
-  },
-  {
-    .element_index = 5, // an index into mesh.triangles
-    .material = &material_material__17_material,
 
     .emission = { .input_set = -1 },
     .ambient = { .input_set = -1 },
@@ -2044,8 +2044,8 @@ instance_light const instance_lights_node_light[] = {
 };
 
 channel const * const node_channels_node_light[] = {
-  &node_channel_node_light_translation_y,
   &node_channel_node_light_translation_x,
+  &node_channel_node_light_translation_y,
 };
 
 node const node_node_light = {
@@ -2140,15 +2140,6 @@ int const joint_node_indices_node_box001_geom_box001_skin1[] = {
 
 instance_material const instance_controller_instance_materials_node_box001_0[] = {
   {
-    .element_index = 0, // an index into mesh.triangles
-    .material = &material_material__14_material,
-
-    .emission = { .input_set = -1 },
-    .ambient = { .input_set = -1 },
-    .diffuse = { .input_set = -1 },
-    .specular = { .input_set = -1 },
-  },
-  {
     .element_index = 1, // an index into mesh.triangles
     .material = &material_material__13_material,
 
@@ -2160,6 +2151,15 @@ instance_material const instance_controller_instance_materials_node_box001_0[] =
   {
     .element_index = 5, // an index into mesh.triangles
     .material = &material_material__15_1_material,
+
+    .emission = { .input_set = -1 },
+    .ambient = { .input_set = -1 },
+    .diffuse = { .input_set = -1 },
+    .specular = { .input_set = -1 },
+  },
+  {
+    .element_index = 0, // an index into mesh.triangles
+    .material = &material_material__14_material,
 
     .emission = { .input_set = -1 },
     .ambient = { .input_set = -1 },
@@ -2328,17 +2328,17 @@ node const node_node_bone002 = {
 };
 
 node const * const nodes[] = {
-  &node_node_environmentambientlight,
-  &node_node_cube,
-  &node_node_torus,
-  &node_node_cylinder,
-  &node_node_plane,
-  &node_node_geosphere,
-  &node_node_light,
-  &node_node_lightindicator,
-  &node_node_box001,
-  &node_node_bone001,
-  &node_node_bone002,
+  &node_node_environmentambientlight, // 0
+  &node_node_cube, // 1
+  &node_node_torus, // 2
+  &node_node_cylinder, // 3
+  &node_node_plane, // 4
+  &node_node_geosphere, // 5
+  &node_node_light, // 6
+  &node_node_lightindicator, // 7
+  &node_node_box001, // 8
+  &node_node_bone001, // 9
+  &node_node_bone002, // 10
 };
 
 inputs const inputs_list[] = {

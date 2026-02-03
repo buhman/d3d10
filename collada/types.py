@@ -519,8 +519,39 @@ class LibraryAnimations:
 
     animations: List[Animation] # 1 or more
 
+@dataclass(frozen=True)
+class Perspective:
+    xfov: float
+    yfov: float
+    znear: float
+    zfar: float
+    aspect_ratio: float
+
+@dataclass(frozen=True)
+class TechniqueCommon_Optics:
+    projection_type: Union[Perspective]
+
+@dataclass(frozen=True)
+class Optics:
+    technique_common: TechniqueCommon_Optics
+
+@dataclass(frozen=True)
+class Camera:
+    id: Optional[ID]
+    name: Optional[str]
+
+    optics: Optics
+
+@dataclass(frozen=True)
+class LibraryCameras:
+    id: Optional[ID]
+    name: Optional[str]
+
+    cameras: List[Camera] # 1 or more
+
 @dataclass
 class Collada:
+    library_cameras: List[LibraryCameras]
     library_animations: List[LibraryAnimations]
     library_controllers: List[LibraryControllers]
     library_effects: List[LibraryEffects]
@@ -533,6 +564,7 @@ class Collada:
     _lookup: dict = field(repr=False)
 
     def __init__(self):
+        self.library_cameras = []
         self.library_animations = []
         self.library_controllers = []
         self.library_effects = []

@@ -65,7 +65,7 @@ def main():
 
     collada = parse.parse_collada_file(input_collada)
     namespace = parse_namespace(input_collada)
-    state, out_source = header.render_all(collada, namespace)
+    state, out_source = header.render_all(collada, namespace, input_collada)
 
     with open(output_source, 'wb') as f:
         source_buf = out_source.getvalue()
