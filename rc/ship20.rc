@@ -1,1 +1,5 @@
+RES_SCENES_SHIP20_VTX RCDATA "scenes/ship20/ship20.vtx"
+RES_SCENES_SHIP20_VJW RCDATA "scenes/ship20/ship20.vjw"
+RES_SCENES_SHIP20_IDX RCDATA "scenes/ship20/ship20.idx"
+
 _0_SHIPPLE2_PNG RCDATA "image/0_shipple2.DDS"

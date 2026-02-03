@@ -209,15 +209,15 @@ namespace collada_scene {
     if (FAILED(hr))
       return E_FAIL;
 
-    hr = LoadVertexBuffer(L"RES_SCENES_SHIP20_VTX", &m_pVertexBuffers[0]);
+    hr = LoadVertexBuffer(descriptor->position_normal_texture_buffer, &m_pVertexBuffers[0]);
     if (FAILED(hr))
       return E_FAIL;
 
-    hr = LoadVertexBuffer(L"RES_SCENES_SHIP20_VJW", &m_pVertexBuffers[1]);
+    hr = LoadVertexBuffer(descriptor->joint_weight_buffer, &m_pVertexBuffers[1]);
     if (FAILED(hr))
       return E_FAIL;
 
-    hr = LoadIndexBuffer(L"RES_SCENES_SHIP20_IDX", &m_pIndexBuffer);
+    hr = LoadIndexBuffer(descriptor->index_buffer, &m_pIndexBuffer);
     if (FAILED(hr))
       return E_FAIL;
 

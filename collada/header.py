@@ -24,7 +24,7 @@ class State:
     # buffers
     vertex_buffer: BytesIO
     index_buffer: BytesIO
-    joints_weights_vertex_buffer: BytesIO
+    joint_weight_vertex_buffer: BytesIO
 
     # geometry__indices:
     #   keys: collada <geometry> id
@@ -68,7 +68,7 @@ class State:
     def __init__(self, input_filename):
         self.vertex_buffer = BytesIO()
         self.index_buffer = BytesIO()
-        self.joints_weights_vertex_buffer = BytesIO()
+        self.joint_weight_vertex_buffer = BytesIO()
         self.geometry__indices = {}
         self.geometry__vertex_index_tables = {}
         self.symbol_names = {}
@@ -662,6 +662,10 @@ def render_descriptor(namespace):
     yield ""
     yield ".images = images,"
     yield ".images_count = (sizeof (images)) / (sizeof (images[0])),"
+    yield ""
+    yield f'.position_normal_texture_buffer = L"RES_SCENES_{namespace.upper()}_VTX",'
+    yield f'.joint_weight_buffer = L"RES_SCENES_{namespace.upper()}_VJW",'
+    yield f'.index_buffer = L"RES_SCENES_{namespace.upper()}_IDX",'
     yield "};"
 
 def render_end_of_namespace():
@@ -949,9 +953,9 @@ def render_controller(state, collada, controller):
     # fixme: skin_vertex_buffer should multiply vertices by the bind shape matrix
     vertex_buffer = buffer.skin_vertex_buffer(collada, skin, vertex_index_table)
     # skin.vertex_weights and skin.source are entirely dealt with
-    vertex_buffer_offset = state.joints_weights_vertex_buffer.tell()
-    renderbin_any(state.joints_weights_vertex_buffer, vertex_buffer)
-    vertex_buffer_size = state.joints_weights_vertex_buffer.tell() - vertex_buffer_offset
+    vertex_buffer_offset = state.joint_weight_vertex_buffer.tell()
+    renderbin_any(state.joint_weight_vertex_buffer, vertex_buffer)
+    vertex_buffer_size = state.joint_weight_vertex_buffer.tell() - vertex_buffer_offset
 
     yield from render_inverse_bind_matrices(collada, skin, controller_name)
 

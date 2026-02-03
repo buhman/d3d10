@@ -2248,8 +2248,8 @@ instance_light const instance_lights_node_cube[] = {
 };
 
 channel const * const node_channels_node_cube[] = {
-  &node_channel_node_cube_translation_y,
   &node_channel_node_cube_translation_x,
+  &node_channel_node_cube_translation_y,
 };
 
 node const node_node_cube = {
@@ -2519,9 +2519,9 @@ instance_light const instance_lights_node_geosphere[] = {
 };
 
 channel const * const node_channels_node_geosphere[] = {
-  &node_channel_node_geosphere_scaleaxisrotation,
-  &node_channel_node_geosphere_inversescaleaxisrotation,
   &node_channel_node_geosphere_scale,
+  &node_channel_node_geosphere_inversescaleaxisrotation,
+  &node_channel_node_geosphere_scaleaxisrotation,
 };
 
 node const node_node_geosphere = {
@@ -2569,8 +2569,8 @@ instance_light const instance_lights_node_light[] = {
 };
 
 channel const * const node_channels_node_light[] = {
-  &node_channel_node_light_translation_y,
   &node_channel_node_light_translation_x,
+  &node_channel_node_light_translation_y,
 };
 
 node const node_node_light = {
@@ -2899,12 +2899,12 @@ instance_light const instance_lights_node_pyramid001[] = {
 };
 
 channel const * const node_channels_node_pyramid001[] = {
-  &node_channel_node_pyramid001_rotationy_angle,
   &node_channel_node_pyramid001_translation_z,
-  &node_channel_node_pyramid001_rotationx_angle,
-  &node_channel_node_pyramid001_translation_x,
-  &node_channel_node_pyramid001_rotationz_angle,
   &node_channel_node_pyramid001_translation_y,
+  &node_channel_node_pyramid001_translation_x,
+  &node_channel_node_pyramid001_rotationx_angle,
+  &node_channel_node_pyramid001_rotationy_angle,
+  &node_channel_node_pyramid001_rotationz_angle,
 };
 
 node const node_node_pyramid001 = {
@@ -2961,6 +2961,10 @@ collada::descriptor const descriptor = {
 
   .images = images,
   .images_count = (sizeof (images)) / (sizeof (images[0])),
+
+  .position_normal_texture_buffer = L"RES_SCENES_CURVE_INTERPOLATION_VTX",
+  .joint_weight_buffer = L"RES_SCENES_CURVE_INTERPOLATION_VJW",
+  .index_buffer = L"RES_SCENES_CURVE_INTERPOLATION_IDX",
 };
 
 }

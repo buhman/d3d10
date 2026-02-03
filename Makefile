@@ -51,8 +51,7 @@ SHADERS = \
 	$(BUILD_TYPE)/effect/collada.fxo \
 	$(BUILD_TYPE)/effect/collada_scene.fxo
 
-SCENES = \
-	src/scenes/curve_interpolation/curve_interpolation.cpp
+SCENES = $(shell find src/scenes -type f -name "*.cpp")
 
 include curve_interpolation.mk
 include ship20.mk
@@ -79,7 +78,7 @@ include/scenes/%.hpp: $(COLLADA_PY_SOURCE)
 
 src/scenes/%.cpp: scenes/%.DAE include/scenes/%.hpp
 	@mkdir -p $(@D)
-	PYTHONPATH=. python -m collada.main $< $@ $(<:.DAE=.vtx) $(<:.DAE=.idx) $(<:.DAE=.vjw) rc/$(notdir $(<:.DAE=.rc)) $(notdir $(<:.DAE=.mk))
+	PYTHONPATH=. python -m collada.main $< $@ $(<:.DAE=.vtx) $(<:.DAE=.vjw) $(<:.DAE=.idx) rc/$(notdir $(<:.DAE=.rc)) $(notdir $(<:.DAE=.mk))
 
 OBJS = \
 	$(BUILD_TYPE)/main.res \

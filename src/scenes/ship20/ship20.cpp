@@ -242,12 +242,12 @@ transform const transforms_node_ship[] = {
 
 instance_material const instance_geometry_instance_materials_node_ship_0[] = {
   {
-    .element_index = 2, // an index into mesh.triangles
-    .material = &material_emissivetexture_material,
+    .element_index = 1, // an index into mesh.triangles
+    .material = &material_cyanengine_material,
 
-    .emission = { .input_set = 0 },
+    .emission = { .input_set = -1 },
     .ambient = { .input_set = -1 },
-    .diffuse = { .input_set = 0 },
+    .diffuse = { .input_set = -1 },
     .specular = { .input_set = -1 },
   },
   {
@@ -260,12 +260,12 @@ instance_material const instance_geometry_instance_materials_node_ship_0[] = {
     .specular = { .input_set = -1 },
   },
   {
-    .element_index = 1, // an index into mesh.triangles
-    .material = &material_cyanengine_material,
+    .element_index = 2, // an index into mesh.triangles
+    .material = &material_emissivetexture_material,
 
-    .emission = { .input_set = -1 },
+    .emission = { .input_set = 0 },
     .ambient = { .input_set = -1 },
-    .diffuse = { .input_set = -1 },
+    .diffuse = { .input_set = 0 },
     .specular = { .input_set = -1 },
   },
 };
@@ -420,6 +420,10 @@ collada::descriptor const descriptor = {
 
   .images = images,
   .images_count = (sizeof (images)) / (sizeof (images[0])),
+
+  .position_normal_texture_buffer = L"RES_SCENES_SHIP20_VTX",
+  .joint_weight_buffer = L"RES_SCENES_SHIP20_VJW",
+  .index_buffer = L"RES_SCENES_SHIP20_IDX",
 };
 
 }

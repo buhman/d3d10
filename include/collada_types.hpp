@@ -398,5 +398,10 @@ namespace collada {
 
     //animation const * const animations;
     //int const animations_count;
+
+    // hmm, this part is not really platform-agnostic:
+    wchar_t const * const position_normal_texture_buffer;
+    wchar_t const * const joint_weight_buffer;
+    wchar_t const * const index_buffer;
   };
 }
