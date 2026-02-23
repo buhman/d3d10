@@ -115,7 +115,7 @@ namespace collada {
   // effect
   //////////////////////////////////////////////////////////////////////
 
-  enum color_or_texture_type {
+  enum class color_or_texture_type {
     COLOR,
     TEXTURE,
   };

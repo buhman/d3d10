@@ -15,3 +15,5 @@ __pycache__
 image/*.DDS
 debug/*.rc
 release/*.rc
+*~
+*.out
