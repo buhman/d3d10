@@ -14,7 +14,8 @@ from collada import parse
 from collada import types
 from collada.generate import renderer
 from collada import buffer
-from collada import cpp_header
+
+lang_header = None
 
 @dataclass
 class State:
@@ -139,7 +140,7 @@ def render_input_elements(state, collada, geometry_name, offset_tables):
             continue
         state.emitted_input_elements_arrays[key_name] = (i, key)
 
-        yield from cpp_header.render_input_elements(key_name, key)
+        yield from lang_header.render_input_elements(key_name, key)
 
 def render_triangles(state, collada, geometry_name, primitive_elements, mesh_buffer_state):
     yield from render_input_elements(state, collada, geometry_name, mesh_buffer_state.offset_tables)
@@ -154,7 +155,7 @@ def render_triangles(state, collada, geometry_name, primitive_elements, mesh_buf
 
             yield triangles.count, mesh_buffer_state.index_buffer_offsets[i], index
 
-    yield from cpp_header.render_triangles(geometry_name, items())
+    yield from lang_header.render_triangles(geometry_name, items())
 
 def render_geometry(state, collada, geometry):
     geometry_name = sanitize_name(state, geometry.id, geometry)
@@ -178,7 +179,7 @@ def render_geometry(state, collada, geometry):
 
     triangles_count = len(mesh.primitive_elements)
 
-    yield from cpp_header.render_geometry(geometry_name,
+    yield from lang_header.render_geometry(geometry_name,
                                           triangles_count,
                                           vertex_buffer_offset,
                                           vertex_buffer_size,
@@ -200,26 +201,26 @@ def render_library_geometries(state, collada):
                 geometry_name = sanitize_name(state, geometry.id, geometry)
                 yield geometry_name
 
-    yield from cpp_header.render_library_geometries(geometry_names())
+    yield from lang_header.render_library_geometries(geometry_names())
 
 def render_node_transforms(state, collada, node_name, transformation_elements):
     def render_transform(transform):
         if type(transform) is types.Lookat:
-            yield from cpp_header.render_transform_lookat(transform.eye, transform.at, transform.up)
+            yield from lang_header.render_transform_lookat(transform.eye, transform.at, transform.up)
         elif type(transform) is types.Matrix:
-            yield from cpp_header.render_transform_matrix(matrix_transpose(transform.values))
+            yield from lang_header.render_transform_matrix(matrix_transpose(transform.values))
         elif type(transform) is types.Rotate:
-            yield from cpp_header.render_transform_rotate(transform.rotate)
+            yield from lang_header.render_transform_rotate(transform.rotate)
         elif type(transform) is types.Scale:
-            yield from cpp_header.render_transform_scale(transform.scale)
+            yield from lang_header.render_transform_scale(transform.scale)
         elif type(transform) is types.Skew:
-            yield from cpp_header.render_transform_skew(transform.skew)
+            yield from lang_header.render_transform_skew(transform.skew)
         elif type(transform) is types.Translate:
-            yield from cpp_header.render_transform_translate(transform.translate)
+            yield from lang_header.render_transform_translate(transform.translate)
         else:
             assert False, type(transform)
 
-    yield from cpp_header.render_node_transforms(node_name, transformation_elements, render_transform)
+    yield from lang_header.render_node_transforms(node_name, transformation_elements, render_transform)
 
 def find_material_symbol(geometry, material_symbol):
     assert material_symbol is not None
@@ -279,7 +280,7 @@ def render_node_geometry_instance_materials(state, collada, prefix, node_name, i
             specular_input_set = shader_to_input_set(channel_to_input_set, shader, attrgetter("specular"))
             yield element_index, material_name, emission_input_set, ambient_input_set, diffuse_input_set, specular_input_set
 
-    yield from cpp_header.render_node_geometry_instance_materials(prefix, node_name, i, items())
+    yield from lang_header.render_node_geometry_instance_materials(prefix, node_name, i, items())
 
 def get_instance_materials(instance_geometry):
     return instance_geometry.bind_material.technique_common.materials if instance_geometry.bind_material is not None else []
@@ -300,7 +301,7 @@ def render_node_instance_geometries(state, collada, node_name, instance_geometri
 
             yield geometry_name, i, instance_materials_count
 
-    yield from cpp_header.render_node_instance_geometries(node_name, items())
+    yield from lang_header.render_node_instance_geometries(node_name, items())
 
 def get_node_name_id(node):
     name = node.id if node.id is not None else f"node-{node.name}"
@@ -318,10 +319,10 @@ def get_node_name_id(node):
 def render_node_channels(state, collada, node, node_name):
     if node.id is None:
         # nodes with no ID can't have channels
-        yield from cpp_header.render_node_channels(node_name, [])
+        yield from lang_header.render_node_channels(node_name, [])
     else:
         target_names = state.node_animation_channels[node.id]
-        yield from cpp_header.render_node_channels(node_name, target_names)
+        yield from lang_header.render_node_channels(node_name, target_names)
 
 def render_node_instance_lights(state, collada, node_name, instance_lights):
     def light_names():
@@ -330,7 +331,7 @@ def render_node_instance_lights(state, collada, node_name, instance_lights):
             light_name = sanitize_name(state, light.id, light)
             yield light_name
 
-    yield from cpp_header.render_node_instance_lights(node_name, light_names())
+    yield from lang_header.render_node_instance_lights(node_name, light_names())
 
 def find_node_by_sid(root_node, sid):
     if sid == root_node.sid:
@@ -365,7 +366,7 @@ def render_joint_node_indices(state, collada, skin, node_name, controller_name, 
             joint_node_name = sanitize_name(state, joint_node_name_id, joint_node)
             yield joint_node_index, node_sid, joint_node_name
 
-    yield from cpp_header.render_joint_node_indices(node_name, controller_name, items())
+    yield from lang_header.render_joint_node_indices(node_name, controller_name, items())
 
 def render_node_instance_controller_joint_node_indices(state, collada, node_name, instance_controller):
     controller = collada.lookup(instance_controller.url, types.Controller)
@@ -395,7 +396,7 @@ def render_node_instance_controllers(state, collada, node_name, instance_control
 
             yield controller_name, i, instance_materials_count
 
-    yield from cpp_header.render_node_instance_controllers(node_name, items())
+    yield from lang_header.render_node_instance_controllers(node_name, items())
 
 def render_node(state, collada, node, node_index):
     node_name_id = get_node_name_id(node)
@@ -419,7 +420,7 @@ def render_node(state, collada, node, node_index):
     instance_lights_count = len(node.instance_lights)
     channels_count = len(state.node_animation_channels[node.id])
 
-    yield from cpp_header.render_node(node_name, parent_index, type,
+    yield from lang_header.render_node(node_name, parent_index, type,
                                       transforms_count,
                                       instance_geometries_count,
                                       instance_controllers_count,
@@ -453,7 +454,7 @@ def render_library_visual_scenes(state, collada):
             node_name = sanitize_name(state, node_name_id, node)
             yield node_name, node_index
 
-    yield from cpp_header.render_library_visual_scenes(items())
+    yield from lang_header.render_library_visual_scenes(items())
 
 def render_opt_texture(state, profile_common, field_name, texture):
     sampler_sid = texture.texture
@@ -469,10 +470,10 @@ def render_opt_texture(state, profile_common, field_name, texture):
     image_id = surface.parameter_type.init_from.uri
     image_index = state.image_indices[image_id]
 
-    yield from cpp_header.render_opt_texture(field_name, image_index, image_id)
+    yield from lang_header.render_opt_texture(field_name, image_index, image_id)
 
 def render_opt_color(field_name, color):
-    yield from cpp_header.render_opt_color(field_name, color)
+    yield from lang_header.render_opt_color(field_name, color)
 
 def render_opt_color_or_texture(state, profile_common, field_name, color_or_texture):
     if color_or_texture is None:
@@ -490,12 +491,12 @@ def render_opt_color_or_texture(state, profile_common, field_name, color_or_text
         else:
             assert False, color_or_texture
 
-    yield from cpp_header.render_opt_color_or_texture(field_name, opt_type, render_body)
+    yield from lang_header.render_opt_color_or_texture(field_name, opt_type, render_body)
 
 def render_opt_float(field_name, f):
     if f is None:
         f = types.Float(value=0.0)
-    yield from cpp_header.render_opt_float(field_name, float(f.value))
+    yield from lang_header.render_opt_float(field_name, float(f.value))
 
 def render_effect(state, collada, effect):
     profile_common, = effect.profile_common
@@ -556,7 +557,7 @@ def render_effect(state, collada, effect):
     else:
         assert False, type(shader)
 
-    yield from cpp_header.render_effect(effect_name, type_name, field_name, render_body)
+    yield from lang_header.render_effect(effect_name, type_name, field_name, render_body)
 
 def render_library_effects(state, collada):
     for library_effects in collada.library_effects:
@@ -569,21 +570,21 @@ def render_library_materials(state, collada):
             effect = collada.lookup(material.instance_effect.url, types.Effect)
             material_name = sanitize_name(state, material.id, material)
             effect_name = sanitize_name(state, effect.id, effect)
-            yield from cpp_header.render_library_material(material_name, effect_name)
+            yield from lang_header.render_library_material(material_name, effect_name)
 
 def render_input_elements_list(state):
     def items():
         for key_name, (index, key) in state.emitted_input_elements_arrays.items():
             elements_count = len(key)
             yield key_name, elements_count
-    yield from cpp_header.render_input_elements_list(items())
+    yield from lang_header.render_input_elements_list(items())
 
 def render_animation_children(state, collada, animation_name, animations):
     def items():
         for animation in animations:
             animation_name = sanitize_name(state, animation.id, animation)
             yield animation_name
-    yield from cpp_header.render_animation_children(animation_name, items())
+    yield from lang_header.render_animation_children(animation_name, items())
 
 def render_array(state, collada, accessor, array):
     array_name = sanitize_name(state, array.id, array)
@@ -596,14 +597,14 @@ def render_array(state, collada, accessor, array):
             for name in array.names:
                 assert name in {"BEZIER", "LINEAR"}, name
                 yield name
-        yield from cpp_header.render_interpolation_array(array_name, names())
+        yield from lang_header.render_interpolation_array(array_name, names())
     elif type(array) is types.FloatArray:
         def vectors():
             it = iter(array.floats)
             for i in range(accessor.count):
-                vector = ", ".join(f"{float(f)}f" for f in islice(it, accessor.stride))
+                vector = list(islice(it, accessor.stride))
                 yield vector
-        yield from cpp_header.render_float_array(array_name, vectors())
+        yield from lang_header.render_float_array(array_name, vectors())
     else:
         assert False, type(array)
 
@@ -612,7 +613,7 @@ def render_source(state, collada, field_name, source):
     c_type = "interpolation" if type(source.array_element) is types.NameArray else "float"
     source_name = sanitize_name(state, source.id, source)
 
-    yield from cpp_header.render_source(source_name,
+    yield from lang_header.render_source(source_name,
                                         field_name,
                                         c_type,
                                         array_name,
@@ -656,7 +657,7 @@ def render_sampler(state, collada, sampler):
             source = collada.lookup(input.source, types.SourceCore)
             field_name = input.semantic.lower()
             yield from render_source(state, collada, field_name, source)
-    yield from cpp_header.render_sampler(sampler_name, render_body)
+    yield from lang_header.render_sampler(sampler_name, render_body)
 
 target_attributes = {
     "A", "ANGLE", "B", "G", "P", "Q", "R", "S", "T", "TIME", "U", "V", "W", "X", "Y", "Z", "ALL"
@@ -703,7 +704,7 @@ def render_channel(state, collada, channel):
     assert target_name not in state.node_animation_channels[node.id]
     state.node_animation_channels[node.id].add(target_name)
 
-    yield from cpp_header.render_channel(target_name, sampler_name, transform_index, target_attribute)
+    yield from lang_header.render_channel(target_name, sampler_name, transform_index, target_attribute)
 
 def render_animation(state, collada, animation_name, animation):
     # render children first
@@ -751,9 +752,9 @@ def render_light_type(technique_common: types.TechniqueCommon_Light):
 def render_light(state, collada, light):
     technique_common = light.technique_common
     light_name = sanitize_name(state, light.id, light)
-    color = ", ".join(f"{float(f)}f" for f in technique_common.light.color)
+    color = technique_common.light.color
     light_type = render_light_type(technique_common)
-    yield from cpp_header.render_light(light_name, light_type, color)
+    yield from lang_header.render_light(light_name, light_type, color)
 
 def render_library_lights(state, collada):
     for library_lights in collada.library_lights:
@@ -785,7 +786,7 @@ def render_image(state, collada, image, image_index):
     resource_name = image_resource_name(state, image.image_source.uri)
     image_name = sanitize_name(state, image.id, image)
 
-    yield from cpp_header.render_image(image.id, image_name, resource_name)
+    yield from lang_header.render_image(image.id, image_name, resource_name)
 
 def render_library_images(state, collada):
     image_index = 0
@@ -799,7 +800,7 @@ def render_library_images(state, collada):
             for image in library_images.images:
                 image_name = sanitize_name(state, image.id, image)
                 yield image_name
-    yield from cpp_header.render_library_images(image_names())
+    yield from lang_header.render_library_images(image_names())
 
 def render_inverse_bind_matrices(collada, skin, controller_name):
     inverse_bind_matrix_input, = find_semantics(skin.joints.inputs, "INV_BIND_MATRIX")
@@ -817,7 +818,7 @@ def render_inverse_bind_matrices(collada, skin, controller_name):
             offset = stride * i
             matrix = matrix_transpose(array.floats[offset:offset+stride])
             yield matrix
-    yield from cpp_header.render_inverse_bind_matrices(controller_name, matrices())
+    yield from lang_header.render_inverse_bind_matrices(controller_name, matrices())
 
 def renderbin_any(f, elems):
     fmt = {
@@ -847,7 +848,7 @@ def render_controller(state, collada, controller):
 
     yield from render_inverse_bind_matrices(collada, skin, controller_name)
 
-    yield from cpp_header.render_controller(controller_name, geometry_name, vertex_buffer_offset, vertex_buffer_size)
+    yield from lang_header.render_controller(controller_name, geometry_name, vertex_buffer_offset, vertex_buffer_size)
 
 def render_library_controllers(state, collada):
     for library_controllers in collada.library_controllers:
@@ -864,7 +865,7 @@ def render_camera(state, collada, camera):
         else:
             return f
 
-    yield from cpp_header.render_camera(camera_name,
+    yield from lang_header.render_camera(camera_name,
                                         nf(perspective.xfov),
                                         nf(perspective.yfov),
                                         nf(perspective.znear),
@@ -879,7 +880,7 @@ def render_library_cameras(state, collada):
 def render_all(collada, namespace, input_filename):
     state = State(input_filename)
     render, out = renderer()
-    render(cpp_header.render_prelude(namespace))
+    render(lang_header.render_prelude(namespace))
     render(render_library_cameras(state, collada))
     render(render_library_lights(state, collada))
     render(render_library_animations(state, collada))
@@ -892,13 +893,13 @@ def render_all(collada, namespace, input_filename):
     # root elements
     render(render_library_visual_scenes(state, collada))
     render(render_input_elements_list(state))
-    render(cpp_header.render_descriptor(namespace))
-    render(cpp_header.render_prologue())
+    render(lang_header.render_descriptor(namespace))
+    render(lang_header.render_prologue())
     return state, out
 
 def render_all_hpp(namespace):
     render, out = renderer()
-    render(cpp_header.render_hpp(namespace))
+    render(lang_header.render_hpp(namespace))
     return out
 
 if __name__ == "__main__":

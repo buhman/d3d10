@@ -42,7 +42,7 @@ def render_geometry(geometry_name,
 def render_library_geometries(geometry_names):
     yield "geometry const * const geometries[] = {"
     for geometry_name in geometry_names:
-            yield f"&geometry_{geometry_name},"
+        yield f"&geometry_{geometry_name},"
     yield "};"
 
 def render_float_tuple(t):
@@ -269,7 +269,7 @@ def render_interpolation_array(array_name, names):
 def render_float_array(array_name, vectors):
     yield f"float const array_{array_name}[] = {{"
     for vector in vectors:
-        yield f"{vector},"
+        yield f"{render_float_tuple(vector)},"
     yield "};"
 
 def render_source(source_name, field_name, c_type, array_name, count, stride):
@@ -295,7 +295,7 @@ def render_channel(target_name, sampler_name, transform_index, target_attribute)
 def render_light(light_name, light_type, color):
     yield f"light const light_{light_name} = {{"
     yield f".type = light_type::{light_type},"
-    yield f".color = {{ {color} }},"
+    yield f".color = {{ {render_float_tuple(color)} }},"
     yield "};"
 
 def render_image(image_id, image_name, resource_name):

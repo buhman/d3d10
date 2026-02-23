@@ -3,6 +3,8 @@ import os.path
 
 from collada import parse
 from collada import header
+from collada import cpp_header
+from collada import lua_header
 
 def usage():
     name = sys.argv[0]
@@ -60,7 +62,7 @@ def main():
         output_resource = sys.argv[6]
         output_makefile = sys.argv[7]
         assert input_collada.lower().endswith(".dae")
-        assert output_source.lower().endswith(".cpp")
+        assert output_source.lower().endswith(".cpp") or output_source.lower().endswith(".lua")
         assert output_position_normal_texture.lower().endswith(".vtx")
         assert output_joint_weight.lower().endswith(".vjw")
         assert output_index.lower().endswith(".idx")
@@ -71,6 +73,13 @@ def main():
 
     collada = parse.parse_collada_file(input_collada)
     namespace = parse_namespace(input_collada)
+
+    if output_source.lower().endswith(".cpp"):
+        header.lang_header = cpp_header
+    elif output_source.lower().endswith(".lua"):
+        header.lang_header = lua_header
+    else:
+        assert False
     state, out_source = header.render_all(collada, namespace, input_collada)
 
     with open(output_source, 'wb') as f:
