@@ -191,7 +191,7 @@ def render_opt_color(field_name, color):
     yield f"{field_name} = {render_float_tuple(color.value)},"
 
 def render_opt_texture(field_name, image_index, image_id):
-    yield f"{field_name} = {{ .image_index = {image_index} }}, -- {image_id}"
+    yield f"{field_name} = {{ image_index = {image_index} }}, -- {image_id}"
 
 def render_opt_color_or_texture(field_name, opt_type, render_body):
     yield f"{field_name} = {{"
@@ -230,6 +230,9 @@ def render_descriptor(namespace):
     yield "local descriptor = {"
     yield "nodes = nodes,"
     yield "nodes_count = #nodes,"
+    yield ""
+    yield "geometries = geometries,"
+    yield "nodes_count = #geometries,"
     yield ""
     yield "inputs_list = inputs_list,"
     yield "inputs_list_count = #inputs_list,"
@@ -296,10 +299,10 @@ def render_light(light_name, light_type, color):
     yield f"color = {render_float_tuple(color)},"
     yield "}"
 
-def render_image(image_id, image_name, resource_name):
-    yield f"-- {image.id}"
+def render_image(image_id, image_name, resource_name, uri):
+    yield f"-- {image_id}"
     yield f"local image_{image_name} = {{"
-    yield f'resource_name = L"{resource_name}",'
+    yield f'uri = "{uri}",'
     yield "}"
 
 def render_library_images(image_names):

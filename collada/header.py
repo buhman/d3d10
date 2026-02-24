@@ -786,7 +786,7 @@ def render_image(state, collada, image, image_index):
     resource_name = image_resource_name(state, image.image_source.uri)
     image_name = sanitize_name(state, image.id, image)
 
-    yield from lang_header.render_image(image.id, image_name, resource_name)
+    yield from lang_header.render_image(image.id, image_name, resource_name, image.image_source.uri)
 
 def render_library_images(state, collada):
     image_index = 0

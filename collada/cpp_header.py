@@ -298,8 +298,8 @@ def render_light(light_name, light_type, color):
     yield f".color = {{ {render_float_tuple(color)} }},"
     yield "};"
 
-def render_image(image_id, image_name, resource_name):
-    yield f"// {image.id}"
+def render_image(image_id, image_name, resource_name, uri):
+    yield f"// {image_id}"
     yield f"image const image_{image_name} = {{"
     yield f'.resource_name = L"{resource_name}",'
     yield "};"
