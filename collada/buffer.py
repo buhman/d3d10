@@ -8,6 +8,8 @@ from collada import parse
 from collada import types
 from collada.util import find_semantics
 
+STD430 = True
+
 def linearize_offset_table(by_offset, p_stride):
     for offset in range(p_stride):
         for input, source in by_offset[offset]:
@@ -105,6 +107,9 @@ def mesh_vertex_index_buffer(collada, mesh):
                 assert type(source.array_element) is types.FloatArray
                 array_slice = source.array_element.floats[source_index:source_index+source_stride]
                 state.vertex_buffer.extend(array_slice)
+                if STD430:
+                    assert source_stride == 3, source_stride
+                    state.vertex_buffer.append(1.0)
 
     return state
 
