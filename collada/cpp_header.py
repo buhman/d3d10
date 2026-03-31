@@ -151,13 +151,17 @@ def render_node_instance_controllers(node_name, items):
         yield "},"
     yield "};"
 
-def render_node(node_name, parent_index, type,
+def render_node(node_name,
+                original_node_name,
+                parent_index, type,
                 transforms_count,
                 instance_geometries_count,
                 instance_controllers_count,
                 instance_lights_count,
                 channels_count):
     yield f"node const node_{node_name} = {{"
+    yield f'.name = "{original_node_name}",'
+    yield ""
     yield f".parent_index = {parent_index},"
     yield ""
     yield f".type = node_type::{type},"
@@ -227,9 +231,9 @@ def render_input_elements_list(items):
     yield "};"
 
 def render_descriptor(namespace):
-    yield f"extern collada::descriptor const descriptor;"
+    yield f"extern collada::types::descriptor const descriptor;"
     yield ""
-    yield "collada::descriptor const descriptor = {"
+    yield "collada::types::descriptor const descriptor = {"
     yield ".nodes = nodes,"
     yield ".nodes_count = (sizeof (nodes)) / (sizeof (nodes[0])),"
     yield ""
@@ -239,17 +243,19 @@ def render_descriptor(namespace):
     yield ".images = images,"
     yield ".images_count = (sizeof (images)) / (sizeof (images[0])),"
     yield ""
-    yield f'.position_normal_texture_buffer = L"RES_SCENES_{namespace.upper()}_VTX",'
-    yield f'.joint_weight_buffer = L"RES_SCENES_{namespace.upper()}_VJW",'
-    yield f'.index_buffer = L"RES_SCENES_{namespace.upper()}_IDX",'
+    yield f'.position_normal_texture_buffer = "data/scenes/{namespace}/{namespace}.vtx",'
+    yield f'.joint_weight_buffer = "data/scenes/{namespace}/{namespace}.vjw",'
+    yield f'.index_buffer = "data/scenes/{namespace}/{namespace}.idx",'
     yield "};"
 
 def render_prelude(namespace):
-    yield '#include "collada_types.hpp"'
+    yield '#include "collada/types.h"'
+    yield ''
+    yield f'#include "data/scenes/{namespace}.h"'
     yield ''
     yield f'namespace {namespace} {{'
     yield ''
-    yield 'using namespace collada;'
+    yield 'using namespace collada::types;'
 
 def render_prologue():
     yield "}"
@@ -269,7 +275,8 @@ def render_interpolation_array(array_name, names):
 def render_float_array(array_name, vectors):
     yield f"float const array_{array_name}[] = {{"
     for vector in vectors:
-        yield f"{render_float_tuple(vector)},"
+        s = ", ".join((f"{float(f)}" for f in vector))
+        yield f"{s},"
     yield "};"
 
 def render_source(source_name, field_name, c_type, array_name, count, stride):
@@ -295,13 +302,13 @@ def render_channel(target_name, sampler_name, transform_index, target_attribute)
 def render_light(light_name, light_type, color):
     yield f"light const light_{light_name} = {{"
     yield f".type = light_type::{light_type},"
-    yield f".color = {{ {render_float_tuple(color)} }},"
+    yield f".color = {render_float_tuple(color)},"
     yield "};"
 
 def render_image(image_id, image_name, resource_name, uri):
     yield f"// {image_id}"
     yield f"image const image_{image_name} = {{"
-    yield f'.resource_name = L"{resource_name}",'
+    yield f'.uri = "{uri}",'
     yield "};"
 
 def render_library_images(image_names):
@@ -318,11 +325,14 @@ def render_inverse_bind_matrices(controller_name, matrices):
         yield "},"
     yield "};"
 
-def render_controller(controller_name, geometry_name, vertex_buffer_offset, vertex_buffer_size):
+def render_controller(controller_name, geometry_name, bind_shape_matrix, vertex_buffer_offset, vertex_buffer_size):
     yield f"controller const controller_{controller_name} = {{"
     yield ".skin = {"
     yield f".geometry = &geometry_{geometry_name},"
     yield ""
+    yield ".bind_shape_matrix = {"
+    yield from render_matrix(bind_shape_matrix)
+    yield "},"
     yield f".inverse_bind_matrices = inverse_bind_matrices_{controller_name},"
     yield ""
     yield f".vertex_buffer_offset = {vertex_buffer_offset},"
@@ -341,5 +351,5 @@ def render_camera(camera_name, xfov, yfov, znear, zfar, aspect_ratio):
 
 def render_hpp(namespace):
     yield f"namespace {namespace} {{"
-    yield "extern collada::descriptor const descriptor;"
+    yield "extern collada::types::descriptor const descriptor;"
     yield "}"

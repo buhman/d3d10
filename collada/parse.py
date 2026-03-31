@@ -492,7 +492,7 @@ def parse_geometry(lookup, root):
             geometric_element = parse_mesh(lookup, child)
         if child.tag == tag("spline"):
             assert child.tag, False
-    assert geometric_element is not None
+    assert geometric_element is not None, root.getchildren()
 
     geometry = types.Geometry(id, name, geometric_element)
     lookup_add(lookup, id, geometry)
@@ -614,7 +614,7 @@ def parse_library_images(lookup, root):
         if child.tag == tag("image"):
             images.append(parse_image(lookup, child))
 
-    assert len(images) >= 1
+    #assert len(images) >= 1
 
     library_images = types.LibraryImages(id, name, images)
     lookup_add(lookup, id, library_images)
@@ -743,7 +743,7 @@ def parse_instance_controller(lookup, sid_lookup, root):
     name = root.attrib.get("name")
     url = root.attrib["url"]
 
-    skeleton = None
+    skeleton = []
     bind_material = None
 
     for child in root.getchildren():
@@ -751,9 +751,8 @@ def parse_instance_controller(lookup, sid_lookup, root):
             assert bind_material is None
             bind_material = parse_bind_material(lookup, child)
         if child.tag == tag("skeleton"):
-            assert skeleton is None
             assert len(child.getchildren()) == 0
-            skeleton = child.text.strip()
+            skeleton.append(child.text.strip())
 
     instance_controller = types.InstanceController(sid, name, url, skeleton, bind_material)
     lookup_add(sid_lookup, sid, instance_controller)
@@ -921,11 +920,6 @@ def parse_bind_shape_matrix(lookup, root):
     values = [float(i) for i in root.text.strip().split()]
     assert len(values) == 16
 
-    r0 = tuple(values[0:4])
-    r1 = tuple(values[4:8])
-    r2 = tuple(values[8:12])
-    r3 = tuple(values[12:16])
-    values = tuple([r0, r1, r2, r3])
     return types.BindShapeMatrix(values)
 
 def parse_joints(lookup, root):

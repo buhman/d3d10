@@ -151,13 +151,17 @@ def render_node_instance_controllers(node_name, items):
         yield "},"
     yield "}"
 
-def render_node(node_name, parent_index, type,
+def render_node(node_name,
+                original_node_name,
+                parent_index, type,
                 transforms_count,
                 instance_geometries_count,
                 instance_controllers_count,
                 instance_lights_count,
                 channels_count):
     yield f"ns.node_{node_name} = {{"
+    yield f'name = "{original_node_name}",'
+    yield ""
     yield f"parent_index = {parent_index},"
     yield ""
     yield f"type = collada_types.node_type.{type},"

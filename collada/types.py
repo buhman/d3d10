@@ -418,7 +418,7 @@ class InstanceController:
     name: Optional[str]
     url: URI # controller id
 
-    skeleton: URI # node id
+    skeleton: List[URI] # node id
     bind_material: Optional[BindMaterial]
 
 @dataclass(frozen=True)
@@ -457,7 +457,10 @@ class LibraryVisualScenes:
 class BindShapeMatrix:
     # it is written in row-major order in the COLLADA document for
     # human readability.
-    values: Tuple[Float4, Float4, Float4, Float4]
+    values: Tuple[float, float, float, float,
+                  float, float, float, float,
+                  float, float, float, float,
+                  float, float, float, float]
 
 @dataclass(frozen=True)
 class Joints:

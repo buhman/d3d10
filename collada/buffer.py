@@ -8,7 +8,7 @@ from collada import parse
 from collada import types
 from collada.util import find_semantics
 
-STD430 = True
+STD430 = False
 
 def linearize_offset_table(by_offset, p_stride):
     for offset in range(p_stride):

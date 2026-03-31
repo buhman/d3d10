@@ -235,7 +235,10 @@ def shader_to_input_set(channel_to_input_set, shader, op):
     if type(shader) is types.Constant:
         return -1
 
-    shader_op = op(shader)
+    try:
+        shader_op = op(shader)
+    except AttributeError:
+        return -1
 
     if type(shader_op) is types.Color:
         return -1
@@ -347,7 +350,7 @@ def find_node_index(state, node):
         if other is node:
             return other_index
 
-def render_joint_node_indices(state, collada, skin, node_name, controller_name, skeleton_node):
+def render_joint_node_indices(state, collada, skin, node_name, controller_name, skeleton_nodes):
     joint_input, = find_semantics(skin.joints.inputs, "JOINT")
     joint_source = collada.lookup(joint_input.source, types.SourceCore)
     stride = joint_source.technique_common.accessor.stride
@@ -359,7 +362,13 @@ def render_joint_node_indices(state, collada, skin, node_name, controller_name, 
 
     def items():
         for node_sid in array.names:
-            joint_node = find_node_by_sid(skeleton_node, node_sid);
+            joint_node = None
+            for skeleton_node in skeleton_nodes:
+                _node = find_node_by_sid(skeleton_node, node_sid)
+                if _node is not None:
+                    assert joint_node is None
+                    joint_node = _node
+
             assert joint_node is not None, (node_sid, skeleton_node.sid_lookup)
             joint_node_index = find_node_index(state, joint_node)
             joint_node_name_id = get_node_name_id(joint_node)
@@ -373,9 +382,11 @@ def render_node_instance_controller_joint_node_indices(state, collada, node_name
     controller_name = sanitize_name(state, controller.id, controller)
     assert type(controller.control_element) is types.Skin
     skin = controller.control_element
-    skeleton_node = collada.lookup(instance_controller.skeleton, types.Node)
+    skeleton_nodes = []
+    for skeleton_id in instance_controller.skeleton:
+        skeleton_nodes.append(collada.lookup(skeleton_id, types.Node))
 
-    yield from render_joint_node_indices(state, collada, skin, node_name, controller_name, skeleton_node)
+    yield from render_joint_node_indices(state, collada, skin, node_name, controller_name, skeleton_nodes)
 
 def render_node_instance_controllers(state, collada, node_name, instance_controllers):
     for i, instance_controller in enumerate(instance_controllers):
@@ -420,12 +431,14 @@ def render_node(state, collada, node, node_index):
     instance_lights_count = len(node.instance_lights)
     channels_count = len(state.node_animation_channels[node.id])
 
-    yield from lang_header.render_node(node_name, parent_index, type,
-                                      transforms_count,
-                                      instance_geometries_count,
-                                      instance_controllers_count,
-                                      instance_lights_count,
-                                      channels_count)
+    yield from lang_header.render_node(node_name,
+                                       node.name,
+                                       parent_index, type,
+                                       transforms_count,
+                                       instance_geometries_count,
+                                       instance_controllers_count,
+                                       instance_lights_count,
+                                       channels_count)
 
 def traverse_node(state, parent_node_index, node):
     assert parent_node_index < len(state.linearized_nodes)
@@ -847,8 +860,8 @@ def render_controller(state, collada, controller):
     vertex_buffer_size = state.joint_weight_vertex_buffer.tell() - vertex_buffer_offset
 
     yield from render_inverse_bind_matrices(collada, skin, controller_name)
-
-    yield from lang_header.render_controller(controller_name, geometry_name, vertex_buffer_offset, vertex_buffer_size)
+    bind_shape_matrix = matrix_transpose(skin.bind_shape_matrix.values)
+    yield from lang_header.render_controller(controller_name, geometry_name, bind_shape_matrix, vertex_buffer_offset, vertex_buffer_size)
 
 def render_library_controllers(state, collada):
     for library_controllers in collada.library_controllers:

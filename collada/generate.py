@@ -1,6 +1,6 @@
 import io
 
-line_ending = "\r\n"
+line_ending = "\n"
 
 def should_autonewline(line):
     return (

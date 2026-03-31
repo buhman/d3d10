@@ -9,24 +9,24 @@ from collada import lua_header
 def usage():
     name = sys.argv[0]
     print("usage (source):")
-    print(f"  {name} [input_collada.dae] [output_source.cpp] [output_position_normal_texture.vtx] [output_joint_weight.vjw] [output_index.idx] [output_resource.rc] [output_makefile.mk]")
+    print(f"  {name} [input_collada.dae] [output_source.cpp] [output_position_normal_texture.vtx] [output_joint_weight.vjw] [output_index.idx]") # [output_resource.rc] [output_makefile.mk]
     print("usage (header):")
-    print(f"  {name} [output_header.hpp]")
+    print(f"  {name} [output_header.h]")
     sys.exit(1)
 
 def parse_namespace(filename):
     namespace = os.path.splitext(os.path.split(filename)[1])[0]
-    return namespace
+    return namespace.replace("-", "_")
 
 def render_resource_file(state, namespace, output_vtx, output_vjw, output_idx, f):
-    f.write(f'RES_SCENES_{namespace.upper()}_VTX RCDATA "{output_vtx}"\r\n'.encode('ascii'))
-    f.write(f'RES_SCENES_{namespace.upper()}_VJW RCDATA "{output_vjw}"\r\n'.encode('ascii'))
-    f.write(f'RES_SCENES_{namespace.upper()}_IDX RCDATA "{output_idx}"\r\n'.encode('ascii'))
-    f.write(b"\r\n")
+    f.write(f'RES_SCENES_{namespace.upper()}_VTX RCDATA "{output_vtx}"\n'.encode('ascii'))
+    f.write(f'RES_SCENES_{namespace.upper()}_VJW RCDATA "{output_vjw}"\n'.encode('ascii'))
+    f.write(f'RES_SCENES_{namespace.upper()}_IDX RCDATA "{output_idx}"\n'.encode('ascii'))
+    f.write(b"\n")
     for resource_name, path in state.resource_names.items():
         filename = os.path.split(path)[1]
         filename = os.path.splitext(filename)[0]
-        f.write(f'{resource_name} RCDATA "image/{filename}.DDS"\r\n'.encode('ascii'))
+        f.write(f'{resource_name} RCDATA "image/{filename}.DDS"\n'.encode('ascii'))
 
 def escape_space(s):
     def _escape_space(s):
@@ -45,12 +45,12 @@ def render_makefile(state, f):
         escaped = escape_space(path)
         escaped_dds = os.path.splitext(filename)
 
-        f.write(f"IMAGES += image/{filename}.DDS\r\n".encode('ascii'))
-        f.write(f"image/{filename}.DDS: {escaped}\r\n".encode('ascii'))
-        f.write(f"\t@mkdir -p image\r\n".encode('ascii'))
-        f.write('\ttexconv10.exe -f BC1_UNORM -nologo "$<"\r\n'.encode('ascii'))
-        f.write(f'\tmv "$(<:.{ext[1:]}=.DDS)" "$@"\r\n'.encode('ascii'))
-        f.write(b"\r\n")
+        f.write(f"IMAGES += image/{filename}.DDS\n".encode('ascii'))
+        f.write(f"image/{filename}.DDS: {escaped}\n".encode('ascii'))
+        f.write(f"\t@mkdir -p image\n".encode('ascii'))
+        f.write('\ttexconv10.exe -f BC1_UNORM -nologo "$<"\n'.encode('ascii'))
+        f.write(f'\tmv "$(<:.{ext[1:]}=.DDS)" "$@"\n'.encode('ascii'))
+        f.write(b"\n")
 
 def main():
     try:
@@ -59,15 +59,15 @@ def main():
         output_position_normal_texture = sys.argv[3]
         output_joint_weight = sys.argv[4]
         output_index  = sys.argv[5]
-        output_resource = sys.argv[6]
-        output_makefile = sys.argv[7]
+        #output_resource = sys.argv[6]
+        #output_makefile = sys.argv[7]
         assert input_collada.lower().endswith(".dae")
         assert output_source.lower().endswith(".cpp") or output_source.lower().endswith(".lua")
         assert output_position_normal_texture.lower().endswith(".vtx")
         assert output_joint_weight.lower().endswith(".vjw")
         assert output_index.lower().endswith(".idx")
-        assert output_resource.lower().endswith(".rc")
-        assert output_makefile.lower().endswith(".mk")
+        #assert output_resource.lower().endswith(".rc")
+        #assert output_makefile.lower().endswith(".mk")
     except Exception as e:
         usage()
 
@@ -84,7 +84,7 @@ def main():
 
     with open(output_source, 'wb') as f:
         source_buf = out_source.getvalue()
-        assert "\r\n" in source_buf
+        assert "\n" in source_buf
         f.write(source_buf.encode('utf-8'))
 
     with open(output_position_normal_texture, 'wb') as f:
@@ -96,25 +96,27 @@ def main():
     with open(output_joint_weight, 'wb') as f:
         f.write(state.joint_weight_vertex_buffer.getvalue())
 
-    with open(output_resource, 'wb') as f:
-        render_resource_file(state, namespace, output_position_normal_texture, output_joint_weight, output_index, f)
+    #with open(output_resource, 'wb') as f:
+    #    render_resource_file(state, namespace, output_position_normal_texture, output_joint_weight, output_index, f)
 
-    with open(output_makefile, 'wb') as f:
-        render_makefile(state, f)
+    #with open(output_makefile, 'wb') as f:
+    #    render_makefile(state, f)
 
 def main_header():
     try:
         output_header = sys.argv[1]
-        assert output_header.lower().endswith(".hpp")
+        assert output_header.lower().endswith(".h")
     except Exception as e:
         usage()
+
+    header.lang_header = cpp_header
 
     namespace = parse_namespace(output_header)
     out_header = header.render_all_hpp(namespace)
 
     with open(output_header, 'wb') as f:
         header_buf = out_header.getvalue()
-        assert "\r\n" in header_buf
+        assert "\n" in header_buf
         f.write(header_buf.encode('utf-8'))
 
 if __name__ == "__main__":
