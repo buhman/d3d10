@@ -132,13 +132,14 @@ def input_elements_key_name(key):
     return "_".join(map(str, chain.from_iterable(key))).lower()
 
 def render_input_elements(state, collada, geometry_name, offset_tables):
-    for i, offset_table in enumerate(offset_tables):
+    for offset_table in offset_tables:
         key = tuple(offset_table_key(offset_table))
         key_name = input_elements_key_name(key)
         if key_name in state.emitted_input_elements_arrays:
             assert state.emitted_input_elements_arrays[key_name][1] == key
             continue
-        state.emitted_input_elements_arrays[key_name] = (i, key)
+        index = len(state.emitted_input_elements_arrays)
+        state.emitted_input_elements_arrays[key_name] = (index, key)
 
         yield from lang_header.render_input_elements(key_name, key)
 
@@ -595,7 +596,7 @@ def render_library_materials(state, collada):
 
 def render_input_elements_list(state):
     def items():
-        for key_name, (index, key) in state.emitted_input_elements_arrays.items():
+        for key_name, (index, key) in sorted(state.emitted_input_elements_arrays.items(), key=lambda k_v: k_v[1][0]):
             elements_count = len(key)
             yield key_name, elements_count
     yield from lang_header.render_input_elements_list(items())
