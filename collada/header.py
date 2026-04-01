@@ -9,7 +9,7 @@ from io import BytesIO
 import os.path
 import struct
 
-from collada.util import matrix_transpose, find_semantics
+from collada.util import find_semantics
 from collada import parse
 from collada import types
 from collada.generate import renderer
@@ -106,7 +106,7 @@ def sanitize_name(state, name, value, *, allow_slash=False):
     if not allow_slash:
         assert '/' not in name, name
     c_id = _sanitize(name).lower()
-    assert c_id not in state.symbol_names or state.symbol_names[c_id] is value
+    assert c_id not in state.symbol_names or state.symbol_names[c_id] is value, c_id
     state.symbol_names[c_id] = value
     return c_id
 
@@ -208,7 +208,7 @@ def render_node_transforms(state, collada, node_name, transformation_elements):
         if type(transform) is types.Lookat:
             yield from lang_header.render_transform_lookat(transform.eye, transform.at, transform.up)
         elif type(transform) is types.Matrix:
-            yield from lang_header.render_transform_matrix(matrix_transpose(transform.values))
+            yield from lang_header.render_transform_matrix(transform.values)
         elif type(transform) is types.Rotate:
             yield from lang_header.render_transform_rotate(transform.rotate)
         elif type(transform) is types.Scale:
@@ -306,10 +306,16 @@ def render_node_instance_geometries(state, collada, node_name, instance_geometri
 
     yield from lang_header.render_node_instance_geometries(node_name, items())
 
-def get_node_name_id(node):
-    name = node.id if node.id is not None else f"node-{node.name}"
-    assert name is not None, node
-    return name
+def get_node_name_id(state, node, node_index, use_id=True, name_prefix="node-"):
+    if use_id and node.id is not None:
+        return node.id
+    elif node.name is not None:
+        return f"{name_prefix}{node.name}"
+    else:
+        parent_index = state.node_parents[node_index]
+        parent = state.linearized_nodes[parent_index]
+        parent_name = get_node_name_id(state, parent, parent_index)
+        return f"{parent_name}-{node_index}"
 
 #def render_node_children(state, collada, node_name, nodes):
 #    yield f"node const * const node_children_{node_name}[] = {{"
@@ -371,7 +377,7 @@ def render_joint_node_indices(state, collada, skin, node_name, controller_name, 
 
             assert joint_node is not None, (node_sid, skeleton_node.sid_lookup)
             joint_node_index = find_node_index(state, joint_node)
-            joint_node_name_id = get_node_name_id(joint_node)
+            joint_node_name_id = get_node_name_id(state, joint_node, joint_node_index)
             joint_node_name = sanitize_name(state, joint_node_name_id, joint_node)
             yield joint_node_index, node_sid, joint_node_name
 
@@ -410,7 +416,7 @@ def render_node_instance_controllers(state, collada, node_name, instance_control
     yield from lang_header.render_node_instance_controllers(node_name, items())
 
 def render_node(state, collada, node, node_index):
-    node_name_id = get_node_name_id(node)
+    node_name_id = get_node_name_id(state, node, node_index)
     node_name = sanitize_name(state, node_name_id, node)
     #yield from render_node_children(state, collada, node_name, node.nodes)
     yield from render_node_transforms(state, collada, node_name, node.transformation_elements)
@@ -431,8 +437,10 @@ def render_node(state, collada, node, node_index):
     instance_lights_count = len(node.instance_lights)
     channels_count = len(state.node_animation_channels[node.id])
 
+    name = get_node_name_id(state, node, node_index, use_id=False, name_prefix="")
+
     yield from lang_header.render_node(node_name,
-                                       node.name,
+                                       name,
                                        parent_index, type,
                                        transforms_count,
                                        instance_geometries_count,
@@ -463,7 +471,7 @@ def render_library_visual_scenes(state, collada):
 
     def items():
         for node_index, node in enumerate(state.linearized_nodes):
-            node_name_id = get_node_name_id(node)
+            node_name_id = get_node_name_id(state, node, node_index)
             node_name = sanitize_name(state, node_name_id, node)
             yield node_name, node_index
 
@@ -707,7 +715,8 @@ def render_channel(state, collada, channel):
     assert target_attribute in target_attributes
 
     node = collada.lookup(f"#{node_id}", types.Node)
-    node_name_id = get_node_name_id(node)
+    node_index = find_node_index(state, node)
+    node_name_id = get_node_name_id(state, node, node_index)
     node_name = sanitize_name(state, node_name_id, node)
 
     transform = transform_sid_lookup(node, node_transform_sid)
@@ -790,7 +799,7 @@ def image_resource_name(state, uri):
     state.image_paths[filename] = path
     return sanitize_resource_name(state, filename, path)
 
-def render_image(state, collada, image, image_index):
+def render_image(namespace, state, collada, image, image_index):
     assert image.id is not None
     assert image.id not in state.image_indices
     state.image_indices[image.id] = image_index
@@ -799,13 +808,13 @@ def render_image(state, collada, image, image_index):
     resource_name = image_resource_name(state, image.image_source.uri)
     image_name = sanitize_name(state, image.id, image)
 
-    yield from lang_header.render_image(image.id, image_name, resource_name, image.image_source.uri)
+    yield from lang_header.render_image(namespace, image.id, image_name, resource_name, image.image_source.uri)
 
-def render_library_images(state, collada):
+def render_library_images(namespace, state, collada):
     image_index = 0
     for library_images in collada.library_images:
         for image in library_images.images:
-            yield from render_image(state, collada, image, image_index)
+            yield from render_image(namespace, state, collada, image, image_index)
             image_index += 1
 
     def image_names():
@@ -829,7 +838,7 @@ def render_inverse_bind_matrices(collada, skin, controller_name):
     def matrices():
         for i in range(count):
             offset = stride * i
-            matrix = matrix_transpose(array.floats[offset:offset+stride])
+            matrix = array.floats[offset:offset+stride]
             yield matrix
     yield from lang_header.render_inverse_bind_matrices(controller_name, matrices())
 
@@ -860,7 +869,7 @@ def render_controller(state, collada, controller):
     vertex_buffer_size = state.joint_weight_vertex_buffer.tell() - vertex_buffer_offset
 
     yield from render_inverse_bind_matrices(collada, skin, controller_name)
-    bind_shape_matrix = matrix_transpose(skin.bind_shape_matrix.values)
+    bind_shape_matrix = skin.bind_shape_matrix.values
     yield from lang_header.render_controller(controller_name, geometry_name, bind_shape_matrix, vertex_buffer_offset, vertex_buffer_size)
 
 def render_library_controllers(state, collada):
@@ -897,7 +906,7 @@ def render_all(collada, namespace, input_filename):
     render(render_library_cameras(state, collada))
     render(render_library_lights(state, collada))
     render(render_library_animations(state, collada))
-    render(render_library_images(state, collada))
+    render(render_library_images(namespace, state, collada))
     render(render_library_effects(state, collada))
     render(render_library_materials(state, collada))
     render(render_library_geometries(state, collada))

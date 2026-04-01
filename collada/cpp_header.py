@@ -1,4 +1,5 @@
 from itertools import islice
+import os.path
 
 from collada import types
 
@@ -243,9 +244,9 @@ def render_descriptor(namespace):
     yield ".images = images,"
     yield ".images_count = (sizeof (images)) / (sizeof (images[0])),"
     yield ""
-    yield f'.position_normal_texture_buffer = "data/scenes/{namespace}/{namespace}.vtx",'
-    yield f'.joint_weight_buffer = "data/scenes/{namespace}/{namespace}.vjw",'
-    yield f'.index_buffer = "data/scenes/{namespace}/{namespace}.idx",'
+    yield f'.position_normal_texture_buffer = "data/scenes/{namespace}/scene.vtx",'
+    yield f'.joint_weight_buffer = "data/scenes/{namespace}/scene.vjw",'
+    yield f'.index_buffer = "data/scenes/{namespace}/scene.idx",'
     yield "};"
 
 def render_prelude(namespace):
@@ -305,10 +306,19 @@ def render_light(light_name, light_type, color):
     yield f".color = {render_float_tuple(color)},"
     yield "};"
 
-def render_image(image_id, image_name, resource_name, uri):
+def render_image(namespace, image_id, image_name, resource_name, uri):
     yield f"// {image_id}"
     yield f"image const image_{image_name} = {{"
-    yield f'.uri = "{uri}",'
+    # hacky
+    if uri.startswith("./"):
+        uri = uri.removeprefix("./")
+    if uri.endswith(".png"):
+        uri = uri.removesuffix(".png")
+        uri = uri + ".dds"
+    else:
+        assert False, uri
+    uri = os.path.join('data', 'scenes', namespace, uri)
+    yield f'.uri = "{uri}"'
     yield "};"
 
 def render_library_images(image_names):

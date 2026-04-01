@@ -9,14 +9,11 @@ from collada import lua_header
 def usage():
     name = sys.argv[0]
     print("usage (source):")
-    print(f"  {name} [input_collada.dae] [output_source.cpp] [output_position_normal_texture.vtx] [output_joint_weight.vjw] [output_index.idx]") # [output_resource.rc] [output_makefile.mk]
+    print(f"  {name} [namespace] [input_collada.dae] [output_source.cpp] [output_position_normal_texture.vtx] [output_joint_weight.vjw] [output_index.idx]") # [output_resource.rc] [output_makefile.mk]
+    print()
     print("usage (header):")
-    print(f"  {name} [output_header.h]")
+    print(f"  {name} [namespace] [output_header.h]")
     sys.exit(1)
-
-def parse_namespace(filename):
-    namespace = os.path.splitext(os.path.split(filename)[1])[0]
-    return namespace.replace("-", "_")
 
 def render_resource_file(state, namespace, output_vtx, output_vjw, output_idx, f):
     f.write(f'RES_SCENES_{namespace.upper()}_VTX RCDATA "{output_vtx}"\n'.encode('ascii'))
@@ -54,13 +51,14 @@ def render_makefile(state, f):
 
 def main():
     try:
-        input_collada = sys.argv[1]
-        output_source = sys.argv[2]
-        output_position_normal_texture = sys.argv[3]
-        output_joint_weight = sys.argv[4]
-        output_index  = sys.argv[5]
-        #output_resource = sys.argv[6]
-        #output_makefile = sys.argv[7]
+        namespace = sys.argv[1]
+        input_collada = sys.argv[2]
+        output_source = sys.argv[3]
+        output_position_normal_texture = sys.argv[4]
+        output_joint_weight = sys.argv[5]
+        output_index  = sys.argv[6]
+        #output_resource = sys.argv[7]
+        #output_makefile = sys.argv[8]
         assert input_collada.lower().endswith(".dae")
         assert output_source.lower().endswith(".cpp") or output_source.lower().endswith(".lua")
         assert output_position_normal_texture.lower().endswith(".vtx")
@@ -72,7 +70,6 @@ def main():
         usage()
 
     collada = parse.parse_collada_file(input_collada)
-    namespace = parse_namespace(input_collada)
 
     if output_source.lower().endswith(".cpp"):
         header.lang_header = cpp_header
@@ -104,14 +101,14 @@ def main():
 
 def main_header():
     try:
-        output_header = sys.argv[1]
+        namespace = sys.argv[1]
+        output_header = sys.argv[2]
         assert output_header.lower().endswith(".h")
     except Exception as e:
         usage()
 
     header.lang_header = cpp_header
 
-    namespace = parse_namespace(output_header)
     out_header = header.render_all_hpp(namespace)
 
     with open(output_header, 'wb') as f:
@@ -120,7 +117,7 @@ def main_header():
         f.write(header_buf.encode('utf-8'))
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
+    if len(sys.argv) == 3:
         main_header()
     else:
         main()
