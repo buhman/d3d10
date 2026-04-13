@@ -64,6 +64,9 @@ class State:
     input_filename: str
     relative_path: bool
 
+    # material names
+    material_name_indices: Dict[str, int]
+
     def __init__(self, input_filename):
         self.vertex_buffer = BytesIO()
         self.index_buffer = BytesIO()
@@ -81,6 +84,7 @@ class State:
         self.effect_textures_by_texcoord = defaultdict(list)
         self.input_filename = input_filename
         self.relative_path = False
+        self.material_name_indices = {}
 
 def _sanitize(name):
     return name.replace(' ', '_').replace('-', '_').replace('.', '_').replace('/', '_')
@@ -264,6 +268,7 @@ def render_node_geometry_instance_materials(state, collada, prefix, node_name, i
             # target is an XML id
             material = collada.lookup(instance_material.target, types.Material)
             material_name = sanitize_name(state, material.id, material)
+            material_index = state.material_name_indices[material_name]
 
             channel_to_input_set = {}
             for bind_vertex_input in instance_material.bind_vertex_inputs:
@@ -273,7 +278,6 @@ def render_node_geometry_instance_materials(state, collada, prefix, node_name, i
                 else:
                     channel_to_input_set[bind_vertex_input.semantic] = bind_vertex_input.input_set
 
-
             effect = collada.lookup(material.instance_effect.url, types.Effect)
             profile_common, = effect.profile_common
             shader = profile_common.technique.shader
@@ -282,7 +286,7 @@ def render_node_geometry_instance_materials(state, collada, prefix, node_name, i
             ambient_input_set = shader_to_input_set(channel_to_input_set, shader, attrgetter("ambient"))
             diffuse_input_set = shader_to_input_set(channel_to_input_set, shader, attrgetter("diffuse"))
             specular_input_set = shader_to_input_set(channel_to_input_set, shader, attrgetter("specular"))
-            yield element_index, material_name, emission_input_set, ambient_input_set, diffuse_input_set, specular_input_set
+            yield element_index, material_index, emission_input_set, ambient_input_set, diffuse_input_set, specular_input_set
 
     yield from lang_header.render_node_geometry_instance_materials(prefix, node_name, i, items())
 
@@ -588,11 +592,17 @@ def render_library_effects(state, collada):
 
 def render_library_materials(state, collada):
     for library_materials in collada.library_materials:
+        material_names = []
         for material in library_materials.materials:
             effect = collada.lookup(material.instance_effect.url, types.Effect)
             material_name = sanitize_name(state, material.id, material)
             effect_name = sanitize_name(state, effect.id, effect)
             yield from lang_header.render_library_material(material_name, effect_name)
+            material_names.append(material_name)
+        yield from lang_header.render_library_materials(material_names)
+        for i, material_name in enumerate(material_names):
+            assert material_name not in state.material_name_indices, material_name
+            state.material_name_indices[material_name] = i
 
 def render_input_elements_list(state):
     def items():

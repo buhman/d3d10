@@ -10,6 +10,7 @@ def render_input_elements(key_name, semantic__semantic_index__stride):
         yield f'.semantic = "{semantic}",'
         yield f".semantic_index = {semantic_index},"
         yield f".format = input_format::FLOAT{stride},"
+        #yield f".size = {4 * stride},"
         yield "},"
     yield "};"
 
@@ -95,10 +96,10 @@ def render_node_transforms(node_name, transformation_elements, render_transform)
 def render_node_geometry_instance_materials(prefix, node_name, i,
                                             items):
     yield f"instance_material const {prefix}_instance_materials_{node_name}_{i}[] = {{"
-    for element_index, material_name, emission_input_set, ambient_input_set, diffuse_input_set, specular_input_set in items:
+    for element_index, material_index, emission_input_set, ambient_input_set, diffuse_input_set, specular_input_set in items:
         yield "{"
         yield f".element_index = {element_index}, // an index into mesh.triangles"
-        yield f".material = &material_{material_name},"
+        yield f".material_index = {material_index}, // an index into materials"
         yield ""
         yield f".emission = {{ .input_set = {emission_input_set} }},"
         yield f".ambient = {{ .input_set = {ambient_input_set} }},"
@@ -222,6 +223,12 @@ def render_library_material(material_name, effect_name):
     yield f".effect = &effect_{effect_name},"
     yield "};"
 
+def render_library_materials(material_names):
+    yield "material const * const materials[] = {"
+    for material_name in material_names:
+        yield f"&material_{material_name},"
+    yield "};"
+
 def render_input_elements_list(items):
     yield "inputs const inputs_list[] = {"
     for key_name, elements_count in items:
@@ -244,15 +251,18 @@ def render_descriptor(namespace):
     yield ".images = images,"
     yield ".images_count = (sizeof (images)) / (sizeof (images[0])),"
     yield ""
-    yield f'.position_normal_texture_buffer = "data/scenes/{namespace}/scene.vtx",'
-    yield f'.joint_weight_buffer = "data/scenes/{namespace}/scene.vjw",'
-    yield f'.index_buffer = "data/scenes/{namespace}/scene.idx",'
+    yield ".materials = materials,"
+    yield ".materials_count = (sizeof (materials)) / (sizeof (materials[0])),"
+    yield ""
+    yield f'.position_normal_texture_buffer = "data/scenes/{namespace}/{namespace}.vtx",'
+    yield f'.joint_weight_buffer = "data/scenes/{namespace}/{namespace}.vjw",'
+    yield f'.index_buffer = "data/scenes/{namespace}/{namespace}.idx",'
     yield "};"
 
 def render_prelude(namespace):
     yield '#include "collada/types.h"'
     yield ''
-    yield f'#include "data/scenes/{namespace}.h"'
+    yield f'#include "scenes/{namespace}/{namespace}.h"'
     yield ''
     yield f'namespace {namespace} {{'
     yield ''
