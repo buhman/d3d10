@@ -218,8 +218,9 @@ def render_effect(effect_name, type_name, field_name, render_body):
 
     yield "};"
 
-def render_library_material(material_name, effect_name):
+def render_library_material(material_name, original_name, effect_name):
     yield f"material const material_{material_name} = {{"
+    yield f".name = \"{original_name}\","
     yield f".effect = &effect_{effect_name},"
     yield "};"
 

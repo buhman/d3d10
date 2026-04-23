@@ -597,7 +597,7 @@ def render_library_materials(state, collada):
             effect = collada.lookup(material.instance_effect.url, types.Effect)
             material_name = sanitize_name(state, material.id, material)
             effect_name = sanitize_name(state, effect.id, effect)
-            yield from lang_header.render_library_material(material_name, effect_name)
+            yield from lang_header.render_library_material(material_name, material.name, effect_name)
             material_names.append(material_name)
         yield from lang_header.render_library_materials(material_names)
         for i, material_name in enumerate(material_names):
